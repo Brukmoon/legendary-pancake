@@ -1,0 +1,109 @@
+#include "camera.h"
+#include "common.h"
+#include "graphics.h"
+#include "game.h"
+#include "level.h"
+#include "menu.h"
+#include "player.h"
+#include "render.h"
+#ifdef _DEBUG
+#include "text.h"
+#endif // _DEBUG
+
+static void render_grid(SDL_Renderer *const renderer, const SDL_Color color);
+
+#define BLANK_TILE 0
+
+#define TILE_HEIGHT g_level->tile_map.tile_height
+#define TILE_WIDTH g_level->tile_map.tile_width
+
+#define MAP_NOT_OVERFLOW (y>=0&&y<=g_level->tile_map.height&&x>=0&&x<=g_level->tile_map.width)
+
+void render_map(SDL_Renderer* const renderer)
+{
+	SDL_RenderCopy(renderer, g_level->background, NULL, NULL);
+	int start_y = g_camera.position.y/TILE_HEIGHT, start_x = g_camera.position.x/TILE_WIDTH;
+	for (int y = start_y; y < g_level->tile_map.height; ++y)
+		for (int x = start_x; x < g_level->tile_map.width; ++x)
+		{
+			if (!is_visible(&g_camera, &(const struct vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
+				break;
+			if (MAP_NOT_OVERFLOW)
+			{
+				if (g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x] != BLANK_TILE)
+				{
+					SDL_RenderCopy(renderer, g_level->textures.container[g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x] - 1], NULL,
+						&(const struct SDL_Rect){ x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT });
+				}
+			}
+		}
+}
+
+void render_grid(SDL_Renderer *const renderer, const SDL_Color color)
+{
+	int start_y = (g_camera.position.y) / TILE_HEIGHT, start_x = (g_camera.position.x) / TILE_WIDTH;
+	for (int y = start_y; y < g_level->tile_map.height; ++y)
+		for (int x = start_x; x < g_level->tile_map.width; ++x)
+		{
+			if (!is_visible(&g_camera, &(const struct vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
+				break;
+			if (MAP_NOT_OVERFLOW)
+			{
+				hollow_rect(renderer, x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT, color);
+			} 
+		}
+}
+
+#undef MAP_NOT_OVERFLOW
+#undef TILE_HEIGHT
+#undef TILE_WIDTH
+
+#ifdef _DEBUG
+
+static void render_debug_console(SDL_Renderer* const renderer)
+{
+	char buffer[256];
+	sprintf_s(buffer, 256, "Player coordinates: [%d;%d]", g_player.skeleton.x, g_player.skeleton.y);
+	SDL_Texture *p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
+	SDL_Rect rect;
+	rect.x = rect.y = 0;
+	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
+	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
+	SDL_DestroyTexture(p_coord);
+}
+#endif // _DEBUG
+
+void render_menu_interface(SDL_Renderer* const renderer)
+{
+	SDL_SetRenderDrawColor(renderer, 0, 170, 170, 1);
+	draw_menu(renderer);
+}
+
+void render_play(SDL_Renderer *renderer)
+{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
+	SDL_RenderClear(renderer);
+#ifdef _DEBUG
+	render_grid(renderer, (SDL_Color) { 214, 214, 214, 1 });
+	render_debug_console(renderer);
+#endif // _DEBUG
+	render_map(renderer);
+	draw_actor(&g_player, renderer);
+	SDL_RenderPresent(renderer);
+}
+
+void render_menu(SDL_Renderer *renderer)
+{
+	SDL_SetRenderDrawColor(renderer, 112, 146, 190, 1);
+	SDL_RenderClear(renderer);
+	render_menu_interface(renderer);
+	SDL_RenderPresent(renderer);
+}
+
+void render_edit(SDL_Renderer *renderer)
+{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
+	SDL_RenderClear(renderer);
+	render_grid(renderer, (SDL_Color) { 0, 0, 0, 1 });
+	SDL_RenderPresent(renderer);
+}

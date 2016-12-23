@@ -1,0 +1,7 @@
+<UI>
+<button_group>
+PLAY:400:400
+EDIT
+QUIT
+</button_group>
+</UI>
