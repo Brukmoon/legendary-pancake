@@ -68,6 +68,10 @@ void process_input_play(struct game* game)
 			/*case SDLK_DOWN:
 				player.y_vel = 1* PLAYER_SPEED;
 				break;*/
+			case SDLK_RETURN:
+				game_set_pause(game, !game->paused);
+				INFO("Game pause:%d.", game->paused);
+				break;
 			case SDLK_SPACE:
 				if(g_player.state != AIR)
 					g_player.y_vel = -6;
