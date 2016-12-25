@@ -76,6 +76,15 @@ static void render_debug_console(SDL_Renderer* const renderer)
 void render_menu_interface(SDL_Renderer* const renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 0, 170, 170, 1);
+	static SDL_Rect rect = { 100, 50, 1800, 900 };
+	static bool direction = 0;
+	if (direction)
+		rect.x++;
+	else
+		rect.x--;
+	if (rect.x > 1800 || rect.x < 0)
+		direction = !direction;
+	SDL_RenderCopy(renderer, curr_menu->background, &rect, NULL);
 	draw_menu(renderer);
 }
 

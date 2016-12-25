@@ -35,12 +35,21 @@ void draw_actor(const struct actor *actor, SDL_Renderer *renderer)
 	dest.y = actor->skeleton.y - g_camera.position.y;
 	SDL_Rect src;
 	src.w = src.h = 32;
-	src.x = ((int)actor->draw_state)*actor->skeleton.w;
-	src.y = 96;
-	if(actor->x_vel < 0)
-		SDL_RenderCopyEx(renderer, actor->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
-	else
+	if (actor->x_vel == 0)
+	{
+		src.y = 0;
+		src.x = 0;
 		SDL_RenderCopy(renderer, actor->texture, &src, &dest);
+	}
+	else
+	{
+		src.x = ((int)actor->draw_state)*actor->skeleton.w;
+		src.y = 96;
+		if (actor->x_vel < 0)
+			SDL_RenderCopyEx(renderer, actor->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
+		else
+			SDL_RenderCopy(renderer, actor->texture, &src, &dest);
+	}
 }
 
 void move_actor(struct actor *actor, float d_x, float d_y)

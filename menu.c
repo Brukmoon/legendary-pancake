@@ -16,9 +16,10 @@ void load_menu(SDL_Renderer* renderer)
 	curr_menu->button_list.root = curr_menu->button_list.head = NULL;
 	INFO("Menu memory allocated.");
 	add_button(renderer, "PLAY", (const struct vec2) { CENTER_X-2*FONT_SIZE, CENTER_Y });
-	add_button(renderer, "EDITOR", (const struct vec2) { CENTER_X-(int)(2.5*FONT_SIZE), CENTER_Y+FONT_SIZE });
+	add_button(renderer, "EDITOR[NYI]", (const struct vec2) { CENTER_X-(int)(2.5*FONT_SIZE), CENTER_Y+FONT_SIZE });
 	add_button(renderer, "QUIT", (const struct vec2) { CENTER_X-2*FONT_SIZE, CENTER_Y+2*FONT_SIZE });
 	curr_menu->button_list.root->curr_sprite = BUTTON_SPRITE_MOUSE_OVER;
+	curr_menu->background = load_texture(renderer, "data/background1.png");
 }
 
 void destroy_menu()
@@ -35,6 +36,7 @@ void destroy_menu()
 		curr_menu->button_list.head = curr_menu->button_list.head->next;
 		free(temp);
 	}
+	SDL_DestroyTexture(curr_menu->background);
 	free(curr_menu);
 	INFO("Menu memory freed.");
 	INFO("Menu destroyed.");

@@ -1,6 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
+#include <SDL.h>
 #include "button.h"
 
 struct menu
@@ -12,6 +13,7 @@ struct menu
 	} button_list;
 	int max_button_count;
 	int button_count;
+	SDL_Texture *background;
 } *curr_menu;
 
 void add_button(SDL_Renderer* renderer, const char* text, const struct vec2 position);
