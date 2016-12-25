@@ -9,8 +9,10 @@
 #include "game.h"
 //#include "test.h"
 
+#include "common.h"
+
 // framerate limited to 60 FPS
-#define FPS 1
+#define FPS 60
 
 int main(int argc, char* argv[]) {
 	UNUSED_PARAMETER(argc);
@@ -35,7 +37,7 @@ int main(int argc, char* argv[]) {
 	};
 	if (!game.init(&game))
 		return EXIT_FAILURE;
-	double time = (double)SDL_GetTicks();
+	Uint32 time = SDL_GetTicks();
 	// game loop
 	while (game_running(&game)) {
 		if (time > SDL_GetTicks()) // rendering rate can't exceed logic rate
@@ -43,10 +45,10 @@ int main(int argc, char* argv[]) {
 		game.process_input(&game);
 		if(!game.paused)
 			game.update();
-		int delay = (int)(time - SDL_GetTicks());
+		int delay = time - SDL_GetTicks();
 		if (delay > 0)
 			SDL_Delay(delay);
-		time += 1000.0 / FPS; // frames per 1000 MS (1s) --> FPS
+		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
 	game.clean(&game);
 	return EXIT_SUCCESS;

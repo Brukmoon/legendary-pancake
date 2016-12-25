@@ -170,6 +170,7 @@
     <ClCompile Include="test.c" />
     <ClCompile Include="text.c" />
     <ClCompile Include="texture.c" />
+    <ClCompile Include="timer.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="button.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="test.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

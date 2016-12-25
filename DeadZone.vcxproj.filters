@@ -76,6 +76,9 @@
     <ClCompile Include="camera.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="timer.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -130,6 +133,9 @@
       <Filter>Core\Header files</Filter>
     </ClInclude>
     <ClInclude Include="physics.h">
+      <Filter>Core\Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
       <Filter>Core\Header files</Filter>
     </ClInclude>
   </ItemGroup>
