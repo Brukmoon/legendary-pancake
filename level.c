@@ -74,7 +74,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		fclose(f);
 		return false;
 	}
-	g_level->background = load_texture(renderer, "data/background1.jpg");
+	g_level->background = load_texture(renderer, "data/background1.png");
 	if (!g_level->background)
 	{
 		INFO("Level background couldn't be loaded.");
@@ -154,28 +154,21 @@ void level_free_grid(struct level *level)
 bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f)
 {
 	INFO("Loading textures...");
-	fscanf_s(f, "%d", &level->textures.count);
 	char file_name[BUFFER_SIZE];
-	level->textures.container = malloc(level->textures.count*sizeof(SDL_Texture*));
-	for (int i = 0; i < level->textures.count; ++i)
+	fscanf_s(f, "%s", file_name, BUFFER_SIZE);
+	level->tileset = load_texture(renderer, file_name);
+	if (!level->tileset)
 	{
-		fscanf_s(f, "%s", file_name, BUFFER_SIZE);
-		level->textures.container[i] = load_texture(renderer, file_name);
-		if (!level->textures.container[i])
-		{
-			ERROR("Texture %s couldn't be loaded.", file_name);
-			return false;
-		}
-		INFO("Texture #%d (file: %s) loaded.", i, file_name);
+		ERROR("Tileset %s couldn't be loaded.", file_name);
+		return false;
 	}
-	INFO("Loading textures finished.");
+	INFO("Tileset (file: %s) loaded.", file_name);
 	return true;
 }
 
 void level_destroy_textures(struct level *level)
 {
-	for (int i = 0; i < level->textures.count; ++i)
-		SDL_DestroyTexture(level->textures.container[i]);
-	free(level->textures.container);
+	SDL_DestroyTexture(level->tileset);
+	SDL_DestroyTexture(level->background);
 	INFO("Textures destroyed.");
 }

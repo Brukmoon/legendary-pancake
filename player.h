@@ -9,9 +9,11 @@ struct actor
 	enum
 	{
 		GROUND,
-		FALL
+		AIR
 	} state;
 	SDL_Texture *texture;
+	float draw_state;
+	int sprite_count;
 	struct
 	{
 		int x, y, w, h;
@@ -19,6 +21,7 @@ struct actor
 	// speed coefficient
 	float speed_coeff;
 	float x_vel, y_vel;
+	int hp;
 };
 extern struct actor g_player;
 

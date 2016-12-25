@@ -26,11 +26,11 @@ int main(int argc, char* argv[]) {
 		},
 		// callbacks
 		g_init,  // initialization function, must be called before entering the game loop
-		g_clean, // cleaner function, should be made an atexit callback or called every time the program exits
-		// events, update, render
+		// draw, events, update
 		NULL,
 		NULL,
-		NULL
+		NULL,
+		g_clean // cleaner function, should be made an atexit callback or called every time the program exits
 	};
 	if (!game.init(&game))
 		return EXIT_FAILURE;

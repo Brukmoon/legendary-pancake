@@ -5,7 +5,6 @@
 
 // Max length of level name.
 #define LEVEL_NAME_LENGTH 30
-#define TILE_SIZE 30
 
 struct level;
 
@@ -22,6 +21,7 @@ typedef int tile;
 	...
 };*/
 
+// Map layers.
 enum tile_map_layer
 {
 	TMAP_TEXTURE_LAYER,
@@ -31,22 +31,20 @@ enum tile_map_layer
 
 extern struct level
 {
+	// Level id.
 	unsigned id;
+	// Name of the level.
 	char name[LEVEL_NAME_LENGTH];
+	// Level background.
 	SDL_Texture* background;
 	// TODO: Implement sounds.
-	// TODO: Build layered map.
 	struct
 	{
 		tile **map[TMAP_LAYER_COUNT];
 		int width, height;
 		int tile_width, tile_height;
 	} tile_map;
-	struct
-	{
-		int count;
-		SDL_Texture **container;
-	} textures;
+	SDL_Texture *tileset;
 } *g_level;
 
 #endif // LEVEL_H

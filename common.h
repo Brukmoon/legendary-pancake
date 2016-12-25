@@ -1,13 +1,13 @@
 /**
- * Common macros.
+ * Common definitions.
  * @author Michal H.
  *
  */
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 // Message type.
 enum log_level

@@ -134,4 +134,5 @@ void to_edit_state(struct game *game)
 	g_player.y_vel = g_player.x_vel = 0;
 	SDL_ShowCursor(1);
 	init_camera(&g_camera);
+	init_actor(&g_player, game->screen.renderer);
 }

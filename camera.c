@@ -11,7 +11,7 @@ void init_camera(struct camera *camera)
 		return;
 	}
 	// Camera defaults to the center of the screen.
-	set_camera(camera, (const struct vec2) { CENTER_X, CENTER_Y });
+	set_camera(camera, (const struct vec2) { 0, 0 });
 	INFO("Camera offsets set to (%d, %d).", camera->position.x, camera->position.y);
 	// TODO: Limit scrolling.
 }
@@ -33,16 +33,14 @@ void scroll_camera(struct camera *camera, const coord d_x, const coord d_y)
 		INFO("Camera can't be NULL.");
 		return;
 	}
-	camera->position.x += d_x;
-	camera->position.y += d_y;
-	INFO("Camera offsets set to (%d, %d).", camera->position.x, camera->position.y);
+	set_camera(camera, (struct vec2) { camera->position.x + d_x, camera->position.y + d_y });
 }
 
 bool is_visible(const struct camera *camera, const struct vec2 *const position, const int w, const int h)
 {
-	if(position->x < camera->position.x+CENTER_X+CENTER_X+w && 
+	if(position->x < camera->position.x+CENTER_X+CENTER_X && 
 	   position->x > camera->position.x+CENTER_X-CENTER_X-w &&
-	   position->y < camera->position.y+CENTER_Y+CENTER_Y+h && 
+	   position->y < camera->position.y+CENTER_Y+CENTER_Y && 
 	   position->y > camera->position.y+CENTER_Y-CENTER_Y-h)
 		return true;
 	return false;

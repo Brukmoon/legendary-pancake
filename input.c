@@ -69,8 +69,8 @@ void process_input_play(struct game* game)
 				player.y_vel = 1* PLAYER_SPEED;
 				break;*/
 			case SDLK_SPACE:
-				if(g_player.state != FALL)
-					g_player.y_vel = -10;
+				if(g_player.state != AIR)
+					g_player.y_vel = -6;
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);

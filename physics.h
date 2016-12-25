@@ -1,9 +1,9 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-// gravity push per frame
+// Gravity push per frame.
 #define GRAVITY 0.3
-// terminal velocity
+// Terminal velocity.
 #define T_VEL 9
 
 #endif // PHYSICS_H

@@ -1,10 +1,7 @@
-#include "collision.h"
-#include "graphics.h"
-#include "common.h"
-#ifdef _DEBUG
-#include "game.h"
-#endif // _DEBUG
 #include <SDL.h>
+#include "collision.h"
+#include "level.h"
+#include "common.h"
 
 bool tilemap_collision(const struct level *level, const SDL_Rect* rect)
 {
@@ -24,8 +21,8 @@ bool tilemap_collision(const struct level *level, const SDL_Rect* rect)
 		{
 			/*
 			if (j > level->tile_map.height - 1 || i > level->tile_map.width - 1)
-				break;
-				*/
+				break;*/
+				
 			tile t = level->tile_map.map[TMAP_COLLISION_LAYER][j][i];
 			if (t != 0)
 				return true;
