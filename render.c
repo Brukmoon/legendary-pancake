@@ -26,7 +26,7 @@ void render_map(SDL_Renderer* const renderer)
 	for (int y = start_y; y < g_level->tile_map.height; ++y)
 		for (int x = start_x; x < g_level->tile_map.width; ++x)
 		{
-			if (!is_visible(&g_camera, &(const struct vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
+			if (!is_visible(&g_camera, &(const vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
 				break;
 			if (MAP_NOT_OVERFLOW)
 			{
@@ -45,7 +45,7 @@ void render_grid(SDL_Renderer *const renderer, const SDL_Color color)
 	for (int y = start_y; y < g_level->tile_map.height; ++y)
 		for (int x = start_x; x < g_level->tile_map.width; ++x)
 		{
-			if (!is_visible(&g_camera, &(const struct vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
+			if (!is_visible(&g_camera, &(const vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
 				break;
 			if (MAP_NOT_OVERFLOW)
 			{
@@ -92,11 +92,11 @@ void render_play(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
 	SDL_RenderClear(renderer);
+	render_map(renderer);
 #ifdef _DEBUG
 	render_grid(renderer, (SDL_Color) { 214, 214, 214, 1 });
 	render_debug_console(renderer);
 #endif // _DEBUG
-	render_map(renderer);
 	draw_actor(&g_player, renderer);
 	SDL_RenderPresent(renderer);
 }

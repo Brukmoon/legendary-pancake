@@ -2,9 +2,9 @@
 #define POSITION_H
 
 typedef int coord;
-struct vec2
+typedef struct
 {
 	coord x, y;
-};
+} vec2;
 
 #endif // POSITION_H

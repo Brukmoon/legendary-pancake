@@ -5,13 +5,7 @@
 
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color)
 {
-	if (!font)
-	{
-		ERROR("Font not initialized.");
-		return NULL;
-	}
-	font_init(size);
-	SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
+	SDL_Surface* surface = TTF_RenderText_Solid(get_font(&g_fonts, size), text, color);
 	if (!surface)
 	{
 		ERROR("Couldn't create %s text surface.", text);
@@ -27,43 +21,79 @@ SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int s
 	return texture;
 }
 
-bool font_init(int size)
+bool init_fonts(int buffer_size)
 {
 	if (TTF_Init() < 0)
 	{
 		ERROR("TTF engine couldn't be initialized. %s", TTF_GetError());
 		return false;
 	}
-	if (font_cache(size))
-		return true;
-	else
-	{
-		font = TTF_OpenFont(FONT_FILE, size);
-		if(cache_count <= 4)
-			add_to_cache(font, size);
-	}
-	if (!font)
-	{
-		ERROR("Font %s couldn't be opened.", FONT_FILE);
+	g_fonts.hash_array = malloc(sizeof(struct bucket*) * buffer_size);
+	if (!g_fonts.hash_array)
 		return false;
-	}
+	g_fonts.max_size = buffer_size;
+	for (int i = 0; i < buffer_size; ++i)
+		g_fonts.hash_array[i] = NULL;
 	return true;
 }
 
-bool font_cache(int size)
+TTF_Font* add_font(struct font_container *table, int size)
 {
-	for (int i = 0; i < cache_count; ++i)
-		if (cache.size[i] == size)
-		{
-			font = cache.data[i];
-			return true;
-		}
-	return false;
+	// Create a new bucket.
+	struct bucket* new_bucket = (struct bucket*) malloc(sizeof(struct bucket));
+	if (!new_bucket)
+	{
+		ERROR("Not enough memory.");
+		return NULL;
+	}
+	new_bucket->font = TTF_OpenFont(FONT_FILE, size);
+	if (!new_bucket->font)
+	{
+		ERROR("Font %s couldn't be opened. %s", FONT_FILE, TTF_GetError());
+		return NULL;
+	}
+	new_bucket->next = NULL;
+	new_bucket->key = size;
+	// Find the index.
+	int index = hash_code(new_bucket->key, table->max_size);
+	struct bucket* iter = table->hash_array[index], *prev = NULL;
+	while (iter)
+	{
+		prev = iter;
+		iter = iter->next;
+	}
+	if (prev) // Bucket not empty.
+		prev->next = new_bucket;
+	else // Bucket empty.
+		table->hash_array[index] = new_bucket;
+	return new_bucket->font;
 }
 
-void add_to_cache(TTF_Font *font, int size)
+void destroy_fonts()
 {
-	cache.data[cache_count] = font;
-	cache.size[cache_count] = size;
-	cache_count++;
+	for (int i = 0; i < g_fonts.max_size; ++i)
+	{
+		while (g_fonts.hash_array[i])
+		{
+			struct bucket *iter = g_fonts.hash_array[i];
+			g_fonts.hash_array[i] = iter->next;
+			TTF_CloseFont(iter->font);
+			free(iter);
+		}
+	}
+	free(g_fonts.hash_array);
+}
+
+TTF_Font *get_font(struct font_container *table, int size)
+{
+	int index = hash_code(size, table->max_size);
+	struct bucket* iter = table->hash_array[index], *prev = NULL;
+	while (iter && iter->key != size)
+	{
+		prev = iter;
+		iter = iter->next;
+	}
+	if (!iter)
+		return add_font(&g_fonts, size);
+	return iter->font;
 }

@@ -5,11 +5,12 @@
  **/
 #define UNUSED_PARAMETER(p) (void)p
 #include <stdlib.h>
+
 #include "config.h"
 #include "game.h"
 //#include "test.h"
 
-#include "common.h"
+#include <SDL_mixer.h>
 
 // framerate limited to 60 FPS
 #define FPS 60
@@ -50,6 +51,18 @@ int main(int argc, char* argv[]) {
 			SDL_Delay(delay);
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
+	/*
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		return EXIT_FAILURE;
+	}
+	Mix_Music *gMusic = Mix_LoadMUS("data/music.wav");
+	Mix_PlayMusic(gMusic, -1);
+	while (game_running(&game))
+	{
+
+	}
+	*/
 	game.clean(&game);
 	return EXIT_SUCCESS;
 }

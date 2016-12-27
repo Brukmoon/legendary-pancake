@@ -2,7 +2,7 @@
 #include "button.h"
 #include "text.h"
 
-struct button* create_button(SDL_Renderer* renderer, struct button* parent, const char* text, const struct vec2 position)
+struct button* create_button(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position)
 {
 	struct button* butt = malloc(sizeof(struct button));
 	if (!butt)

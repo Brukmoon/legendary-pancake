@@ -14,13 +14,13 @@ enum button_sprite
 struct button
 {
 	enum button_sprite curr_sprite;
-	struct vec2 position;
+    vec2 position;
 	SDL_Texture **texture;
 
 	struct button* next;
 };
 
-struct button* create_button(SDL_Renderer* renderer, struct button* parent, const char* text, const struct vec2 position);
+struct button* create_button(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position);
 void destroy_button(struct button *button);
 
 #endif // BUTTON_H

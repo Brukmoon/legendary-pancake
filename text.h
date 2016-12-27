@@ -8,18 +8,25 @@
 // good monospace font
 #define FONT_TYPE "Consolas.ttf"
 
-// One font rules them all.
-TTF_Font *font;
-static struct
+struct bucket
 {
-	TTF_Font *data[5];
-	int size[5];
-} cache;
-static int cache_count = 0;
+	struct bucket *next;
+	int key;
+	TTF_Font *font;
+};
 
-bool font_init(int size);
-bool font_cache(int size);
-void add_to_cache(TTF_Font* font, int size);
+static struct font_container
+{
+	struct bucket **hash_array;
+	int max_size;
+} g_fonts;
+
+static inline int hash_code(int key, int htable_size) { return key%htable_size; }
+TTF_Font *add_font(struct font_container *table, int size);
+TTF_Font *get_font(struct font_container *table, int size);
+
+bool init_fonts(int buffer_size);
+void destroy_fonts();
 
 // Text --> SDL_Texture
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color);

@@ -33,7 +33,7 @@ bool g_init(struct game *game)
 			if (game->screen.renderer)
 			{
 				INFO("Renderer created.");
-				if (font_init(18)) {
+				if (init_fonts(10)) {
 					INFO("Text engine initialized.");
 					INFO("> Game initialization sequence finished.\n");
 					game_set_state(game, MENU);
@@ -60,6 +60,8 @@ void g_clean(struct game *game)
 	SDL_DestroyWindow(game->window);
 	game->screen.renderer = NULL;
 	game->window = NULL;
+	// destroy text resources
+	destroy_fonts();
 	// exit subsystems	
 	TTF_Quit();
 	SDL_Quit();

@@ -16,7 +16,7 @@ struct menu
 	SDL_Texture *background;
 } *curr_menu;
 
-void add_button(SDL_Renderer* renderer, const char* text, const struct vec2 position);
+void add_button(SDL_Renderer* renderer, const char* text, const vec2 position);
 
 void load_menu(SDL_Renderer* renderer);
 void draw_menu(SDL_Renderer* renderer);

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include "camera.h"
 #include "collision.h"
 #include "common.h"
@@ -24,7 +25,7 @@ void init_actor(struct actor *actor, SDL_Renderer *renderer)
 	actor->x_vel = actor->y_vel = 0;
 	actor->state = GROUND;
 	actor->speed_coeff = ACTOR_STANDARD_SPEED;
-	set_camera(&g_camera, (struct vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
+	set_camera(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }
 
 void draw_actor(const struct actor *actor, SDL_Renderer *renderer)
@@ -52,23 +53,23 @@ void draw_actor(const struct actor *actor, SDL_Renderer *renderer)
 	}
 }
 
-void move_actor(struct actor *actor, float d_x, float d_y)
+void move_actor(struct actor *actor, vec2 delta)
 {
-	SDL_Rect actor_after = { actor->skeleton.x, actor->skeleton.y + d_y,
+	SDL_Rect actor_after = { actor->skeleton.x, actor->skeleton.y + delta.y,
 		g_level->tile_map.tile_width, g_level->tile_map.tile_height };
 	actor->state = GROUND;
-	if (d_y != 0) // check y axis collision
+	if (delta.y != 0) // check y axis collision
 	{
 		if (!tilemap_collision(g_level, &actor_after))
 		{
 			actor->state = AIR;
-			actor->skeleton.y += d_y;
+			actor->skeleton.y += delta.y;
 		}
 		else
 		{
 			while (true)
 			{
-				if (d_y > 0)
+				if (delta.y > 0)
 					actor_after.y--;
 				else
 					actor_after.y++;
@@ -78,18 +79,18 @@ void move_actor(struct actor *actor, float d_x, float d_y)
 			actor->skeleton.y = actor_after.y;
 		}
 	}
-	actor_after.x += d_x;
-	if (d_x != 0) // check x axis collision
+	actor_after.x += delta.x;
+	if (delta.x != 0) // check x axis collision
 	{
 		if (!tilemap_collision(g_level, &actor_after))
 		{
-			actor->skeleton.x += d_x;
+			actor->skeleton.x += delta.x;
 		}
 		else
 		{
 			while (true)
 			{
-				if (d_x > 0)
+				if (delta.x > 0)
 					actor_after.x--;
 				else
 					actor_after.x++;
@@ -106,5 +107,5 @@ void move_actor(struct actor *actor, float d_x, float d_y)
 				actor->draw_state = 0;
 		}
 	}
-	set_camera(&g_camera, (struct vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
+	set_camera(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }

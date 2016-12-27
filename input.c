@@ -185,10 +185,10 @@ void update_play(void)
 		g_player.y_vel += (float)GRAVITY;
 	else
 		g_player.y_vel = T_VEL;
-	move_actor(&g_player, g_player.x_vel, g_player.y_vel);
+	move_actor(&g_player, (vec2) { (coord) g_player.x_vel, (coord) g_player.y_vel });
 }
 
 void update_edit(void)
 {
-	scroll_camera(&g_camera, g_player.x_vel*g_player.skeleton.w, g_player.y_vel*g_player.skeleton.h);
+	scroll_camera(&g_camera, (vec2) { (coord) g_player.x_vel*g_player.skeleton.w, (coord) g_player.y_vel*g_player.skeleton.h });
 }

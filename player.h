@@ -26,7 +26,7 @@ struct actor
 extern struct actor g_player;
 
 void init_actor(struct actor *actor, SDL_Renderer *renderer);
-void move_actor(struct actor *actor, float d_x, float d_y);
+void move_actor(struct actor *actor, vec2 delta);
 void draw_actor(const struct actor *actor, SDL_Renderer *renderer);
 
 #endif // PLAYER_H
