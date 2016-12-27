@@ -5,7 +5,7 @@
 
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color)
 {
-	SDL_Surface* surface = TTF_RenderText_Solid(get_font(&g_fonts, size), text, color);
+	SDL_Surface* surface = TTF_RenderText_Solid(get_font(&g_fonts, size, &color), text, color);
 	if (!surface)
 	{
 		ERROR("Couldn't create %s text surface.", text);
@@ -37,7 +37,7 @@ bool init_fonts(int buffer_size)
 	return true;
 }
 
-TTF_Font* add_font(struct font_container *table, int size)
+TTF_Font* add_font(struct font_container *table, int size, const SDL_Color *color)
 {
 	// Create a new bucket.
 	struct bucket* new_bucket = (struct bucket*) malloc(sizeof(struct bucket));
@@ -54,6 +54,7 @@ TTF_Font* add_font(struct font_container *table, int size)
 	}
 	new_bucket->next = NULL;
 	new_bucket->key = size;
+	new_bucket->color = *color;
 	// Find the index.
 	int index = hash_code(new_bucket->key, table->max_size);
 	struct bucket* iter = table->hash_array[index], *prev = NULL;
@@ -84,16 +85,19 @@ void destroy_fonts()
 	free(g_fonts.hash_array);
 }
 
-TTF_Font *get_font(struct font_container *table, int size)
+static bool colors_equal(const SDL_Color *first, const SDL_Color *second) 
+{ return first->a == second->a && first->b == second->b && first->g == second->g && first->a == second->a; }
+
+TTF_Font *get_font(struct font_container *table, int size, const SDL_Color *color)
 {
 	int index = hash_code(size, table->max_size);
 	struct bucket* iter = table->hash_array[index], *prev = NULL;
-	while (iter && iter->key != size)
+	while (iter && iter->key != size && !colors_equal(color, &iter->color))
 	{
 		prev = iter;
 		iter = iter->next;
 	}
 	if (!iter)
-		return add_font(&g_fonts, size);
+		return add_font(&g_fonts, size, color);
 	return iter->font;
 }

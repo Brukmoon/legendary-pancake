@@ -12,6 +12,8 @@ struct bucket
 {
 	struct bucket *next;
 	int key;
+
+	SDL_Color color;
 	TTF_Font *font;
 };
 
@@ -21,9 +23,9 @@ static struct font_container
 	int max_size;
 } g_fonts;
 
-static inline int hash_code(int key, int htable_size) { return key%htable_size; }
-TTF_Font *add_font(struct font_container *table, int size);
-TTF_Font *get_font(struct font_container *table, int size);
+static inline int hash_code(int key, int buffer_size) { return key%buffer_size; }
+TTF_Font *add_font(struct font_container *table, int size, const SDL_Color *color);
+TTF_Font *get_font(struct font_container *table, int size, const SDL_Color *color);
 
 bool init_fonts(int buffer_size);
 void destroy_fonts();
