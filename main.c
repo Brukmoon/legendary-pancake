@@ -1,5 +1,6 @@
 /*
  * Dead Zone game engine.
+ * WELCOME TO HELL!
  * @author Michal H.
  *
  **/
@@ -39,12 +40,9 @@ int main(int argc, char* argv[]) {
 	};
 	if (!game.init(&game))
 		return EXIT_FAILURE;
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
-	{
-		return false;
-	}
 
-	add_music("data/music", ".wav");
+	add_music("data/music", ".ogg");
+	add_sound("data/jump", ".wav");
 	play_music("data/music");
 	
 	Uint32 time = SDL_GetTicks();

@@ -1,3 +1,5 @@
+#include <SDL_mixer.h>
+
 #include "text.h"
 #include "camera.h"
 #include "config.h"
@@ -7,6 +9,7 @@
 #include "input.h"
 #include "level.h"
 #include "player.h"
+#include "sound.h"
 #include "menu.h"
 
 // Outputs SDL version info.
@@ -23,22 +26,27 @@ bool g_init(struct game *game)
 	SDL_version_info();
 	if (SDL_Init(SDL_INIT_EVERYTHING) >= 0)
 	{
-		INFO("SDL successfully initialized.");
+		INFO("SDL activated.");
 		game->window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, game->screen.width, game->screen.height, SDL_WINDOW_SHOWN);
 		if (game->window)
 		{
-			INFO("Window spawned.");
+			INFO("Window activated.");
 			// Renderer with HW acceleration enabled.
 			game->screen.renderer = SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED);
 			if (game->screen.renderer)
 			{
-				INFO("Renderer created.");
-				if (init_fonts(10)) {
-					INFO("Text engine initialized.");
-					INFO("> Game initialization sequence finished.\n");
-					game_set_state(game, MENU);
-					SDL_ShowCursor(0);
-					return true;
+				INFO("Renderer activated.");
+				// Stereo, high frequency, low latency
+				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) != -1)
+				{
+					INFO("Sound system activated.");
+					if (init_fonts(10)) {
+						INFO("Text engine activated.");
+						INFO("> Game initialization sequence finished.\n");
+						game_set_state(game, MENU);
+						SDL_ShowCursor(0);
+						return true;
+					}
 				}
 			}
 		}
@@ -62,7 +70,10 @@ void g_clean(struct game *game)
 	game->window = NULL;
 	// destroy text resources
 	destroy_fonts();
+	// destroy sound
+	destroy_sound();
 	// exit subsystems	
+	Mix_CloseAudio();
 	TTF_Quit();
 	SDL_Quit();
 	INFO("Cleanup sequence finished.");

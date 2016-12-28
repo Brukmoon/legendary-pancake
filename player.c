@@ -6,6 +6,7 @@
 #include "graphics.h"
 #include "level.h"
 #include "player.h"
+#include "sound.h"
 #include "texture.h"
 #ifdef _DEBUG
 #include "game.h"
@@ -123,6 +124,7 @@ void jump_actor(struct actor *actor, float speed)
 {
 	if ((actor->state != AIR && !actor->is_jumping) || (actor->jump_count <= JUMP_COUNT && actor->jump_count > 0))
 	{
+		play_sound("data/jump");
 		actor->is_jumping = true;
 		actor->jump_count++;
 		actor->velocity.y = -speed;
