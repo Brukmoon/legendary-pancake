@@ -2,7 +2,7 @@
 #define TEXT_H
 
 #include <SDL_ttf.h>
-#include "position.h"
+#include "vector.h"
 
 #define FONT_SIZE 25
 // good monospace font

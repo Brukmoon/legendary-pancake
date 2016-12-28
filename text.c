@@ -30,7 +30,10 @@ bool init_fonts(int buffer_size)
 	}
 	g_fonts.hash_array = malloc(sizeof(struct bucket*) * buffer_size);
 	if (!g_fonts.hash_array)
+	{
+		ERROR("Not enough memory!");
 		return false;
+	}
 	g_fonts.max_size = buffer_size;
 	for (int i = 0; i < buffer_size; ++i)
 		g_fonts.hash_array[i] = NULL;

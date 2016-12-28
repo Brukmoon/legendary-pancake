@@ -8,16 +8,17 @@
 
 #include <stdbool.h>
 
-unsigned long
-hash(unsigned char *str)
+// djb2 hash
+/*unsigned long
+hash(const char *str)
 {
 	unsigned long hash = 5381;
 	int c;
 
 	while (c = *str++)
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		hash = ((hash << 5) + hash) + c;
 
 	return hash;
-}
+}*/
 
 #endif // HTABLE_H

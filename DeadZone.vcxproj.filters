@@ -132,9 +132,6 @@
     <ClInclude Include="collision.h">
       <Filter>Core\Header files</Filter>
     </ClInclude>
-    <ClInclude Include="position.h">
-      <Filter>Core\Header files</Filter>
-    </ClInclude>
     <ClInclude Include="physics.h">
       <Filter>Core\Header files</Filter>
     </ClInclude>
@@ -142,6 +139,12 @@
       <Filter>Core\Header files</Filter>
     </ClInclude>
     <ClInclude Include="htable.h">
+      <Filter>Core\Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
+      <Filter>Core\Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="sound.h">
       <Filter>Core\Header files</Filter>
     </ClInclude>
   </ItemGroup>

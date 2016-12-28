@@ -22,31 +22,30 @@ void init_actor(struct actor *actor, SDL_Renderer *renderer)
 	actor->sprite_count = 3;
 	actor->skeleton.x = actor->skeleton.y = 32;
 	actor->skeleton.w = actor->skeleton.h = 32;
-	actor->x_vel = actor->y_vel = 0;
-	actor->state = GROUND;
-	actor->speed_coeff = ACTOR_STANDARD_SPEED;
+	actor->velocity = (vec2f) { 0, 0 };
+	actor->state = AIR;
+	actor->speed = ACTOR_STANDARD_SPEED;
 	set_camera(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }
 
 void draw_actor(const struct actor *actor, SDL_Renderer *renderer)
 {
 	SDL_Rect dest;
-	dest.w = dest.h = 34;
+	dest.w = dest.h = 34; // Draw a bit larger.
 	dest.x = actor->skeleton.x - g_camera.position.x;
 	dest.y = actor->skeleton.y - g_camera.position.y;
 	SDL_Rect src;
 	src.w = src.h = 32;
-	if (actor->x_vel == 0)
+	if (actor->velocity.x == 0) // If standing.
 	{
-		src.y = 0;
-		src.x = 0;
+		src.y = src.x = 0;
 		SDL_RenderCopy(renderer, actor->texture, &src, &dest);
 	}
-	else
+	else // moving
 	{
 		src.x = ((int)actor->draw_state)*actor->skeleton.w;
 		src.y = 96;
-		if (actor->x_vel < 0)
+		if (actor->velocity.x < 0) // Moving left.
 			SDL_RenderCopyEx(renderer, actor->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
 		else
 			SDL_RenderCopy(renderer, actor->texture, &src, &dest);
@@ -61,12 +60,10 @@ void move_actor(struct actor *actor, vec2 delta)
 	if (delta.y != 0) // check y axis collision
 	{
 		if (!tilemap_collision(g_level, &actor_after))
-		{
-			actor->state = AIR;
 			actor->skeleton.y += delta.y;
-		}
 		else
 		{
+			actor->velocity.y = 0;
 			while (true)
 			{
 				if (delta.y > 0)
@@ -78,6 +75,8 @@ void move_actor(struct actor *actor, vec2 delta)
 			}
 			actor->skeleton.y = actor_after.y;
 		}
+		if(actor_after.y != actor->skeleton.y)
+			actor->state = AIR;
 	}
 	actor_after.x += delta.x;
 	if (delta.x != 0) // check x axis collision
@@ -102,10 +101,16 @@ void move_actor(struct actor *actor, vec2 delta)
 		if (actor->state != AIR)
 		{
 			if (actor->draw_state < actor->sprite_count - 1)
-				actor->draw_state+=0.2;
+				actor->draw_state += .2f;
 			else
 				actor->draw_state = 0;
 		}
 	}
 	set_camera(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
+}
+
+void jump_actor(struct actor *actor, float speed)
+{
+	if (actor->state != AIR)
+		actor->velocity.y = -speed;
 }

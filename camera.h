@@ -8,7 +8,7 @@
 
 #include <stdbool.h>
 #include "config.h"
-#include "position.h"
+#include "vector.h"
 
 // Center of the screen, relative to which the camera can be placed.
 #define CENTER_X SCREEN_WIDTH/2

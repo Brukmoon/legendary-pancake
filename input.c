@@ -56,25 +56,24 @@ void process_input_play(struct game* game)
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				g_player.x_vel = 1*g_player.speed_coeff;
+				g_player.velocity.x = 1*g_player.speed;
 				break;
 			case SDLK_LEFT:
-				g_player.x_vel = -1*g_player.speed_coeff;
+				g_player.velocity.x = -1*g_player.speed;
 				break;
 		    /*
 			case SDLK_UP:
-				player.y_vel = -1* PLAYER_SPEED;
+				player.velocity.y = -1* PLAYER_SPEED;
 				break;*/
 			/*case SDLK_DOWN:
-				player.y_vel = 1* PLAYER_SPEED;
+				player.velocity.y = 1* PLAYER_SPEED;
 				break;*/
 			case SDLK_RETURN:
 				game_set_pause(game, !game->paused);
 				INFO("Game pause:%d.", game->paused);
 				break;
 			case SDLK_SPACE:
-				if(g_player.state != AIR)
-					g_player.y_vel = -6;
+				jump_actor(&g_player, 7.f);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -90,7 +89,7 @@ void process_input_play(struct game* game)
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
 			case SDLK_LEFT:
-				g_player.x_vel = 0;
+				g_player.velocity.x = 0;
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -120,16 +119,16 @@ void process_input_edit(struct game *game)
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				g_player.x_vel = 1;
+				g_player.velocity.x = 1;
 				break;
 			case SDLK_LEFT:
-				g_player.x_vel = -1;
+				g_player.velocity.x = -1;
 				break;
 			case SDLK_UP:
-				g_player.y_vel = -1;
+				g_player.velocity.y = -1;
 				break;
 			case SDLK_DOWN:
-				g_player.y_vel = 1;
+				g_player.velocity.y = 1;
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -145,11 +144,11 @@ void process_input_edit(struct game *game)
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
 			case SDLK_LEFT:
-				g_player.x_vel = 0;
+				g_player.velocity.x = 0;
 				break;
 			case SDLK_UP:
 			case SDLK_DOWN:
-				g_player.y_vel = 0;
+				g_player.velocity.y = 0;
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -179,16 +178,16 @@ void update_menu(void)
 
 void update_play(void)
 {
-	if (g_player.state == GROUND)
-		g_player.y_vel += (float)(2*GRAVITY);
-	if (g_player.y_vel <= T_VEL)
-		g_player.y_vel += (float)GRAVITY;
+	// Handle player.
+	if ((g_player.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
+		g_player.velocity.y += (float)GRAVITY;
 	else
-		g_player.y_vel = T_VEL;
-	move_actor(&g_player, (vec2) { (coord) g_player.x_vel, (coord) g_player.y_vel });
+		g_player.velocity.y = T_VEL;
+	// Move him.
+	move_actor(&g_player, (vec2) { (coord) g_player.velocity.x, (coord) g_player.velocity.y });
 }
 
 void update_edit(void)
 {
-	scroll_camera(&g_camera, (vec2) { (coord) g_player.x_vel*g_player.skeleton.w, (coord) g_player.y_vel*g_player.skeleton.h });
+	scroll_camera(&g_camera, (vec2) { (coord) g_player.velocity.x*g_player.skeleton.w, (coord) g_player.velocity.y*g_player.skeleton.h });
 }

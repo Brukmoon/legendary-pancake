@@ -2,7 +2,7 @@
 #define BUTTON_H
 
 #include "texture.h"
-#include "position.h"
+#include "vector.h"
 
 enum button_sprite
 {

@@ -186,7 +186,8 @@
     <ClInclude Include="menu.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="position.h" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="vector.h" />
     <ClInclude Include="render.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="graphics.h" />

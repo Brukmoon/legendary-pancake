@@ -70,13 +70,19 @@ void g_clean(struct game *game)
 
 void SDL_version_info(void)
 {
-	SDL_version compiled, linked;
-	SDL_VERSION(&compiled);
-	SDL_GetVersion(&linked);
+	SDL_version SDL_compiled, TTF_compiled, SDL_linked;
+	const SDL_version *TTF_linked = TTF_Linked_Version();
+	SDL_VERSION(&SDL_compiled);
+	SDL_TTF_VERSION(&TTF_compiled);
+	SDL_GetVersion(&SDL_linked);
 	INFO("SDL compiled version: %d.%d.%d",
-		compiled.major, compiled.minor, compiled.patch);
+		SDL_compiled.major, SDL_compiled.minor, SDL_compiled.patch);
+	INFO("SDL_TTF compiled version: %d.%d.%d",
+		TTF_compiled.major, TTF_compiled.minor, TTF_compiled.patch);
 	INFO("SDL linked version: %d.%d.%d",
-		linked.major, linked.minor, linked.patch);
+		SDL_linked.major, SDL_linked.minor, SDL_linked.patch);
+	INFO("SDL_TTF linked version: %d.%d.%d",
+		TTF_linked->major, TTF_linked->minor, TTF_linked->patch);
 }
 
 void game_set_state(struct game *game, const enum game_state state)
@@ -133,7 +139,7 @@ void to_edit_state(struct game *game)
 	game->update = update_edit;
 	game->draw = render_edit;
 	game->process_input = process_input_edit;
-	g_player.y_vel = g_player.x_vel = 0;
+	g_player.velocity.y = g_player.velocity.x = 0;
 	SDL_ShowCursor(1);
 	init_camera(&g_camera);
 	init_actor(&g_player, game->screen.renderer);

@@ -10,14 +10,16 @@
 #include "text.h"
 #endif // _DEBUG
 
-static void render_grid(SDL_Renderer *const renderer, const SDL_Color color);
-
+#ifndef BLANK_TILE
 #define BLANK_TILE 0
+#endif // BLANK_TILE
 
 #define TILE_HEIGHT g_level->tile_map.tile_height
 #define TILE_WIDTH g_level->tile_map.tile_width
 
 #define MAP_NOT_OVERFLOW (y>=0&&y<=g_level->tile_map.height&&x>=0&&x<=g_level->tile_map.width)
+
+static void render_grid(SDL_Renderer *const renderer, const SDL_Color color);
 
 void render_map(SDL_Renderer* const renderer)
 {

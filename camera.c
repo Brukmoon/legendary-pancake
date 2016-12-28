@@ -7,7 +7,7 @@ void init_camera(struct camera *camera)
 {
 	if (!camera)
 	{
-		INFO("Camera can't be NULL.");
+		ERROR("Camera can't be NULL.");
 		return;
 	}
 	// Camera defaults to the center of the screen.
@@ -20,7 +20,7 @@ void set_camera(struct camera *camera, const vec2 position)
 {
 	if (!camera)
 	{
-		INFO("Camera can't be NULL.");
+		ERROR("Camera can't be NULL.");
 		return;
 	}
 	camera->position = position;
@@ -30,7 +30,7 @@ void scroll_camera(struct camera *camera, const vec2 delta)
 {
 	if (!camera)
 	{
-		INFO("Camera can't be NULL.");
+		ERROR("Camera can't be NULL.");
 		return;
 	}
 	set_camera(camera, (vec2) { camera->position.x + delta.x, camera->position.y + delta.y });
