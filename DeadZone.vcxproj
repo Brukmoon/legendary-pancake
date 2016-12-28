@@ -169,6 +169,7 @@
     <ClCompile Include="graphics.c" />
     <ClCompile Include="level.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="sound.c" />
     <ClCompile Include="stack.c" />
     <ClCompile Include="test.c" />
     <ClCompile Include="text.c" />

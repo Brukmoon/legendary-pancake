@@ -82,6 +82,9 @@
     <ClCompile Include="htable.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="sound.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">

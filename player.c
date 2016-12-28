@@ -25,6 +25,8 @@ void init_actor(struct actor *actor, SDL_Renderer *renderer)
 	actor->velocity = (vec2f) { 0, 0 };
 	actor->state = AIR;
 	actor->speed = ACTOR_STANDARD_SPEED;
+	actor->is_jumping = false;
+	actor->jump_count = 0;
 	set_camera(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }
 
@@ -60,7 +62,10 @@ void move_actor(struct actor *actor, vec2 delta)
 	if (delta.y != 0) // check y axis collision
 	{
 		if (!tilemap_collision(g_level, &actor_after))
+		{
+			actor->state = AIR;
 			actor->skeleton.y += delta.y;
+		}
 		else
 		{
 			actor->velocity.y = 0;
@@ -73,10 +78,10 @@ void move_actor(struct actor *actor, vec2 delta)
 				if (!tilemap_collision(g_level, &actor_after))
 					break;
 			}
+			if (actor_after.y != actor->skeleton.y || delta.y < 0)
+				actor->state = AIR;
 			actor->skeleton.y = actor_after.y;
 		}
-		if(actor_after.y != actor->skeleton.y)
-			actor->state = AIR;
 	}
 	actor_after.x += delta.x;
 	if (delta.x != 0) // check x axis collision
@@ -106,11 +111,20 @@ void move_actor(struct actor *actor, vec2 delta)
 				actor->draw_state = 0;
 		}
 	}
+	if (actor->is_jumping && actor->state == GROUND)
+	{
+		actor->is_jumping = false;
+		actor->jump_count = 0;
+	}
 	set_camera(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }
 
 void jump_actor(struct actor *actor, float speed)
 {
-	if (actor->state != AIR)
+	if ((actor->state != AIR && !actor->is_jumping) || (actor->jump_count <= JUMP_COUNT && actor->jump_count > 0))
+	{
+		actor->is_jumping = true;
+		actor->jump_count++;
 		actor->velocity.y = -speed;
+	}
 }

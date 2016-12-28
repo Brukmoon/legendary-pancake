@@ -2,10 +2,15 @@
 #define PLAYER_H
 
 #include <SDL.h>
+#include <stdbool.h>
+
 #include "vector.h"
+
+#define JUMP_COUNT 2
 
 struct actor
 {
+	int hp;
 	enum
 	{
 		GROUND,
@@ -18,10 +23,13 @@ struct actor
 	{
 		int x, y, w, h;
 	} skeleton;
+
+	bool is_jumping;
+	unsigned short jump_count;
+
 	// speed coefficient
 	float speed;
 	vec2f velocity;
-	int hp;
 };
 extern struct actor g_player;
 

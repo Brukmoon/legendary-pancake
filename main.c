@@ -10,7 +10,8 @@
 #include "game.h"
 //#include "test.h"
 
-#include <stdio.h>
+#include <SDL_mixer.h>
+#include "sound.h"
 
 // framerate limited to 60 FPS
 #define FPS 60
@@ -38,6 +39,14 @@ int main(int argc, char* argv[]) {
 	};
 	if (!game.init(&game))
 		return EXIT_FAILURE;
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
+	{
+		return false;
+	}
+
+	add_music("data/music", ".wav");
+	play_music("data/music");
+	
 	Uint32 time = SDL_GetTicks();
 	// game loop
 	while (game_running(&game)) {
