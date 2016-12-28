@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
 	add_music("data/music", ".ogg");
 	add_sound("data/jump", ".wav");
-	play_music("data/music");
+	//play_music("data/music");
 	
 	Uint32 time = SDL_GetTicks();
 	// game loop
