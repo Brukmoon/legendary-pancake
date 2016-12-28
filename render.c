@@ -90,6 +90,22 @@ void render_menu_interface(SDL_Renderer* const renderer)
 	draw_menu(renderer);
 }
 
+static void draw_player_info(const struct actor *player, SDL_Renderer *renderer)
+{
+	fill_rect(renderer, SCREEN_WIDTH - 105, 9, 100, 11, (SDL_Color) { 255, 0, 0, 1 });
+	hollow_rect(renderer, SCREEN_WIDTH - 105, 9, 100, 11, (SDL_Color) { 0, 0, 0, 1 });
+	if (player->jump_count < 2)
+		fill_rect(renderer, SCREEN_WIDTH - 110, 5, 5, 10, (SDL_Color) { 255, 255, 0, 1 });
+	if (player->jump_count < 1)
+		fill_rect(renderer, SCREEN_WIDTH - 110, 15, 5, 10, (SDL_Color) { 255, 255, 0, 1 });
+	hollow_rect(renderer, SCREEN_WIDTH - 110, 5, 5, 10, (SDL_Color) { 0, 0, 0, 1 });
+	hollow_rect(renderer, SCREEN_WIDTH - 110, 15, 5, 10, (SDL_Color) { 0, 0, 0, 1 });
+
+	SDL_Rect src_rect = (SDL_Rect) { 0, 0, 32, 32 };
+	SDL_Rect dest_rect = (SDL_Rect) { SCREEN_WIDTH-135, 5, 20, 20 };
+	SDL_RenderCopy(renderer, player->texture, &src_rect, &dest_rect);
+}
+
 void render_play(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
@@ -100,6 +116,7 @@ void render_play(SDL_Renderer *renderer)
 	render_debug_console(renderer);
 #endif // _DEBUG
 	draw_actor(&g_player, renderer);
+	draw_player_info(&g_player, renderer);
 	SDL_RenderPresent(renderer);
 }
 

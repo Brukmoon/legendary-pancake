@@ -79,9 +79,6 @@
     <ClCompile Include="timer.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="htable.c">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="sound.c">
       <Filter>Core</Filter>
     </ClCompile>
@@ -139,9 +136,6 @@
       <Filter>Core\Header files</Filter>
     </ClInclude>
     <ClInclude Include="timer.h">
-      <Filter>Core\Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="htable.h">
       <Filter>Core\Header files</Filter>
     </ClInclude>
     <ClInclude Include="vector.h">

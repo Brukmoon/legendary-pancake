@@ -59,7 +59,7 @@ void move_actor(struct actor *actor, vec2 delta)
 {
 	SDL_Rect actor_after = { actor->skeleton.x, actor->skeleton.y + delta.y,
 		g_level->tile_map.tile_width, g_level->tile_map.tile_height };
-	actor->state = GROUND;
+	INFO("%d", delta.y);
 	if (delta.y != 0) // check y axis collision
 	{
 		if (!tilemap_collision(g_level, &actor_after))
@@ -79,7 +79,9 @@ void move_actor(struct actor *actor, vec2 delta)
 				if (!tilemap_collision(g_level, &actor_after))
 					break;
 			}
-			if (actor_after.y != actor->skeleton.y || delta.y < 0)
+			if (actor_after.y == actor->skeleton.y)
+				actor->state = GROUND;
+			else
 				actor->state = AIR;
 			actor->skeleton.y = actor_after.y;
 		}
@@ -122,7 +124,7 @@ void move_actor(struct actor *actor, vec2 delta)
 
 void jump_actor(struct actor *actor, float speed)
 {
-	if ((actor->state != AIR && !actor->is_jumping) || (actor->jump_count <= JUMP_COUNT && actor->jump_count > 0))
+	if ((actor->state != AIR && !actor->is_jumping) || (actor->jump_count < JUMP_COUNT && actor->jump_count > 0))
 	{
 		play_sound("data/jump");
 		actor->is_jumping = true;

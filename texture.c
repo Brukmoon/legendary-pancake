@@ -1,4 +1,5 @@
 #include <SDL_image.h>
+
 #include "texture.h"
 
 // WIP

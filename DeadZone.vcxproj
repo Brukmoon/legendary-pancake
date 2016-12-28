@@ -160,7 +160,6 @@
     <ClCompile Include="button.c" />
     <ClCompile Include="camera.c" />
     <ClCompile Include="collision.c" />
-    <ClCompile Include="htable.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="menu.c" />
     <ClCompile Include="player.c" />
@@ -182,7 +181,6 @@
     <ClInclude Include="collision.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="htable.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="physics.h" />
