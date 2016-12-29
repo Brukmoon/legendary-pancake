@@ -123,6 +123,12 @@ bool game_pause(struct game *game)
 	return game_set_pause(game, !game->paused); 
 }
 
+bool game_set_pause(struct game *game, bool yesno) 
+{
+	music_set_pause(yesno);
+	return game->paused = yesno; 
+}
+
 void to_play_state(struct game *game)
 {
 	INFO("Game started.\n");

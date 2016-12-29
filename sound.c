@@ -73,6 +73,19 @@ void music_add(const char *name, const char* type)
 		prev->next = new_bucket;
 }
 
+void music_set_pause(bool set)
+{
+	switch (set)
+	{
+	case true:
+		Mix_PauseMusic();
+		break;
+	case false:
+		Mix_ResumeMusic();
+		break;
+	}
+}
+
 void sound_add(const char* name, const char* type)
 {
 	// Calculate index from hash.
