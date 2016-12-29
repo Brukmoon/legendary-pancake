@@ -4,10 +4,11 @@
 #include "texture.h"
 #include "vector.h"
 
+// Texture types.
 enum button_sprite
 {
-	BUTTON_SPRITE_MOUSE_OUT,
-	BUTTON_SPRITE_MOUSE_OVER,
+	BUTTON_SPRITE_INACTIVE,
+	BUTTON_SPRITE_ACTIVE,
 	BUTTON_SPRITE_COUNT
 };
 
@@ -15,12 +16,16 @@ struct button
 {
 	enum button_sprite curr_sprite;
     vec2 position;
+	// Every button has unique texture.
 	SDL_Texture **texture;
-
+	// Linking buttons.
 	struct button* next;
+	struct button* prev;
 };
 
-struct button* create_button(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position);
-void destroy_button(struct button *button);
+struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position);
+void button_destroy(struct button *button);
+// Set button as active.
+void button_active(struct button *button, struct button *prev_button);
 
 #endif // BUTTON_H

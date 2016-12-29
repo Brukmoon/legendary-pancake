@@ -1,8 +1,9 @@
 #include "common.h"
 #include "button.h"
+#include "sound.h"
 #include "text.h"
 
-struct button* create_button(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position)
+struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position)
 {
 	struct button* butt = malloc(sizeof(struct button));
 	if (!butt)
@@ -10,12 +11,13 @@ struct button* create_button(SDL_Renderer* renderer, struct button* parent, cons
 		ERROR("Button memory couldn't be allocated.");
 		return NULL;
 	}
-	butt->texture = malloc(sizeof(SDL_Texture*) * 2);
-	butt->texture[BUTTON_SPRITE_MOUSE_OUT] = create_text_texture(renderer, text, 25, (SDL_Color) { 0, 0, 0 });
-	butt->texture[BUTTON_SPRITE_MOUSE_OVER] = create_text_texture(renderer, text, 25, (SDL_Color) { 255, 0, 0 });
+	butt->texture = malloc(sizeof(SDL_Texture*) * BUTTON_SPRITE_COUNT);
+	butt->texture[BUTTON_SPRITE_INACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 0, 0, 0 });
+	butt->texture[BUTTON_SPRITE_ACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 255, 0, 0 });
 	butt->position = position;
-	butt->curr_sprite = BUTTON_SPRITE_MOUSE_OUT;
+	butt->curr_sprite = BUTTON_SPRITE_INACTIVE; // inactive by default
 	butt->next = NULL;
+	butt->prev = parent;
 	if (parent) // Parent exists.
 	{
 		parent->next = butt;
@@ -25,11 +27,18 @@ struct button* create_button(SDL_Renderer* renderer, struct button* parent, cons
 	return butt;
 }
 
-void destroy_button(struct button *button)
+void button_destroy(struct button *button)
 {
 	for (int i = 0; i < BUTTON_SPRITE_COUNT; ++i)
 		SDL_DestroyTexture(button->texture[i]);
 	free(*button->texture);
 	INFO("Button at position [%d;%d] destroyed.", button->position.x, button->position.y);
 	free(button);
+}
+
+void button_active(struct button *button, struct button *prev_button)
+{
+	sound_play("select");
+	button->curr_sprite = BUTTON_SPRITE_ACTIVE;
+	prev_button->curr_sprite = BUTTON_SPRITE_INACTIVE;
 }

@@ -9,17 +9,22 @@ struct menu
 	struct
 	{
 		struct button *root;
+		// Keep head in memory for quick access.
 		struct button *head;
+		// Currently active button.
+		struct button *current;
 	} button_list;
 	int max_button_count;
 	int button_count;
 	SDL_Texture *background;
-} *curr_menu;
+} *g_menu;
 
-void add_button(SDL_Renderer* renderer, const char* text, const vec2 position);
+void button_add(SDL_Renderer* renderer, const char* text, const vec2 position);
 
-void load_menu(SDL_Renderer* renderer);
-void draw_menu(SDL_Renderer* renderer);
-void destroy_menu();
+void menu_load(SDL_Renderer* renderer);
+void menu_draw(SDL_Renderer* renderer);
+void menu_destroy(void);
+void menu_prev_button(struct menu *menu);
+void menu_next_button(struct menu *menu);
 
 #endif // MENU_H

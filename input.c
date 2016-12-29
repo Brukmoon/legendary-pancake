@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "common.h"
 #include "collision.h"
+#include "menu.h"
 #include "input.h"
 #include "physics.h"
 
@@ -23,8 +24,10 @@ void process_input_menu(struct game* game)
 			case SDLK_LEFT:
 				break;
 			case SDLK_UP:
+				menu_prev_button(g_menu);
 				break;
 			case SDLK_DOWN:
+				menu_next_button(g_menu);
 				break;
 			case SDLK_e:
 				game_set_state(game, EDIT);

@@ -62,7 +62,7 @@ void g_clean(struct game *game)
 	INFO("Cleanup sequence started.");
 	// remove level data
 	level_clean(&g_level);
-	destroy_menu();
+	menu_destroy();
 	// destroy SDL objects
 	SDL_DestroyRenderer(game->screen.renderer);
 	SDL_DestroyWindow(game->window);
@@ -149,7 +149,7 @@ void to_menu_state(struct game *game)
 	game->update = update_menu;
 	game->draw = render_menu;
 	game->process_input = process_input_menu;
-	load_menu(game->screen.renderer);
+	menu_load(game->screen.renderer);
 }
 
 void to_edit_state(struct game *game)
