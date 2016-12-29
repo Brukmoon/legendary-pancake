@@ -5,8 +5,6 @@
 #include "vector.h"
 
 #define FONT_SIZE 25
-// good monospace font
-#define FONT_TYPE "Consolas.ttf"
 
 struct bucket
 {
@@ -24,11 +22,11 @@ static struct font_container
 } g_fonts;
 
 static inline int hash_code(int key, int buffer_size) { return key%buffer_size; }
-TTF_Font *add_font(struct font_container *table, int size, const SDL_Color *color);
-TTF_Font *get_font(struct font_container *table, int size, const SDL_Color *color);
+TTF_Font *font_add(struct font_container *table, int size, const SDL_Color *color);
+TTF_Font *font_get(struct font_container *table, int size, const SDL_Color *color);
 
-bool init_fonts(int buffer_size);
-void destroy_fonts(void);
+bool fonts_init(int buffer_size);
+void fonts_destroy(void);
 
 // Text --> SDL_Texture
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color);

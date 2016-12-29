@@ -3,6 +3,7 @@
 #include <SDL_mixer.h>
 
 #include "common.h"
+#include "config.h"
 #include "sound.h"
 
 struct music_bucket
@@ -37,7 +38,7 @@ static unsigned long hash(const char *str)
 	return hash;
 }
 
-void add_music(const char *name, const char* type)
+void music_add(const char *name, const char* type)
 {
 	// Calculate index from hash.
 	unsigned long index = hash(name) % MUSIC_ARR_SIZE;
@@ -50,10 +51,11 @@ void add_music(const char *name, const char* type)
 	new_bucket->next = NULL;
 	// Copy name to the new bucket.
 	strcpy_s(new_bucket->key, MUSIC_FILE_NAME_LENGTH, name);
-	// Create buffer, put name inside.
+	// Create buffer, put path to data folder inside.
 	char name_buffer[MUSIC_FILE_NAME_LENGTH];
-	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, name);
-	// Append file type.
+	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, SOUND_PATH);
+	// Append file name and type.
+	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, name);
 	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, type);
 	// Load music.
 	new_bucket->music = Mix_LoadMUS(name_buffer);
@@ -71,7 +73,7 @@ void add_music(const char *name, const char* type)
 		prev->next = new_bucket;
 }
 
-void add_sound(const char* name, const char* type)
+void sound_add(const char* name, const char* type)
 {
 	// Calculate index from hash.
 	unsigned long index = hash(name) % SOUND_ARR_SIZE;
@@ -86,8 +88,9 @@ void add_sound(const char* name, const char* type)
 	strcpy_s(new_bucket->key, MUSIC_FILE_NAME_LENGTH, name);
 	// Create buffer, put name inside.
 	char name_buffer[MUSIC_FILE_NAME_LENGTH];
-	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, name);
-	// Append file type.
+	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, SOUND_PATH);
+	// Append file name and file type.
+	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, name);
 	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, type);
 	// Load music.
 	new_bucket->sound = Mix_LoadWAV(name_buffer);
@@ -104,7 +107,7 @@ void add_sound(const char* name, const char* type)
 	else
 		prev->next = new_bucket;
 }
-static Mix_Music* get_music(const char *name)
+static Mix_Music* music_get(const char *name)
 {
 	unsigned long index = hash(name) % MUSIC_ARR_SIZE;
 	struct music_bucket* iter = music_container.music[index];
@@ -118,7 +121,7 @@ static Mix_Music* get_music(const char *name)
 	return NULL;
 }
 
-static Mix_Chunk* get_sound(const char *name)
+static Mix_Chunk* sound_get(const char *name)
 {
 	unsigned long index = hash(name) % SOUND_ARR_SIZE;
 	struct sound_bucket* iter = sound_container.sound[index];
@@ -132,27 +135,27 @@ static Mix_Chunk* get_sound(const char *name)
 	return NULL;
 }
 
-void play_music(const char *name)
+void music_play(const char *name)
 {
 	if (!Mix_PlayingMusic())
 	{
 		//Play the music
-		if (Mix_PlayMusic(get_music(name), -1) == -1)
+		if (Mix_PlayMusic(music_get(name), -1) == -1)
 		{
 			ERROR("Couldn't play music %s.", name);
 		}
 	}
 }
 
-void play_sound(const char *name)
+void sound_play(const char *name)
 {
-	if (Mix_PlayChannel(-1, get_sound(name), 0) == -1)
+	if (Mix_PlayChannel(-1, sound_get(name), 0) == -1)
 	{
 		ERROR("Couldn't play sound %s.", name);
 	}
 }
 
-void destroy_sound(void)
+void audio_destroy(void)
 {
 	for (int i = 0; i < MUSIC_ARR_SIZE; ++i)
 	{

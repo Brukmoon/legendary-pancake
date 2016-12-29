@@ -45,7 +45,7 @@ struct game
 	SDL_Window* window;
 	struct
 	{
-		int width, height; // Width and height of the screen.
+		size_t width, height; // Width and height of the screen.
 		SDL_Renderer* renderer; // Rendering target.
 	} screen;
 

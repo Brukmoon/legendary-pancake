@@ -142,7 +142,7 @@ void actor_jump(struct actor *actor, float speed)
 	{
 		actor->is_jumping = true;
 		actor->jump_count++;
-		play_sound("data/jump");
+		sound_play("jump");
 		// Go against gravity.
 		actor->velocity.y = -speed;
 	}

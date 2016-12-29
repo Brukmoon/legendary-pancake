@@ -1,3 +1,8 @@
+/*
+ * Collision detection.
+ * @author Michal H.
+ *
+ **/
 #ifndef COLLISION_H
 #define COLLISION_H
 

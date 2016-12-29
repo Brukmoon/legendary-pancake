@@ -1,11 +1,10 @@
+#include "config.h"
 #include "common.h"
 #include "text.h"
 
-#define FONT_FILE "data/"FONT_TYPE
-
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color)
 {
-	SDL_Surface* surface = TTF_RenderText_Solid(get_font(&g_fonts, size, &color), text, color);
+	SDL_Surface* surface = TTF_RenderText_Solid(font_get(&g_fonts, size, &color), text, color);
 	if (!surface)
 	{
 		ERROR("Couldn't create %s text surface.", text);
@@ -21,7 +20,7 @@ SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int s
 	return texture;
 }
 
-bool init_fonts(int buffer_size)
+bool fonts_init(int buffer_size)
 {
 	if (TTF_Init() < 0)
 	{
@@ -40,7 +39,7 @@ bool init_fonts(int buffer_size)
 	return true;
 }
 
-TTF_Font* add_font(struct font_container *table, int size, const SDL_Color *color)
+TTF_Font* font_add(struct font_container *table, int size, const SDL_Color *color)
 {
 	// Create a new bucket.
 	struct bucket* new_bucket = (struct bucket*) malloc(sizeof(struct bucket));
@@ -73,7 +72,7 @@ TTF_Font* add_font(struct font_container *table, int size, const SDL_Color *colo
 	return new_bucket->font;
 }
 
-void destroy_fonts(void)
+void fonts_destroy(void)
 {
 	for (int i = 0; i < g_fonts.max_size; ++i)
 	{
@@ -89,9 +88,11 @@ void destroy_fonts(void)
 }
 
 static bool colors_equal(const SDL_Color *first, const SDL_Color *second) 
-{ return first->a == second->a && first->b == second->b && first->g == second->g && first->a == second->a; }
+{ 
+	return first->a == second->a && first->b == second->b && first->g == second->g && first->a == second->a; 
+}
 
-TTF_Font *get_font(struct font_container *table, int size, const SDL_Color *color)
+TTF_Font *font_get(struct font_container *table, int size, const SDL_Color *color)
 {
 	int index = hash_code(size, table->max_size);
 	struct bucket* iter = table->hash_array[index], *prev = NULL;
@@ -101,6 +102,6 @@ TTF_Font *get_font(struct font_container *table, int size, const SDL_Color *colo
 		iter = iter->next;
 	}
 	if (!iter)
-		return add_font(&g_fonts, size, color);
+		return font_add(&g_fonts, size, color);
 	return iter->font;
 }

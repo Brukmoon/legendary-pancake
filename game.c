@@ -40,7 +40,7 @@ bool g_init(struct game *game)
 				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) != -1)
 				{
 					INFO("Sound system activated.");
-					if (init_fonts(10)) {
+					if (fonts_init(10)) {
 						INFO("Text engine activated.");
 						INFO("> Game initialization sequence finished.\n");
 						game_set_state(game, MENU);
@@ -69,9 +69,9 @@ void g_clean(struct game *game)
 	game->screen.renderer = NULL;
 	game->window = NULL;
 	// destroy text resources
-	destroy_fonts();
+	fonts_destroy();
 	// destroy sound
-	destroy_sound();
+	audio_destroy();
 	// exit subsystems	
 	Mix_CloseAudio();
 	TTF_Quit();

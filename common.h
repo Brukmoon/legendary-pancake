@@ -6,6 +6,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+// Variadic args.
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -22,6 +23,7 @@ enum log_level
 #define ERROR(format, ...) fprintf(stderr, "ERROR[%s]"##format##"\n", __FILE__, ##__VA_ARGS__)
 #define INFO(format, ...) fprintf(stdout, ": "##format##"\n", ##__VA_ARGS__)
 #else
+// Empty, nop.
 #define ERROR(format, ...)
 #define INFO(format, ...)
 #endif
