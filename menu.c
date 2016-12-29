@@ -63,10 +63,12 @@ void button_add(SDL_Renderer* renderer, const char* text, const vec2 position)
 	g_menu->button_count++;
 }
 
-void menu_draw(SDL_Renderer* renderer)
+void menu_draw(struct menu *menu, SDL_Renderer* renderer)
 {
+	if(menu->background)
+		SDL_RenderCopy(renderer, menu->background, NULL, NULL);
 	SDL_Rect dest = { 0, 0, 0, 0 };
-	struct button* iterator = g_menu->button_list.root;
+	struct button* iterator = menu->button_list.root;
 	while (iterator)
 	{
 		SDL_QueryTexture(iterator->texture[iterator->curr_sprite], NULL, NULL, &dest.w, &dest.h);

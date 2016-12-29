@@ -16,7 +16,7 @@ struct button
 {
 	enum button_sprite curr_sprite;
     vec2 position;
-	// Every button has unique texture.
+	// Every button has unique textures.
 	SDL_Texture **texture;
 	// Linking buttons.
 	struct button* next;

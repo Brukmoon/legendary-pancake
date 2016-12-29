@@ -40,6 +40,7 @@ static unsigned long hash(const char *str)
 
 void music_add(const char *name, const char* type)
 {
+#if MUSIC_ON
 	// Calculate index from hash.
 	unsigned long index = hash(name) % MUSIC_ARR_SIZE;
 	struct music_bucket* new_bucket = (struct music_bucket*) malloc(sizeof(struct music_bucket));
@@ -71,10 +72,12 @@ void music_add(const char *name, const char* type)
 	}
 	else
 		prev->next = new_bucket;
+#endif // MUSIC_ON
 }
 
 void music_set_pause(bool set)
 {
+#if MUSIC_ON
 	switch (set)
 	{
 	case true:
@@ -84,10 +87,12 @@ void music_set_pause(bool set)
 		Mix_ResumeMusic();
 		break;
 	}
+#endif // MUSIC_ON
 }
 
 void sound_add(const char* name, const char* type)
 {
+#if SOUND_ON
 	// Calculate index from hash.
 	unsigned long index = hash(name) % SOUND_ARR_SIZE;
 	struct sound_bucket* new_bucket = (struct sound_bucket*) malloc(sizeof(struct sound_bucket));
@@ -119,6 +124,7 @@ void sound_add(const char* name, const char* type)
 	}
 	else
 		prev->next = new_bucket;
+#endif // SOUND_ON
 }
 static Mix_Music* music_get(const char *name)
 {
@@ -150,6 +156,7 @@ static Mix_Chunk* sound_get(const char *name)
 
 void music_play(const char *name)
 {
+#if MUSIC_ON
 	if (!Mix_PlayingMusic())
 	{
 		//Play the music
@@ -158,18 +165,22 @@ void music_play(const char *name)
 			ERROR("Couldn't play music %s.", name);
 		}
 	}
+#endif // MUSIC_ON
 }
 
 void sound_play(const char *name)
 {
+#if SOUND_ON
 	if (Mix_PlayChannel(-1, sound_get(name), 0) == -1)
 	{
 		ERROR("Couldn't play sound %s.", name);
 	}
+#endif // SOUND_ON
 }
 
 void audio_destroy(void)
 {
+#if MUSIC_ON
 	for (int i = 0; i < MUSIC_ARR_SIZE; ++i)
 	{
 		while (music_container.music[i])
@@ -180,6 +191,8 @@ void audio_destroy(void)
 			free(iter);
 		}
 	}
+#endif // MUSIC_ON
+#if SOUND_ON
 	for (int i = 0; i < SOUND_ARR_SIZE; ++i)
 		while (sound_container.sound[i])
 		{
@@ -188,4 +201,5 @@ void audio_destroy(void)
 			Mix_FreeChunk(iter->sound);
 			free(iter);
 		}
+#endif // SOUND_ON
 }

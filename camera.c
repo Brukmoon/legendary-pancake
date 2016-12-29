@@ -1,4 +1,5 @@
 #include "common.h"
+#include "config.h"
 #include "camera.h"
 #include "level.h"
 
@@ -27,6 +28,7 @@ void camera_set(struct camera *camera, vec2 position)
 		ERROR("Camera can't be NULL.");
 		return;
 	}
+#if CAMERA_LIMIT
 	// Is camera out of map?
 	if (position.x < 0)
 		position.x = 0;
@@ -36,6 +38,7 @@ void camera_set(struct camera *camera, vec2 position)
 		position.y = 0;
 	else if (g_level->tile_map.height*g_level->tile_map.tile_height > SCREEN_HEIGHT && position.y > MAX_CAMERA_Y)
 		position.y = MAX_CAMERA_Y;
+#endif // NO_CAMERA_LIMIT
 	camera->position = position;
 }
 

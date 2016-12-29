@@ -22,7 +22,7 @@ struct menu
 void button_add(SDL_Renderer* renderer, const char* text, const vec2 position);
 
 void menu_load(SDL_Renderer* renderer);
-void menu_draw(SDL_Renderer* renderer);
+void menu_draw(struct menu *menu, SDL_Renderer* renderer);
 void menu_destroy(void);
 void menu_prev_button(struct menu *menu);
 void menu_next_button(struct menu *menu);

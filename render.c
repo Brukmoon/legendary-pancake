@@ -1,12 +1,13 @@
 #include "actor.h"
 #include "camera.h"
 #include "common.h"
+#include "config.h"
 #include "graphics.h"
 #include "game.h"
 #include "level.h"
 #include "menu.h"
 #include "render.h"
-#ifdef _DEBUG
+#if SHOW_CONSOLE
 #include "text.h"
 #endif // _DEBUG
 
@@ -60,15 +61,32 @@ void render_grid(SDL_Renderer *const renderer, const SDL_Color color)
 #undef TILE_HEIGHT
 #undef TILE_WIDTH
 
-#ifdef _DEBUG
+#if SHOW_CONSOLE
 
 static void render_debug_console(SDL_Renderer* const renderer)
 {
-	char buffer[256];
-	sprintf_s(buffer, 256, "Player coordinates: [%d;%d]", g_player.skeleton.x, g_player.skeleton.y);
+	char buffer[50];
+	// coordinates
+	sprintf_s(buffer, 50, "Player coordinates: [%d;%d]", g_player.skeleton.x, g_player.skeleton.y);
 	SDL_Texture *p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
 	SDL_Rect rect;
 	rect.x = rect.y = 0;
+	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
+	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
+	SDL_DestroyTexture(p_coord);
+	// speed
+	sprintf_s(buffer, 50, "Player speed: [%f;%f]", g_player.velocity.x, g_player.velocity.y);
+	p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
+	rect.x = 0;
+	rect.y = 12;
+	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
+	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
+	SDL_DestroyTexture(p_coord);
+	// state
+	sprintf_s(buffer, 50, g_player.state == GROUND ? "GROUND" : "AIR");
+	p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
+	rect.x = 0;
+	rect.y = 24;
 	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
 	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
 	SDL_DestroyTexture(p_coord);
@@ -77,9 +95,8 @@ static void render_debug_console(SDL_Renderer* const renderer)
 
 void render_menu_interface(SDL_Renderer* const renderer)
 {
-	SDL_SetRenderDrawColor(renderer, 0, 170, 170, 1);
-	SDL_RenderCopy(renderer, g_menu->background, NULL, NULL);
-	menu_draw(renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 1);
+	menu_draw(g_menu, renderer);
 }
 
 static void draw_player_info(const struct actor *player, SDL_Renderer *renderer)
@@ -103,10 +120,12 @@ void render_play(SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
 	SDL_RenderClear(renderer);
 	render_map(renderer);
-#ifdef _DEBUG
+#if SHOW_GRID
 	render_grid(renderer, (SDL_Color) { 214, 214, 214, 1 });
+#endif // SHOW_GRID
+#if SHOW_CONSOLE
 	render_debug_console(renderer);
-#endif // _DEBUG
+#endif // SHOW_CONSOLE
 	actor_draw(&g_player, renderer);
 	draw_player_info(&g_player, renderer);
 	SDL_RenderPresent(renderer);

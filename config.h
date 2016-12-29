@@ -10,6 +10,7 @@
 #define GAME_NAME "Dead Zone"
 // Title of the game window. (GAME_NAME GAME_VERSION)
 #define WINDOW_TITLE GAME_NAME " " GAME_VERSION
+#define FPS 60
 
 // Normalized screen width and height.
 #define SCREEN_WIDTH 1024
@@ -22,6 +23,13 @@
 // good monospace font
 #define FONT_TYPE "Consolas.ttf"
 #define FONT_FILE DATA_PATH FONT_TYPE
+
+// Code configuration.
+#define CAMERA_LIMIT 1
+#define SHOW_CONSOLE 1
+#define SHOW_GRID 0
+#define MUSIC_ON 0
+#define SOUND_ON 1
 
 // TODO: Dynamic configuration, load on init.
 

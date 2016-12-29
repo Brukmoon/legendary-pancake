@@ -8,12 +8,10 @@
 #include "level.h"
 #include "sound.h"
 #include "texture.h"
-#ifdef _DEBUG
-#include "game.h"
-#endif // _DEBUG
 
 #define ACTOR_TEXTURE "data/player.png"
-#define ACTOR_STANDARD_SPEED 6
+#define ACTOR_STANDARD_SPEED 6.f
+
 struct actor g_player;
 
 void actor_init(struct actor *actor, SDL_Renderer *renderer)
@@ -110,8 +108,14 @@ void actor_move(struct actor *actor, vec2 delta)
 				if (!tilemap_collision(g_level, &actor_after))
 					break;
 			}
+			// TODO: This is actually one frame late. Is it noticable?
 			if (actor_after.y == actor->skeleton.y) // If the position after move hasn't changed.
-				actor->state = GROUND;
+			{
+				if (actor->state != GROUND)
+				{
+					actor->state = GROUND;
+				}
+			}
 			else // if it has, he must be in air
 				actor->state = AIR;
 			actor->skeleton.y = actor_after.y;
