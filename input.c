@@ -1,8 +1,9 @@
 #include <SDL.h>
+
+#include "actor.h"
 #include "game.h"
 #include "camera.h"
 #include "common.h"
-#include "player.h"
 #include "collision.h"
 #include "input.h"
 #include "physics.h"
@@ -73,13 +74,16 @@ void process_input_play(struct game* game)
 				INFO("Game pause:%d.", game->paused);
 				break;
 			case SDLK_SPACE:
-				jump_actor(&g_player, 7.f);
+				actor_jump(&g_player, 7.f);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
 				break;
 			case SDLK_m:
 				game_set_state(game, MENU);
+				break;
+			case SDLK_p:
+				game_pause(game);
 				break;
 			default:
 				break;
@@ -178,16 +182,16 @@ void update_menu(void)
 
 void update_play(void)
 {
-	// Handle player.
+	// Update player.
 	if ((g_player.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
 		g_player.velocity.y += (float)GRAVITY;
 	else
 		g_player.velocity.y = T_VEL;
 	// Move him.
-	move_actor(&g_player, (vec2) { (coord) g_player.velocity.x, (coord) g_player.velocity.y });
+	actor_move(&g_player, (vec2) { (coord) g_player.velocity.x, (coord) g_player.velocity.y });
 }
 
 void update_edit(void)
 {
-	scroll_camera(&g_camera, (vec2) { (coord) g_player.velocity.x*g_player.skeleton.w, (coord) g_player.velocity.y*g_player.skeleton.h });
+	camera_scroll(&g_camera, (vec2) { (coord) g_player.velocity.x*g_player.skeleton.w, (coord) g_player.velocity.y*g_player.skeleton.h });
 }

@@ -1,4 +1,5 @@
 #include <SDL.h>
+
 #include "timer.h"
 
 void timer_reset(struct timer *t)

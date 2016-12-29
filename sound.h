@@ -7,6 +7,6 @@ void add_music(const char* name, const char* type);
 void add_sound(const char* name, const char* type);
 void play_music(const char *name);
 void play_sound(const char *name);
-void destroy_sound();
+void destroy_sound(void);
 
 #endif // SOUND_H

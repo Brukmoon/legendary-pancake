@@ -60,7 +60,8 @@ struct game
 // Is the game running?
 inline bool game_running(const struct game *game) { return game->state; }
 // Set game paused.
-inline void game_set_pause(struct game *game, bool yesno) { game->paused = yesno;  }
+inline bool game_set_pause(struct game *game, bool yesno) { return game->paused = yesno;  }
+bool game_pause(struct game *game);
 // Set game state.
 void game_set_state(struct game* game, const enum game_state state);
 

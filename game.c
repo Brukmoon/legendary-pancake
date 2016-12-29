@@ -1,5 +1,6 @@
 #include <SDL_mixer.h>
 
+#include "actor.h"
 #include "text.h"
 #include "camera.h"
 #include "config.h"
@@ -8,7 +9,6 @@
 #include "game.h"
 #include "input.h"
 #include "level.h"
-#include "player.h"
 #include "sound.h"
 #include "menu.h"
 
@@ -118,17 +118,22 @@ void game_set_state(struct game *game, const enum game_state state)
 	game->state = state;
 }
 
+bool game_pause(struct game *game) 
+{ 
+	return game_set_pause(game, !game->paused); 
+}
+
 void to_play_state(struct game *game)
 {
 	INFO("Game started.\n");
 	if (!g_level) // level not yet initialized
-		level_load(1, game->screen.renderer);
+		level_load(1, game->screen.renderer); // load level 1
 	// set callbacks to play state callbacks
 	game->update = update_play;
 	game->draw = render_play;
 	game->process_input = process_input_play;
-	init_camera(&g_camera);
-	init_actor(&g_player, game->screen.renderer);
+	camera_init(&g_camera);
+	actor_init(&g_player, game->screen.renderer);
 }
 
 void to_menu_state(struct game *game)
@@ -152,6 +157,6 @@ void to_edit_state(struct game *game)
 	game->process_input = process_input_edit;
 	g_player.velocity.y = g_player.velocity.x = 0;
 	SDL_ShowCursor(1);
-	init_camera(&g_camera);
-	init_actor(&g_player, game->screen.renderer);
+	camera_init(&g_camera);
+	actor_init(&g_player, game->screen.renderer);
 }

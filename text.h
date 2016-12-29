@@ -28,7 +28,7 @@ TTF_Font *add_font(struct font_container *table, int size, const SDL_Color *colo
 TTF_Font *get_font(struct font_container *table, int size, const SDL_Color *color);
 
 bool init_fonts(int buffer_size);
-void destroy_fonts();
+void destroy_fonts(void);
 
 // Text --> SDL_Texture
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color);

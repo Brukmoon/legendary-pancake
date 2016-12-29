@@ -33,9 +33,9 @@ struct actor
 };
 extern struct actor g_player;
 
-void init_actor(struct actor *actor, SDL_Renderer *renderer);
-void move_actor(struct actor *actor, vec2 delta);
-void jump_actor(struct actor *actor, float speed);
-void draw_actor(const struct actor *actor, SDL_Renderer *renderer);
+void actor_init(struct actor *actor, SDL_Renderer *renderer);
+void actor_move(struct actor *actor, vec2 delta);
+void actor_jump(struct actor *actor, float speed);
+void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
 
 #endif // PLAYER_H

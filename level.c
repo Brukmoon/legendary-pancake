@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "common.h"
 #include "game.h"
 #include "level.h"

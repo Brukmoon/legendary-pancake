@@ -152,7 +152,7 @@ void play_sound(const char *name)
 	}
 }
 
-void destroy_sound()
+void destroy_sound(void)
 {
 	for (int i = 0; i < MUSIC_ARR_SIZE; ++i)
 	{

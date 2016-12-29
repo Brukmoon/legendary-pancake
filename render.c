@@ -1,10 +1,10 @@
+#include "actor.h"
 #include "camera.h"
 #include "common.h"
 #include "graphics.h"
 #include "game.h"
 #include "level.h"
 #include "menu.h"
-#include "player.h"
 #include "render.h"
 #ifdef _DEBUG
 #include "text.h"
@@ -115,7 +115,7 @@ void render_play(SDL_Renderer *renderer)
 	render_grid(renderer, (SDL_Color) { 214, 214, 214, 1 });
 	render_debug_console(renderer);
 #endif // _DEBUG
-	draw_actor(&g_player, renderer);
+	actor_draw(&g_player, renderer);
 	draw_player_info(&g_player, renderer);
 	SDL_RenderPresent(renderer);
 }

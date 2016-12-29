@@ -73,7 +73,7 @@ TTF_Font* add_font(struct font_container *table, int size, const SDL_Color *colo
 	return new_bucket->font;
 }
 
-void destroy_fonts()
+void destroy_fonts(void)
 {
 	for (int i = 0; i < g_fonts.max_size; ++i)
 	{

@@ -162,7 +162,7 @@
     <ClCompile Include="collision.c" />
     <ClCompile Include="input.c" />
     <ClCompile Include="menu.c" />
-    <ClCompile Include="player.c" />
+    <ClCompile Include="actor.c" />
     <ClCompile Include="render.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="graphics.c" />
@@ -184,7 +184,7 @@
     <ClInclude Include="input.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="physics.h" />
-    <ClInclude Include="player.h" />
+    <ClInclude Include="actor.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="render.h" />

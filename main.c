@@ -11,7 +11,6 @@
 #include "game.h"
 //#include "test.h"
 
-#include <SDL_mixer.h>
 #include "sound.h"
 
 // framerate limited to 60 FPS
