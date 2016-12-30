@@ -15,6 +15,7 @@ struct button* button_create(SDL_Renderer* renderer, struct button* parent, cons
 	butt->texture[BUTTON_SPRITE_INACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 0, 0, 0 });
 	butt->texture[BUTTON_SPRITE_ACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 255, 0, 0 });
 	butt->position = position;
+	SDL_strlcpy(butt->text, text, BUTTON_TEXT_LENGTH);
 	butt->curr_sprite = BUTTON_SPRITE_INACTIVE; // inactive by default
 	butt->next = NULL;
 	butt->prev = parent;

@@ -19,24 +19,19 @@ void process_input_menu(struct game* game)
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) 
 			{
-			case SDLK_RIGHT:
-				break;
-			case SDLK_LEFT:
-				break;
 			case SDLK_UP:
 				menu_prev_button(g_menu);
 				break;
 			case SDLK_DOWN:
 				menu_next_button(g_menu);
 				break;
-			case SDLK_e:
-				game_set_state(game, EDIT);
-				break;
-			case SDLK_p:
-				game_set_state(game, PLAY);
-				break;
-			case SDLK_q:
-				game_set_state(game, EXIT);
+			case SDLK_RETURN:
+				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list.current->text) == 0)
+					game_set_state(game, PLAY);
+				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list.current->text) == 0)
+					game_set_state(game, EDIT);
+				else if(SDL_strcmp(M_MENU_QUIT, g_menu->button_list.current->text) == 0)
+					game_set_state(game, EXIT);
 				break;
 			default:
 				break;

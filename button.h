@@ -14,8 +14,10 @@ enum button_sprite
 
 struct button
 {
+#define BUTTON_TEXT_LENGTH 20
 	enum button_sprite curr_sprite;
     vec2 position;
+	char text[BUTTON_TEXT_LENGTH];
 	// Every button has unique textures.
 	SDL_Texture **texture;
 	// Linking buttons.
