@@ -39,16 +39,17 @@ int main(int argc, char* argv[]) {
 	music_add("music", ".ogg");
 	sound_add("jump", ".wav");
 	sound_add("select", ".wav");
+	sound_add("fall", ".wav");
 	music_play("music");
 	
 	Uint32 time = SDL_GetTicks();
 	// game loop
 	while (game_running(&game)) {
+		game.process_input(&game);
+		if (!game.paused)
+			game.update();
 		if (time > SDL_GetTicks()) // rendering rate can't exceed logic rate
 			game.draw(game.screen.renderer);
-		game.process_input(&game);
-		if(!game.paused)
-			game.update();
 		int delay = time - SDL_GetTicks();
 		if (delay > 0)
 			SDL_Delay(delay);

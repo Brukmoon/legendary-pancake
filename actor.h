@@ -10,7 +10,7 @@
 
 struct actor
 {
-	int hp;
+	int hitpoints;
 	enum
 	{
 		GROUND,
@@ -36,6 +36,7 @@ extern struct actor g_player;
 void actor_init(struct actor *actor, SDL_Renderer *renderer);
 void actor_move(struct actor *actor, vec2 delta);
 void actor_jump(struct actor *actor, float speed);
+void actor_damage(struct actor *actor, int damage);
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
 
 #endif // PLAYER_H

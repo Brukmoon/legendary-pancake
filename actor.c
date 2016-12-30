@@ -18,6 +18,7 @@ void actor_init(struct actor *actor, SDL_Renderer *renderer)
 {
 	actor->texture = load_texture(renderer, ACTOR_TEXTURE);
 	actor->draw_state = 0;
+	actor->hitpoints = 100;
 	actor->sprite_count = 3;
 	actor->skeleton.x = actor->skeleton.y = 32;
 	actor->skeleton.w = actor->skeleton.h = 32;
@@ -98,7 +99,6 @@ void actor_move(struct actor *actor, vec2 delta)
 		}
 		else
 		{
-			actor->velocity.y = 0;
 			while (true)
 			{
 				if (delta.y > 0)
@@ -108,16 +108,17 @@ void actor_move(struct actor *actor, vec2 delta)
 				if (!tilemap_collision(g_level, &actor_after))
 					break;
 			}
-			// TODO: This is actually one frame late. Is it noticable?
-			if (actor_after.y == actor->skeleton.y) // If the position after move hasn't changed.
+			if (actor_after.y >= actor->skeleton.y) // If the position after move hasn't changed.
 			{
 				if (actor->state != GROUND)
 				{
+					INFO("%f", actor->velocity.y);
+					if (actor->velocity.y > 12)
+						actor_damage(actor, ((int)actor->velocity.y % 10)*10);
 					actor->state = GROUND;
 				}
 			}
-			else // if it has, he must be in air
-				actor->state = AIR;
+			actor->velocity.y = 0;
 			actor->skeleton.y = actor_after.y;
 		}
 	}
@@ -133,6 +134,17 @@ void actor_move(struct actor *actor, vec2 delta)
 		actor->jump_count = 0;
 	}
 	camera_set(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
+}
+
+void actor_damage(struct actor *actor, int damage)
+{
+	sound_play("fall");
+#if DAMAGE_ON
+	if (actor->hitpoints - damage > 0)
+		actor->hitpoints -= damage;
+	else
+		actor->hitpoints = 0;
+#endif // GOD_MODE
 }
 
 void actor_jump(struct actor *actor, float speed)

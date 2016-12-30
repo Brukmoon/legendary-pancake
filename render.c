@@ -101,7 +101,7 @@ void render_menu_interface(SDL_Renderer* const renderer)
 
 static void draw_player_info(const struct actor *player, SDL_Renderer *renderer)
 {
-	fill_rect(renderer, SCREEN_WIDTH - 105, 9, 100, 11, (SDL_Color) { 255, 0, 0, 1 });
+	fill_rect(renderer, SCREEN_WIDTH - 105, 9, player->hitpoints, 11, (SDL_Color) { 255, 0, 0, 1 });
 	hollow_rect(renderer, SCREEN_WIDTH - 105, 9, 100, 11, (SDL_Color) { 0, 0, 0, 1 });
 	if (player->jump_count < 2)
 		fill_rect(renderer, SCREEN_WIDTH - 110, 5, 5, 10, (SDL_Color) { 255, 255, 0, 1 });
