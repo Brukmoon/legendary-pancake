@@ -68,28 +68,13 @@ static void render_debug_console(SDL_Renderer* const renderer)
 	char buffer[50];
 	// coordinates
 	sprintf_s(buffer, 50, "Player coordinates: [%d;%d]", g_player.skeleton.x, g_player.skeleton.y);
-	SDL_Texture *p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
-	SDL_Rect rect;
-	rect.x = rect.y = 0;
-	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
-	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
-	SDL_DestroyTexture(p_coord);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 0 }, renderer);
 	// speed
 	sprintf_s(buffer, 50, "Player speed: [%f;%f]", g_player.velocity.x, g_player.velocity.y);
-	p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
-	rect.x = 0;
-	rect.y = 12;
-	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
-	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
-	SDL_DestroyTexture(p_coord);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 12 }, renderer);
 	// state
 	sprintf_s(buffer, 50, g_player.state == GROUND ? "GROUND" : "AIR");
-	p_coord = create_text_texture(renderer, buffer, 12, (SDL_Color) { 0, 0, 0 });
-	rect.x = 0;
-	rect.y = 24;
-	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
-	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
-	SDL_DestroyTexture(p_coord);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 24 }, renderer);
 }
 #endif // _DEBUG
 

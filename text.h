@@ -2,6 +2,7 @@
 #define TEXT_H
 
 #include <SDL_ttf.h>
+
 #include "vector.h"
 
 #define FONT_SIZE 25
@@ -30,5 +31,6 @@ void fonts_destroy(void);
 
 // Text --> SDL_Texture
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color);
+void draw_text(const char *text, int font_size, const SDL_Color color, vec2 destination, SDL_Renderer *renderer);
 
 #endif // TEXT_H

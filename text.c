@@ -20,6 +20,17 @@ SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int s
 	return texture;
 }
 
+void draw_text(const char *text, int font_size, const SDL_Color color, vec2 destination, SDL_Renderer *renderer)
+{
+	SDL_Texture *p_coord = create_text_texture(renderer, text, font_size, color);
+	SDL_Rect rect;
+	rect.x = destination.x;
+	rect.y = destination.y;
+	SDL_QueryTexture(p_coord, NULL, NULL, &rect.w, &rect.h);
+	SDL_RenderCopy(renderer, p_coord, NULL, &rect);
+	SDL_DestroyTexture(p_coord);
+}
+
 bool fonts_init(int buffer_size)
 {
 	if (TTF_Init() < 0)
@@ -101,7 +112,7 @@ TTF_Font *font_get(struct font_container *table, int size, const SDL_Color *colo
 		prev = iter;
 		iter = iter->next;
 	}
-	if (!iter)
+	if (!iter) // not found
 		return font_add(&g_fonts, size, color);
 	return iter->font;
 }

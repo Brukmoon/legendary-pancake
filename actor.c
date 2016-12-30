@@ -11,6 +11,7 @@
 
 #define ACTOR_TEXTURE "data/player.png"
 #define ACTOR_STANDARD_SPEED 6.f
+#define ACTOR_HP 100
 
 struct actor g_player;
 
@@ -18,7 +19,7 @@ void actor_init(struct actor *actor, SDL_Renderer *renderer)
 {
 	actor->texture = load_texture(renderer, ACTOR_TEXTURE);
 	actor->draw_state = 0;
-	actor->hitpoints = 100;
+	actor->hitpoints = ACTOR_HP;
 	actor->sprite_count = 3;
 	actor->skeleton.x = actor->skeleton.y = 32;
 	actor->skeleton.w = actor->skeleton.h = 32;
@@ -140,7 +141,7 @@ void actor_damage(struct actor *actor, int damage)
 {
 	sound_play("fall");
 #if DAMAGE_ON
-	if (actor->hitpoints - damage > 0)
+	if (actor->hitpoints - damage > 0) // Hitpoints can't be less than 0.
 		actor->hitpoints -= damage;
 	else
 		actor->hitpoints = 0;
