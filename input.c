@@ -68,8 +68,8 @@ void process_input_play(struct game* game)
 				player.velocity.y = 1* PLAYER_SPEED;
 				break;*/
 			case SDLK_RETURN:
-				game_set_pause(game, !game->paused);
-				INFO("Game pause:%d.", game->paused);
+				game_pause(game);
+				INFO("Game pause: %s", game->paused?"TRUE":"FALSE");
 				break;
 			case SDLK_SPACE:
 				actor_jump(&g_player, 7.f);
@@ -79,9 +79,6 @@ void process_input_play(struct game* game)
 				break;
 			case SDLK_m:
 				game_set_state(game, MENU);
-				break;
-			case SDLK_p:
-				game_pause(game);
 				break;
 			default:
 				break;
@@ -174,6 +171,31 @@ void process_input_edit(struct game *game)
 	}
 }
 
+static void update_double_jump(struct actor *actor)
+{
+	// TODO: Move into update_double_jump.
+	/*
+	* The two following functions should be called only if actor is PC --> maybe add a bool into the struct.
+	*
+	**/
+	if (actor->is_jumping && actor->state == GROUND)
+	{
+		actor->is_jumping = false;
+		actor->jump_count = 0;
+	}
+}
+
+static void update_player_draw_state(struct actor *player)
+{
+	if (player->state != AIR)
+	{
+		if (player->draw_state < player->sprite_count - 1)
+			player->draw_state += .2f;
+		else
+			player->draw_state = 0;
+	}
+}
+
 void update_menu(void)
 {
 }
@@ -187,6 +209,10 @@ void update_play(void)
 		g_player.velocity.y = T_VEL;
 	// Move him.
 	actor_move(&g_player, (vec2) { (coord) g_player.velocity.x, (coord) g_player.velocity.y });
+	update_double_jump(&g_player);
+	update_player_draw_state(&g_player);
+	// Update camera.
+	camera_set(&g_camera, (vec2) { g_player.skeleton.x - CENTER_X, g_player.skeleton.y - CENTER_Y });
 }
 
 void update_edit(void)

@@ -81,14 +81,6 @@ void actor_move(struct actor *actor, vec2 delta)
 			}
 			actor->skeleton.x = actor_after.x;
 		}
-		// TODO: Move into update_actor_draw_state.
-		if (actor->state != AIR)
-		{
-			if (actor->draw_state < actor->sprite_count - 1)
-				actor->draw_state += .2f;
-			else
-				actor->draw_state = 0;
-		}
 	}
 	actor_after.y += delta.y;
 	if (delta.y != 0) // check y axis collision
@@ -113,7 +105,6 @@ void actor_move(struct actor *actor, vec2 delta)
 			{
 				if (actor->state != GROUND)
 				{
-					INFO("%f", actor->velocity.y);
 					if (actor->velocity.y > 12)
 						actor_damage(actor, ((int)actor->velocity.y % 10)*10);
 					actor->state = GROUND;
@@ -123,18 +114,6 @@ void actor_move(struct actor *actor, vec2 delta)
 			actor->skeleton.y = actor_after.y;
 		}
 	}
-	
-	// TODO: Move into update_double_jump.
-	/*
-	 * The two following functions should be called only if actor is PC --> maybe add a bool into the struct.
-	 *
-	 **/
-	if (actor->is_jumping && actor->state == GROUND)
-	{
-		actor->is_jumping = false;
-		actor->jump_count = 0;
-	}
-	camera_set(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }
 
 void actor_damage(struct actor *actor, int damage)

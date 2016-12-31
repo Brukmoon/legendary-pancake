@@ -9,7 +9,10 @@
 #define JUMP_COUNT 2
 
 struct actor
-{
+{/*
+#define ACTOR_NAME_LENGTH 20
+	char name[ACTOR_NAME_LENGTH];*/
+	// life
 	int hitpoints;
 	enum
 	{

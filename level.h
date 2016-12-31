@@ -44,6 +44,7 @@ extern struct level
 		int width, height;
 		int tile_width, tile_height;
 	} tile_map;
+	// Map tileset.
 	SDL_Texture *tileset;
 } *g_level;
 
