@@ -138,6 +138,7 @@ void to_play_state(struct game *game)
 	game->update = update_play;
 	game->draw = render_play;
 	game->process_input = process_input_play;
+	music_play("music", 6000);
 	camera_init(&g_camera);
 	actor_init(&g_player, game->screen.renderer);
 }
@@ -150,6 +151,7 @@ void to_menu_state(struct game *game)
 	game->draw = render_menu;
 	game->process_input = process_input_menu;
 	menu_load(game->screen.renderer);
+	music_play("menu", 4000);
 }
 
 void to_edit_state(struct game *game)

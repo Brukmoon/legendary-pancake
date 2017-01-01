@@ -154,16 +154,13 @@ static Mix_Chunk* sound_get(const char *name)
 	return NULL;
 }
 
-void music_play(const char *name)
+void music_play(const char *name, int ms)
 {
 #if MUSIC_ON
-	if (!Mix_PlayingMusic())
-	{
 		//Play the music
-		if (Mix_PlayMusic(music_get(name), -1) == -1)
-		{
-			ERROR("Couldn't play music %s.", name);
-		}
+	if (Mix_FadeInMusic(music_get(name), -1, ms) == -1)
+	{
+		ERROR("Couldn't play music %s.", name);
 	}
 #endif // MUSIC_ON
 }

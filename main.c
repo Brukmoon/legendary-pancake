@@ -35,14 +35,13 @@ int main(int argc, char* argv[]) {
 	};
 	if (!game.init(&game))
 		return EXIT_FAILURE;
-
 	music_add("music", ".ogg");
+	music_add("menu", ".ogg");
+
 	sound_add("jump", ".wav");
 	sound_add("select", ".wav");
 	sound_add("fall", ".wav");
 	sound_add("accept", ".wav");
-	music_play("music");
-	
 	Uint32 time = SDL_GetTicks();
 	// game loop
 	while (game_running(&game)) {
