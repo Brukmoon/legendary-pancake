@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
 	sound_add("jump", ".wav");
 	sound_add("select", ".wav");
 	sound_add("fall", ".wav");
+	sound_add("accept", ".wav");
 	music_play("music");
 	
 	Uint32 time = SDL_GetTicks();

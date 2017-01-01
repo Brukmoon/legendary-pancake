@@ -6,6 +6,7 @@
 #include "common.h"
 #include "collision.h"
 #include "menu.h"
+#include "sound.h"
 #include "input.h"
 #include "physics.h"
 
@@ -26,6 +27,7 @@ void process_input_menu(struct game* game)
 				menu_next_button(g_menu);
 				break;
 			case SDLK_RETURN:
+				sound_play("accept");
 				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list.current->text) == 0)
 					game_set_state(game, PLAY);
 				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list.current->text) == 0)
@@ -171,9 +173,8 @@ void process_input_edit(struct game *game)
 	}
 }
 
-static void update_double_jump(struct actor *actor)
+static void update_player_double_jump(struct actor *actor)
 {
-	// TODO: Move into update_double_jump.
 	/*
 	* The two following functions should be called only if actor is PC --> maybe add a bool into the struct.
 	*
@@ -209,7 +210,7 @@ void update_play(void)
 		g_player.velocity.y = T_VEL;
 	// Move him.
 	actor_move(&g_player, (vec2) { (coord) g_player.velocity.x, (coord) g_player.velocity.y });
-	update_double_jump(&g_player);
+	update_player_double_jump(&g_player);
 	update_player_draw_state(&g_player);
 	// Update camera.
 	camera_set(&g_camera, (vec2) { g_player.skeleton.x - CENTER_X, g_player.skeleton.y - CENTER_Y });

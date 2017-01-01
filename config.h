@@ -29,7 +29,7 @@
 #define SHOW_CONSOLE 1
 #define SHOW_GRID 1
 #define MUSIC_ON 0
-#define SOUND_ON 0
+#define SOUND_ON 1
 #define DAMAGE_ON 1
 
 // TODO: Dynamic configuration, load on init.
