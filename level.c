@@ -56,6 +56,9 @@ static struct
 #define LEVEL_SPRITE_ARR_SIZE 20
 	struct level_sprite_bucket *data[LEVEL_SPRITE_ARR_SIZE];
 } sprites_container;
+static void level_sprite_add(const char* name, int texture_id, SDL_Rect* target);
+static SDL_Texture *level_sprite_get(const char* name, SDL_Rect* target);
+static void level_destroy_sprites(void);
 
 // INTERNAL, load level textures into container
 static bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f);
@@ -140,6 +143,7 @@ void level_clean(struct level **level)
 	if (!*level)
 		return;
 	level_free_grid(*level);
+	level_destroy_sprites();
 	level_destroy_textures(*level);
 	free(*level);
 	INFO("Level structure freed.");
@@ -202,6 +206,26 @@ bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f)
 		return false;
 	}
 	INFO("Tileset (file: %s) loaded.", file_name);
+	char buffer[BUFFER_SIZE];
+	while (fgets(file_name, BUFFER_SIZE, f))
+	{
+		int curr_id = 0; // currently processing texture id #curr_id
+		SDL_Rect temp;
+		if (sscanf_s(file_name, "SPRITE: %s %d %d %d %d", buffer, BUFFER_SIZE, &temp.x, &temp.y, &temp.w, &temp.h) == 5)
+		{
+			SDL_Rect *target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+			target->x = temp.x;
+			target->y = temp.y;
+			target->w = temp.w;
+			target->h = temp.h;
+			level_sprite_add(buffer, curr_id, target);
+		}
+		else if (sscanf_s(file_name, "FILE: %s", buffer, BUFFER_SIZE) == 1)
+			curr_id = level_texture_add(buffer, renderer);
+		else
+			continue; // for now
+	}
+
 	return true;
 }
 
@@ -214,7 +238,7 @@ void level_destroy_textures(struct level *level)
 		while (textures_container.data[i])
 		{
 #ifdef _DEBUG
-			int ll_position = 0;
+			int ll_position = 0; // position in linked list
 			ll_position++;
 #endif // _DEBUG
 			struct level_texture_bucket *iter = textures_container.data[i];
@@ -239,7 +263,7 @@ int level_texture_add(const char* name, SDL_Renderer *renderer)
 	new_bucket->texture = load_texture(renderer, name);
 	new_bucket->key = id;
 	new_bucket->next = NULL;
-	int index = hash_i(index, LEVEL_TEXTURES_ARR_SIZE);
+	int index = hash_i(id, LEVEL_TEXTURES_ARR_SIZE);
 	struct level_texture_bucket* iter = textures_container.data[index], *prev = NULL;
 	while (iter)
 	{
@@ -268,4 +292,53 @@ SDL_Texture* level_texture_get(int id)
 	}
 	ERROR("Texture %d not found. Use function level_texture_add first to load the texture into the resource manager.", id);
 	return NULL;
+}
+
+void level_sprite_add(const char* name, int texture_id, SDL_Rect* target)
+{
+	INFO("Adding sprite %s (#%d) [%d, %d, %d, %d].", name, texture_id, target->x, target->y, target->w, target->h);
+	struct level_sprite_bucket *new_bucket = (struct level_sprite_bucket*) malloc(sizeof(struct level_sprite_bucket));
+	new_bucket->sprite.target = target;
+	new_bucket->sprite.texture_id = texture_id;
+	SDL_strlcpy(new_bucket->key, name, LEVEL_RESOURCE_LENGTH);
+	new_bucket->next = NULL;
+	int index = hash_s(name) % LEVEL_SPRITE_ARR_SIZE;
+	struct level_sprite_bucket* iter = sprites_container.data[index], *prev = NULL;
+	while (iter)
+	{
+		prev = iter;
+		iter = iter->next;
+	}
+	if (!prev)
+	{
+		sprites_container.data[index] = new_bucket;
+	}
+	else
+		prev->next = new_bucket;
+}
+
+void level_destroy_sprites(void)
+{
+	for (int i = 0; i < LEVEL_SPRITE_ARR_SIZE; ++i)
+	{
+		while (sprites_container.data[i])
+		{
+#ifdef _DEBUG
+			int ll_position = 0; // position in linked list
+			ll_position++;
+#endif // _DEBUG
+			struct level_sprite_bucket *iter = sprites_container.data[i];
+			sprites_container.data[i] = iter->next;
+#ifdef _DEBUG
+			INFO("Freeing sprite %s from index %d (position %d).", iter->key, i, ll_position);
+#endif // _DEBUG
+			free(iter->sprite.target);
+			free(iter);
+		}
+	}
+}
+
+SDL_Texture *level_sprite_get(const char* name, SDL_Rect* target)
+{
+
 }
