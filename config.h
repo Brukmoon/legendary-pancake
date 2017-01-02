@@ -13,6 +13,7 @@
 #define FPS 60
 
 // Normalized screen width and height.
+// 1024x800 during development, tested up to 1980x1080 (FullHD)
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 800
 

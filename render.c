@@ -66,15 +66,20 @@ void render_grid(SDL_Renderer *const renderer, const SDL_Color color)
 static void render_debug_console(SDL_Renderer* const renderer)
 {
 	char buffer[50];
+	// renderer
+	SDL_RendererInfo rendererInfo;
+	SDL_GetRendererInfo(renderer, &rendererInfo);
+	sprintf_s(buffer, 50, "Graphics API: %s %d x %d", rendererInfo.name, SCREEN_WIDTH, SCREEN_HEIGHT);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 0 }, renderer);
 	// coordinates
 	sprintf_s(buffer, 50, "Player coordinates: [%d;%d]", g_player.skeleton.x, g_player.skeleton.y);
-	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 0 }, renderer);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 12 }, renderer);
 	// speed
 	sprintf_s(buffer, 50, "Player speed: [%f;%f]", g_player.velocity.x, g_player.velocity.y);
-	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 12 }, renderer);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 24 }, renderer);
 	// state
 	sprintf_s(buffer, 50, g_player.state == GROUND ? "GROUND" : "AIR");
-	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 24 }, renderer);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 36 }, renderer);
 }
 #endif // _DEBUG
 

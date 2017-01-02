@@ -48,4 +48,24 @@ extern struct level
 	SDL_Texture *tileset;
 } *g_level;
 
+// Level texture data --> objects, actors (enemies) etc.
+struct level_data_bucket
+{
+#define LEVEL_RESOURCE_LENGTH 30
+	struct level_data_bucket *next;
+	char key[LEVEL_RESOURCE_LENGTH];
+
+	struct {
+		// If NULL, full.
+		SDL_Rect *target;
+		// ID of the texture in the texture manager.
+		int texture_id;
+	} sprite;
+};
+
+extern struct
+{
+	struct level_data_bucket **data;
+} *g_sprites;
+
 #endif // LEVEL_H
