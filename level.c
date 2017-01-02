@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "hash.h"
 #include "game.h"
 #include "level.h"
 #include "texture.h"
@@ -21,20 +22,17 @@ static bool level_load_data(struct level *level, SDL_Renderer *renderer, const c
 static bool level_load_tilemap(struct level *level, FILE *f);
 
 // Level sprite manager
-static void level_texture_add(const char* name, const char* type)
+struct level_texture_bucket
 {
-
-}
-static SDL_Texture* level_texture_get(const char *name, SDL_Rect *target)
-{
-
-}
-
+	struct level_texture_bucket *next;
+	int key;
+	SDL_Texture *texture;
+};
 // Level texture data --> objects, actors (enemies) etc.
-struct level_data_bucket
+struct level_sprite_bucket
 {
 #define LEVEL_RESOURCE_LENGTH 30
-	struct level_data_bucket *next;
+	struct level_sprite_bucket *next;
 	char key[LEVEL_RESOURCE_LENGTH];
 
 	struct {
@@ -47,9 +45,17 @@ struct level_data_bucket
 
 static struct
 {
+#define LEVEL_TEXTURES_ARR_SIZE 5
+	struct level_texture_bucket *data[LEVEL_TEXTURES_ARR_SIZE];
+} textures_container;
+static int level_texture_add(const char* name, SDL_Renderer *renderer);
+static SDL_Texture* level_texture_get(int id);
+
+static struct
+{
 #define LEVEL_SPRITE_ARR_SIZE 20
-	struct level_data_bucket *data[LEVEL_SPRITE_ARR_SIZE];
-} *g_sprites;
+	struct level_sprite_bucket *data[LEVEL_SPRITE_ARR_SIZE];
+} sprites_container;
 
 // INTERNAL, load level textures into container
 static bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f);
@@ -203,7 +209,63 @@ void level_destroy_textures(struct level *level)
 {
 	SDL_DestroyTexture(level->tileset);
 	SDL_DestroyTexture(level->background);
+	for (int i = 0; i < LEVEL_TEXTURES_ARR_SIZE; ++i)
+	{
+		while (textures_container.data[i])
+		{
+#ifdef _DEBUG
+			int ll_position = 0;
+			ll_position++;
+#endif // _DEBUG
+			struct level_texture_bucket *iter = textures_container.data[i];
+			textures_container.data[i] = iter->next;
+#ifdef _DEBUG
+			INFO("Freeing texture #%d from index %d (position %d).", iter->key, i, ll_position);
+#endif // _DEBUG
+			SDL_DestroyTexture(iter->texture);
+			free(iter);
+		}
+	}
 	INFO("Textures destroyed.");
 }
 
 // Level sprite manager
+int level_texture_add(const char* name, SDL_Renderer *renderer)
+{
+	// Texture ID.
+	static int id = -1;
+	id++;
+	struct level_texture_bucket *new_bucket = (struct level_texture_bucket*) malloc(sizeof(struct level_texture_bucket));
+	new_bucket->texture = load_texture(renderer, name);
+	new_bucket->key = id;
+	new_bucket->next = NULL;
+	int index = hash_i(index, LEVEL_TEXTURES_ARR_SIZE);
+	struct level_texture_bucket* iter = textures_container.data[index], *prev = NULL;
+	while (iter)
+	{
+		prev = iter;
+		iter = iter->next;
+	}
+	if (!prev)
+	{
+		textures_container.data[index] = new_bucket;
+	}
+	else
+		prev->next = new_bucket;
+	INFO("Added texture %s (ID %d) to index %d", name, id, index);
+	return id;
+}
+
+SDL_Texture* level_texture_get(int id)
+{
+	unsigned long index = hash_i(id, LEVEL_TEXTURES_ARR_SIZE);
+	struct level_texture_bucket* iter = textures_container.data[index];
+	while (iter)
+	{
+		if (iter->key == id) // string match
+			return iter->texture;
+		iter = iter->next;
+	}
+	ERROR("Texture %d not found. Use function level_texture_add first to load the texture into the resource manager.", id);
+	return NULL;
+}
