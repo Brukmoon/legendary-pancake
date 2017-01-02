@@ -22,7 +22,6 @@ static struct font_container
 	int max_size;
 } g_fonts;
 
-static inline int hash_code(int key, int buffer_size) { return key%buffer_size; }
 TTF_Font *font_add(struct font_container *table, int size, const SDL_Color *color);
 TTF_Font *font_get(struct font_container *table, int size, const SDL_Color *color);
 

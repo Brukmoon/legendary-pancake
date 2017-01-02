@@ -1,5 +1,6 @@
 #include "config.h"
 #include "common.h"
+#include "hash.h"
 #include "text.h"
 
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color)
@@ -69,7 +70,7 @@ TTF_Font* font_add(struct font_container *table, int size, const SDL_Color *colo
 	new_bucket->key = size;
 	new_bucket->color = *color;
 	// Find the index.
-	int index = hash_code(new_bucket->key, table->max_size);
+	int index = hash_i(new_bucket->key, table->max_size);
 	struct bucket* iter = table->hash_array[index], *prev = NULL;
 	while (iter)
 	{
@@ -105,7 +106,7 @@ static bool colors_equal(const SDL_Color *first, const SDL_Color *second)
 
 TTF_Font *font_get(struct font_container *table, int size, const SDL_Color *color)
 {
-	int index = hash_code(size, table->max_size);
+	int index = hash_i(size, table->max_size);
 	struct bucket* iter = table->hash_array[index], *prev = NULL;
 	while (iter && iter->key != size && !colors_equal(color, &iter->color))
 	{

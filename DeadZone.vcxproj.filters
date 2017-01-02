@@ -82,6 +82,9 @@
     <ClCompile Include="actor.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="hash.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -142,6 +145,9 @@
       <Filter>Core\Header files</Filter>
     </ClInclude>
     <ClInclude Include="actor.h">
+      <Filter>Core\Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="hash.h">
       <Filter>Core\Header files</Filter>
     </ClInclude>
   </ItemGroup>

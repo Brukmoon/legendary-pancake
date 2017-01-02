@@ -19,6 +19,38 @@ static void level_free_grid(struct level *level);
 static bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* file_name);
 // INTERNAL, load the grid into level, expects iobuf to point to the grid.
 static bool level_load_tilemap(struct level *level, FILE *f);
+
+// Level sprite manager
+static void level_texture_add(const char* name, const char* type)
+{
+
+}
+static SDL_Texture* level_texture_get(const char *name, SDL_Rect *target)
+{
+
+}
+
+// Level texture data --> objects, actors (enemies) etc.
+struct level_data_bucket
+{
+#define LEVEL_RESOURCE_LENGTH 30
+	struct level_data_bucket *next;
+	char key[LEVEL_RESOURCE_LENGTH];
+
+	struct {
+		// If NULL, full.
+		SDL_Rect *target;
+		// ID of the texture in the internal texture manager.
+		int texture_id;
+	} sprite;
+};
+
+static struct
+{
+#define LEVEL_SPRITE_ARR_SIZE 20
+	struct level_data_bucket *data[LEVEL_SPRITE_ARR_SIZE];
+} *g_sprites;
+
 // INTERNAL, load level textures into container
 static bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f);
 static void level_destroy_textures(struct level *level);
@@ -173,3 +205,5 @@ void level_destroy_textures(struct level *level)
 	SDL_DestroyTexture(level->background);
 	INFO("Textures destroyed.");
 }
+
+// Level sprite manager

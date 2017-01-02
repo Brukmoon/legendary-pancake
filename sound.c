@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "hash.h"
 #include "sound.h"
 
 struct music_bucket
@@ -29,20 +30,11 @@ static struct {
 	struct sound_bucket *sound[SOUND_ARR_SIZE];
 } sound_container;
 
-static unsigned long hash(const char *str)
-{
-	unsigned long hash = 5381;
-	int c;
-	while (c = *str++)
-		hash = ((hash << 5) + hash) + c;
-	return hash;
-}
-
 void music_add(const char *name, const char* type)
 {
 #if MUSIC_ON
 	// Calculate index from hash.
-	unsigned long index = hash(name) % MUSIC_ARR_SIZE;
+	unsigned long index = hash_s(name) % MUSIC_ARR_SIZE;
 	struct music_bucket* new_bucket = (struct music_bucket*) malloc(sizeof(struct music_bucket));
 	if (!new_bucket)
 	{
@@ -94,7 +86,7 @@ void sound_add(const char* name, const char* type)
 {
 #if SOUND_ON
 	// Calculate index from hash.
-	unsigned long index = hash(name) % SOUND_ARR_SIZE;
+	unsigned long index = hash_s(name) % SOUND_ARR_SIZE;
 	struct sound_bucket* new_bucket = (struct sound_bucket*) malloc(sizeof(struct sound_bucket));
 	if (!new_bucket)
 	{
@@ -128,7 +120,7 @@ void sound_add(const char* name, const char* type)
 }
 static Mix_Music* music_get(const char *name)
 {
-	unsigned long index = hash(name) % MUSIC_ARR_SIZE;
+	unsigned long index = hash_s(name) % MUSIC_ARR_SIZE;
 	struct music_bucket* iter = music_container.music[index];
 	while (iter)
 	{
@@ -142,7 +134,7 @@ static Mix_Music* music_get(const char *name)
 
 static Mix_Chunk* sound_get(const char *name)
 {
-	unsigned long index = hash(name) % SOUND_ARR_SIZE;
+	unsigned long index = hash_s(name) % SOUND_ARR_SIZE;
 	struct sound_bucket* iter = sound_container.sound[index];
 	while (iter)
 	{

@@ -59,7 +59,7 @@ void actor_move(struct actor *actor, vec2 delta)
 {
 	// Where is the actor after the movement?
 	SDL_Rect actor_after = { actor->skeleton.x + delta.x, actor->skeleton.y,
-		g_level->tile_map.tile_width, g_level->tile_map.tile_height };
+		actor->skeleton.w, actor->skeleton.h };
 	// Handle each axis collision separately.
 	if (delta.x != 0) // check x axis collision
 	{
