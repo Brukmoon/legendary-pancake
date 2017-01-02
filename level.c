@@ -67,13 +67,9 @@ static void level_destroy_textures(struct level *level);
 
 bool level_load(int id, SDL_Renderer *renderer)
 {
-	INFO("- Loading level.");
-	if (g_level)
-	{
-		ERROR("Previous level not cleaned");
-		level_clean(&g_level);
-	}
-	level_init(&g_level);
+	INFO("- Loading level %d.", id);
+	if (!g_level) // Level not yet initialized.
+		level_init(&g_level);
 	char buffer[BUFFER_SIZE];
 	sprintf_s(buffer, BUFFER_SIZE, "data/map/level%d.level", id);
 	if (level_load_data(g_level, renderer, buffer))
@@ -129,6 +125,11 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 
 void level_init(struct level **level)
 {
+	if (*level) // prevent memory leak
+	{
+		INFO("Level already initialized. Skipping.");
+		return;
+	}
 	*level = malloc(sizeof(**level));
 	if (!*level)
 	{
@@ -141,7 +142,10 @@ void level_init(struct level **level)
 void level_clean(struct level **level)
 {
 	if (!*level)
+	{
+		INFO("Level not initialized. Skipping clean.");
 		return;
+	}
 	level_free_grid(*level);
 	level_destroy_sprites();
 	level_destroy_textures(*level);
