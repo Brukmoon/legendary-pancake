@@ -5,6 +5,7 @@
 #include "hash.h"
 #include "game.h"
 #include "level.h"
+#include "object.h"
 #include "texture.h"
 
 #define BUFFER_SIZE 256
@@ -113,13 +114,6 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		fclose(f);
 		return false;
 	}
-	g_level->background = load_texture(renderer, "data/background1.png");
-	if (!g_level->background)
-	{
-		INFO("Level background couldn't be loaded.");
-		fclose(f);
-		return false;
-	}
 	fclose(f);
 	return true;
 }
@@ -211,6 +205,13 @@ bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f)
 		return false;
 	}
 	INFO("Tileset (file: %s) loaded.", file_name);
+	g_level->background = load_texture(renderer, "data/background1.png");
+	if (!g_level->background)
+	{
+		INFO("Level background couldn't be loaded.");
+		fclose(f);
+		return false;
+	}
 	char buffer[BUFFER_SIZE];
 	while (fgets(file_name, BUFFER_SIZE, f))
 	{
@@ -227,8 +228,8 @@ bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f)
 		}
 		else if (sscanf_s(file_name, "FILE: %s", buffer, BUFFER_SIZE) == 1)
 			curr_id = level_texture_add(buffer, renderer);
-		else
-			continue; // for now
+		else if (SDL_strcmp("OBJECTS\n", file_name) == 0)
+			break;
 	}
 	return true;
 }
@@ -304,7 +305,7 @@ SDL_Texture* level_texture_get(int id)
 	return NULL;
 }
 
-void level_sprite_add(const char* name, int texture_id, SDL_Rect* target)
+void level_sprite_add(const char *name, int texture_id, SDL_Rect *target)
 {
 	INFO("Adding sprite %s (#%d) [%d, %d, %d, %d].", name, texture_id, target->x, target->y, target->w, target->h);
 	struct level_sprite_bucket *new_bucket = (struct level_sprite_bucket*) malloc(sizeof(struct level_sprite_bucket));

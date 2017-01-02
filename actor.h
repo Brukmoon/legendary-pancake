@@ -34,12 +34,19 @@ struct actor
 	float speed;
 	vec2f velocity;
 };
+// TODO: Move to player struct.
 extern struct actor g_player;
 
+// Initialize actor.
+// TODO: Add initialization options.
 void actor_init(struct actor *actor, SDL_Renderer *renderer);
+// Move actor by delta.
 void actor_move(struct actor *actor, vec2 delta);
+// Perform jump. Speed must be positive, not a vector.
 void actor_jump(struct actor *actor, float speed);
+// Subtract damage points from actor's HPs.
 void actor_damage(struct actor *actor, int damage);
+// Draw actor on screen.
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
 
 #endif // PLAYER_H

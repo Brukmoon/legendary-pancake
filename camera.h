@@ -15,8 +15,8 @@
 #define CENTER_X SCREEN_WIDTH/2
 #define CENTER_Y SCREEN_HEIGHT/2
 
-// Initial camera positions.
-enum initial_camera
+// Initial camera position.
+enum initial_camera_coords
 {
 	INITIAL_CAMERA_X = 0,
 	INITIAL_CAMERA_Y = 0
