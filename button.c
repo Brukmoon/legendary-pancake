@@ -37,7 +37,7 @@ void button_destroy(struct button *button)
 {
 	for (int i = 0; i < BUTTON_SPRITE_COUNT; ++i)
 		SDL_DestroyTexture(button->texture[i]);
-	free(*button->texture);
+	free(button->texture);
 	INFO("Button at position [%d;%d] destroyed.", button->position.x, button->position.y);
 	free(button);
 }

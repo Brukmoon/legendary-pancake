@@ -36,11 +36,11 @@ void menu_destroy(void)
 		return;
 	}
 	struct button *temp = NULL;
-	while (g_menu->button_list.head)
+	while (g_menu->button_list.root)
 	{
-		temp = g_menu->button_list.head;
-		g_menu->button_list.head = g_menu->button_list.head->next;
-		free(temp);
+		temp = g_menu->button_list.root;
+		g_menu->button_list.root = g_menu->button_list.root->next;
+		button_destroy(temp);
 	}
 	SDL_DestroyTexture(g_menu->background);
 	free(g_menu);

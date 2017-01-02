@@ -5,6 +5,11 @@
  *
  **/
 #define UNUSED_PARAMETER(p) (void)p
+#ifdef _MSC_VER
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // _MSC_VER
 #include <stdlib.h>
 
 #include "config.h"
@@ -56,5 +61,9 @@ int main(int argc, char* argv[]) {
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
 	game.clean(&game);
+	// Memory leak detection --> work only in VS IDE, implicit output to Debug window.
+#ifdef _MSC_VER
+	_CrtDumpMemoryLeaks();
+#endif // _MSC_VER
 	return EXIT_SUCCESS;
 }
