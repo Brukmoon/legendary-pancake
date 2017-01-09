@@ -57,10 +57,10 @@ void process_input_play(struct game* game)
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				g_player.velocity.x = 1*g_player.speed;
+				player_set_vel_x(&g_player, g_player.actor.speed);
 				break;
 			case SDLK_LEFT:
-				g_player.velocity.x = -1*g_player.speed;
+				player_set_vel_x(&g_player, -g_player.actor.speed);
 				break;
 		    /*
 			case SDLK_UP:
@@ -90,7 +90,7 @@ void process_input_play(struct game* game)
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
 			case SDLK_LEFT:
-				g_player.velocity.x = 0;
+				player_set_vel_x(&g_player, 0);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -120,16 +120,16 @@ void process_input_edit(struct game *game)
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				g_player.velocity.x = 1;
+				player_set_vel_x(&g_player, g_player.actor.speed);
 				break;
 			case SDLK_LEFT:
-				g_player.velocity.x = -1;
+				player_set_vel_x(&g_player, -g_player.actor.speed);
 				break;
 			case SDLK_UP:
-				g_player.velocity.y = -1;
+				player_set_vel_y(&g_player, -g_player.actor.speed);
 				break;
 			case SDLK_DOWN:
-				g_player.velocity.y = 1;
+				player_set_vel_y(&g_player, g_player.actor.speed);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -145,11 +145,11 @@ void process_input_edit(struct game *game)
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
 			case SDLK_LEFT:
-				g_player.velocity.x = 0;
+				player_set_vel_x(&g_player, 0);
 				break;
 			case SDLK_UP:
 			case SDLK_DOWN:
-				g_player.velocity.y = 0;
+				player_set_vel_y(&g_player, 0);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -173,27 +173,27 @@ void process_input_edit(struct game *game)
 	}
 }
 
-static void update_player_double_jump(struct actor *actor)
+static void update_player_double_jump(struct player *player)
 {
 	/*
 	* The two following functions should be called only if actor is PC --> maybe add a bool into the struct.
 	*
 	**/
-	if (actor->is_jumping && actor->state == GROUND)
+	if (player->actor.is_jumping && player->actor.state == GROUND)
 	{
-		actor->is_jumping = false;
-		actor->jump_count = 0;
+		player->actor.is_jumping = false;
+		player->actor.jump_count = 0;
 	}
 }
 
-static void update_player_draw_state(struct actor *player)
+static void update_player_draw_state(struct player *player)
 {
-	if (player->state != AIR)
+	if (player->actor.state != AIR)
 	{
-		if (player->draw_state < player->sprite_count - 1)
-			player->draw_state += .2f;
+		if (player->actor.draw_state < player->actor.sprite_count - 1)
+			player->actor.draw_state += .2f;
 		else
-			player->draw_state = 0;
+			player->actor.draw_state = 0;
 	}
 }
 
@@ -204,19 +204,19 @@ void update_menu(void)
 void update_play(void)
 {
 	// Update player.
-	if ((g_player.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
-		g_player.velocity.y += (float)GRAVITY;
+	if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
+		g_player.actor.velocity.y += (float)GRAVITY;
 	else
-		g_player.velocity.y = T_VEL;
+		player_set_vel_y(&g_player, T_VEL);
 	// Move him.
-	actor_move(&g_player, (vec2) { (coord) g_player.velocity.x, (coord) g_player.velocity.y });
+	player_move(&g_player, (vec2) { (coord) g_player.actor.velocity.x, (coord) g_player.actor.velocity.y });
 	update_player_double_jump(&g_player);
 	update_player_draw_state(&g_player);
 	// Update camera.
-	camera_set(&g_camera, (vec2) { g_player.skeleton.x - CENTER_X, g_player.skeleton.y - CENTER_Y });
+	camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
 }
 
 void update_edit(void)
 {
-	camera_scroll(&g_camera, (vec2) { (coord) g_player.velocity.x*g_player.skeleton.w, (coord) g_player.velocity.y*g_player.skeleton.h });
+	camera_scroll(&g_camera, (vec2) { (coord) g_player.actor.velocity.x*g_player.actor.skeleton.w, (coord) g_player.actor.velocity.y*g_player.actor.skeleton.h });
 }

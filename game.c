@@ -140,7 +140,7 @@ void to_play_state(struct game *game)
 	game->process_input = process_input_play;
 	music_play("music", 6000);
 	camera_init(&g_camera);
-	actor_init(&g_player, game->screen.renderer);
+	player_init(&g_player, game->screen.renderer);
 }
 
 void to_menu_state(struct game *game)
@@ -163,7 +163,8 @@ void to_edit_state(struct game *game)
 	game->update = update_edit;
 	game->draw = render_edit;
 	game->process_input = process_input_edit;
-	g_player.velocity.y = g_player.velocity.x = 0;
+    player_set_vel_x(&g_player, 0);
+	player_set_vel_y(&g_player, 0);
 	SDL_ShowCursor(1);
 	camera_init(&g_camera);
 	actor_init(&g_player, game->screen.renderer);

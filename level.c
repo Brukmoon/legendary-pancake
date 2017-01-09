@@ -51,6 +51,7 @@ static struct
 } textures_container;
 static int level_texture_add(const char* name, SDL_Renderer *renderer);
 static SDL_Texture* level_texture_get(int id);
+// textures_container resources are freed in level_destroy_textures()
 
 static struct
 {

@@ -6,12 +6,13 @@
 
 #include "vector.h"
 
+// If JUMP_COUNT changes, modify the UI aswell.
 #define JUMP_COUNT 2
 
 struct actor
-{/*
+{
 #define ACTOR_NAME_LENGTH 20
-	char name[ACTOR_NAME_LENGTH];*/
+	char name[ACTOR_NAME_LENGTH];
 	// life
 	int hitpoints;
 	enum
@@ -19,7 +20,6 @@ struct actor
 		GROUND,
 		AIR
 	} state;
-	SDL_Texture *texture;
 	float draw_state;
 	int sprite_count;
 	struct
@@ -32,10 +32,9 @@ struct actor
 
 	// speed coefficient
 	float speed;
+	// current velocity
 	vec2f velocity;
 };
-// TODO: Move to player struct.
-extern struct actor g_player;
 
 // Initialize actor.
 // TODO: Add initialization options.
@@ -48,5 +47,25 @@ void actor_jump(struct actor *actor, float speed);
 void actor_damage(struct actor *actor, int damage);
 // Draw actor on screen.
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
+
+// Player is a special case of actor.
+struct player // : public actor;
+{
+	// A player is an actor.
+	struct actor actor;
+	SDL_Texture *texture;
+};
+
+void player_init(struct player *player, SDL_Renderer *renderer);
+void player_draw(const struct player *player, SDL_Renderer *renderer);
+void player_move(const struct player *player, const vec2 delta);
+inline void player_jump(struct player *player, float speed) { actor_jump(&player->actor, speed); }
+inline void player_damage(struct player *player, int damage) { actor_damage(&player->actor, damage); }
+inline void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }
+inline void player_set_vel_y(struct player *player, float vel) { player->actor.velocity.y = vel; }
+
+// TODO: Move to player struct.
+extern struct player g_player;
+
 
 #endif // PLAYER_H

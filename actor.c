@@ -13,11 +13,10 @@
 #define ACTOR_STANDARD_SPEED 6.f
 #define ACTOR_HP 100
 
-struct actor g_player;
+struct player g_player;
 
 void actor_init(struct actor *actor, SDL_Renderer *renderer)
 {
-	actor->texture = load_texture(renderer, ACTOR_TEXTURE);
 	actor->draw_state = 0;
 	actor->hitpoints = ACTOR_HP;
 	actor->sprite_count = 3;
@@ -33,7 +32,7 @@ void actor_init(struct actor *actor, SDL_Renderer *renderer)
 
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer)
 {
-	SDL_Rect dest;
+	/*SDL_Rect dest;
 	dest.w = dest.h = 34; // Draw a bit larger.
 	dest.x = actor->skeleton.x - g_camera.position.x;
 	dest.y = actor->skeleton.y - g_camera.position.y;
@@ -52,7 +51,7 @@ void actor_draw(const struct actor *actor, SDL_Renderer *renderer)
 			SDL_RenderCopyEx(renderer, actor->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
 		else
 			SDL_RenderCopy(renderer, actor->texture, &src, &dest);
-	}
+	}*/
 }
 
 void actor_move(struct actor *actor, vec2 delta)
@@ -142,4 +141,39 @@ void actor_jump(struct actor *actor, float speed)
 		// Go against gravity.
 		actor->velocity.y = -speed;
 	}
+}
+
+void player_init(struct player *player, SDL_Renderer *renderer) 
+{ 
+	actor_init(&player->actor, renderer); 
+	player->texture = load_texture(renderer, ACTOR_TEXTURE);
+}
+
+void player_draw(const struct player *player, SDL_Renderer *renderer)
+{
+	SDL_Rect dest;
+	dest.w = dest.h = 34; // Draw a bit larger.
+	dest.x = player->actor.skeleton.x - g_camera.position.x;
+	dest.y = player->actor.skeleton.y - g_camera.position.y;
+	SDL_Rect src;
+	src.w = src.h = 32;
+	if (player->actor.velocity.x == 0) // If standing.
+	{
+		src.y = src.x = 0;
+		SDL_RenderCopy(renderer, player->texture, &src, &dest);
+	}
+	else // moving
+	{
+		src.x = ((int)player->actor.draw_state)*player->actor.skeleton.w;
+		src.y = 96;
+		if (player->actor.velocity.x < 0) // Moving left.
+			SDL_RenderCopyEx(renderer, player->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
+		else
+			SDL_RenderCopy(renderer, player->texture, &src, &dest);
+	}
+}
+
+void player_move(const struct player *player, const vec2 delta)
+{
+	actor_move(&player->actor, delta);
 }
