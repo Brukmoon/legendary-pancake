@@ -4,12 +4,13 @@
 #include "camera.h"
 #include "collision.h"
 #include "common.h"
+#include "config.h"
 #include "graphics.h"
 #include "level.h"
 #include "sound.h"
 #include "texture.h"
 
-#define ACTOR_TEXTURE "data/player.png"
+#define ACTOR_TEXTURE IMG_PATH"player.png"
 #define ACTOR_STANDARD_SPEED 6.f
 #define ACTOR_HP 100
 

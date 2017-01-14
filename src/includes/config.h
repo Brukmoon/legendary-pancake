@@ -17,9 +17,11 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 800
 
-#define DATA_PATH "./data/"
+#define DATA_PATH "./assets/"
 #define IMG_PATH DATA_PATH##"gfx/"
 #define SOUND_PATH DATA_PATH##"sfx/"
+#define SOUND_PATH DATA_PATH##"sfx/"
+#define LEVEL_PATH DATA_PATH##"level/"
 
 // good monospace font
 #define FONT_TYPE "Consolas.ttf"

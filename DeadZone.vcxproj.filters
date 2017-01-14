@@ -1,154 +1,126 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Test">
-      <UniqueIdentifier>{713b0d86-55a3-4da7-84c0-e980c963568b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Data structures">
-      <UniqueIdentifier>{570f4074-e7f3-4fe9-ac91-ee6a3bcfabbc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Data structures\Header files">
-      <UniqueIdentifier>{c0761810-423a-43be-9913-68e37d7b0ff1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Test\Header files">
-      <UniqueIdentifier>{f6fd8a17-efc9-472e-afc9-e73b47b6e848}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI">
-      <UniqueIdentifier>{4dc430c4-bcad-4753-b74f-055dae33610e}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="src\timer.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texture.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\text.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stack.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sound.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\level.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hash.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collision.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\camera.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\actor.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\button.c">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu.c">
+      <Filter>Menu</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Core">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <UniqueIdentifier>{6b96d4ae-8e7a-423d-b8d3-7563f04902b8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Header files">
-      <UniqueIdentifier>{dfb4824c-dd18-4e45-bd89-036e8cd4b1bb}</UniqueIdentifier>
+    <Filter Include="Core\Header Files">
+      <UniqueIdentifier>{b808352c-067e-42cc-be4b-a6b30acba429}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{5fdac6da-eed6-4e4e-b893-1b87e32e2153}</UniqueIdentifier>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{c67035a3-d25e-4c66-b090-98b9a8d70184}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Header files">
-      <UniqueIdentifier>{c633cde8-f7f3-4ff5-9763-da9794f6a8e6}</UniqueIdentifier>
+    <Filter Include="Menu\Header Files">
+      <UniqueIdentifier>{ddee6f31-b059-4f64-920a-d8a12c440def}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="game.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="level.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="test.c">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="stack.c">
-      <Filter>Data structures</Filter>
-    </ClCompile>
-    <ClCompile Include="button.c">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="render.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="text.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="input.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="menu.c">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="collision.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="timer.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="sound.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="actor.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="hash.c">
-      <Filter>Core</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="game.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\actor.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\camera.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="level.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\collision.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\common.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="config.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\config.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\game.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="button.h">
-      <Filter>UI\Header files</Filter>
+    <ClInclude Include="src\includes\graphics.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stack.h">
-      <Filter>Data structures\Header files</Filter>
+    <ClInclude Include="src\includes\hash.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test.h">
-      <Filter>Test\Header files</Filter>
+    <ClInclude Include="src\includes\input.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="render.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\level.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="text.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\physics.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\render.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\sound.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="menu.h">
-      <Filter>UI\Header files</Filter>
+    <ClInclude Include="src\includes\stack.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="collision.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\text.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="physics.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\texture.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="timer.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\button.h">
+      <Filter>Menu\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vector.h">
-      <Filter>Core\Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="sound.h">
-      <Filter>Core\Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="actor.h">
-      <Filter>Core\Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="hash.h">
-      <Filter>Core\Header files</Filter>
+    <ClInclude Include="src\includes\menu.h">
+      <Filter>Menu\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

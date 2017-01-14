@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "config.h"
 #include "hash.h"
 #include "game.h"
 #include "level.h"
@@ -72,7 +73,7 @@ bool level_load(int id, SDL_Renderer *renderer)
 	if (!g_level) // Level not yet initialized.
 		level_init(&g_level);
 	char buffer[BUFFER_SIZE];
-	sprintf_s(buffer, BUFFER_SIZE, "data/map/level%d.level", id);
+	sprintf_s(buffer, BUFFER_SIZE, LEVEL_PATH"level%d.level", id);
 	if (level_load_data(g_level, renderer, buffer))
 	{
 		INFO("Level %d loaded.", id);
@@ -205,7 +206,7 @@ bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f)
 		return false;
 	}
 	INFO("Tileset (file: %s) loaded.", file_name);
-	g_level->background = load_texture(renderer, "data/background1.png");
+	g_level->background = load_texture(renderer, IMG_PATH"level1_background.png");
 	if (!g_level->background)
 	{
 		INFO("Level background couldn't be loaded.");

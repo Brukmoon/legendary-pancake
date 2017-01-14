@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "common.h"
+#include "config.h"
 #include "text.h"
 #include "graphics.h"
 #include "menu.h"
@@ -25,7 +26,7 @@ void menu_load(SDL_Renderer* renderer)
 	button_add(renderer, M_MENU_QUIT, (const vec2) { CENTER_X-2*FONT_SIZE, CENTER_Y+2*FONT_SIZE });
 	g_menu->button_list.current = g_menu->button_list.root;
 	g_menu->button_list.root->curr_sprite = BUTTON_SPRITE_ACTIVE;
-	g_menu->background = load_texture(renderer, "data/gfx/background1.jpg");
+	g_menu->background = load_texture(renderer, IMG_PATH"background1.jpg");
 }
 
 void menu_destroy(void)

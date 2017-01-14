@@ -14,7 +14,6 @@
 
 #include "config.h"
 #include "game.h"
-//#include "test.h"
 #include "sound.h"
 
 int main(int argc, char* argv[]) {

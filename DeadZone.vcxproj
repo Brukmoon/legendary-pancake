@@ -18,6 +18,45 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\actor.c" />
+    <ClCompile Include="src\button.c" />
+    <ClCompile Include="src\camera.c" />
+    <ClCompile Include="src\collision.c" />
+    <ClCompile Include="src\game.c" />
+    <ClCompile Include="src\graphics.c" />
+    <ClCompile Include="src\hash.c" />
+    <ClCompile Include="src\input.c" />
+    <ClCompile Include="src\level.c" />
+    <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\menu.c" />
+    <ClCompile Include="src\render.c" />
+    <ClCompile Include="src\sound.c" />
+    <ClCompile Include="src\stack.c" />
+    <ClCompile Include="src\text.c" />
+    <ClCompile Include="src\texture.c" />
+    <ClCompile Include="src\timer.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\includes\actor.h" />
+    <ClInclude Include="src\includes\button.h" />
+    <ClInclude Include="src\includes\camera.h" />
+    <ClInclude Include="src\includes\collision.h" />
+    <ClInclude Include="src\includes\common.h" />
+    <ClInclude Include="src\includes\config.h" />
+    <ClInclude Include="src\includes\game.h" />
+    <ClInclude Include="src\includes\graphics.h" />
+    <ClInclude Include="src\includes\hash.h" />
+    <ClInclude Include="src\includes\input.h" />
+    <ClInclude Include="src\includes\level.h" />
+    <ClInclude Include="src\includes\menu.h" />
+    <ClInclude Include="src\includes\physics.h" />
+    <ClInclude Include="src\includes\render.h" />
+    <ClInclude Include="src\includes\sound.h" />
+    <ClInclude Include="src\includes\stack.h" />
+    <ClInclude Include="src\includes\text.h" />
+    <ClInclude Include="src\includes\texture.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F01DC806-0612-472D-965B-B53E40F4350A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -95,7 +134,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>C:\SDL2\SDL2_mixer-2.0.1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Michal\Documents\Visual Studio 2015\Projects\DeadZone\src\includes;C:\SDL2\SDL2_mixer-2.0.1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +167,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>C:\SDL2\SDL2_mixer-2.0.1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Michal\Documents\Visual Studio 2015\Projects\DeadZone\src\includes;C:\SDL2\SDL2_mixer-2.0.1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,49 +195,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="button.c" />
-    <ClCompile Include="camera.c" />
-    <ClCompile Include="collision.c" />
-    <ClCompile Include="hash.c" />
-    <ClCompile Include="input.c" />
-    <ClCompile Include="menu.c" />
-    <ClCompile Include="actor.c" />
-    <ClCompile Include="render.c" />
-    <ClCompile Include="game.c" />
-    <ClCompile Include="graphics.c" />
-    <ClCompile Include="level.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="sound.c" />
-    <ClCompile Include="stack.c" />
-    <ClCompile Include="test.c" />
-    <ClCompile Include="text.c" />
-    <ClCompile Include="texture.c" />
-    <ClCompile Include="timer.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="button.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="collision.h" />
-    <ClInclude Include="common.h" />
-    <ClInclude Include="config.h" />
-    <ClInclude Include="hash.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="menu.h" />
-    <ClInclude Include="physics.h" />
-    <ClInclude Include="actor.h" />
-    <ClInclude Include="sound.h" />
-    <ClInclude Include="vector.h" />
-    <ClInclude Include="render.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="graphics.h" />
-    <ClInclude Include="level.h" />
-    <ClInclude Include="stack.h" />
-    <ClInclude Include="test.h" />
-    <ClInclude Include="text.h" />
-    <ClInclude Include="texture.h" />
-    <ClInclude Include="timer.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
