@@ -5,7 +5,6 @@
 #include "hash.h"
 #include "game.h"
 #include "level.h"
-#include "object.h"
 #include "texture.h"
 
 #define BUFFER_SIZE 256

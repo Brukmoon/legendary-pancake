@@ -74,7 +74,7 @@ void process_input_play(struct game* game)
 				INFO("Game pause: %s", game->paused?"TRUE":"FALSE");
 				break;
 			case SDLK_SPACE:
-				actor_jump(&g_player, 7.f);
+				actor_jump(&g_player.actor, 7.f);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);

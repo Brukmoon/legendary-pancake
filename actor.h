@@ -38,7 +38,7 @@ struct actor
 
 // Initialize actor.
 // TODO: Add initialization options.
-void actor_init(struct actor *actor, SDL_Renderer *renderer);
+void actor_init(struct actor *actor);
 // Move actor by delta.
 void actor_move(struct actor *actor, vec2 delta);
 // Perform jump. Speed must be positive, not a vector.

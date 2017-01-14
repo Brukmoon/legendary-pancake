@@ -164,7 +164,6 @@
     <ClCompile Include="input.c" />
     <ClCompile Include="menu.c" />
     <ClCompile Include="actor.c" />
-    <ClCompile Include="object.c" />
     <ClCompile Include="render.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="graphics.c" />
@@ -186,7 +185,6 @@
     <ClInclude Include="hash.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="menu.h" />
-    <ClInclude Include="object.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="actor.h" />
     <ClInclude Include="sound.h" />

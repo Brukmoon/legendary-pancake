@@ -15,7 +15,7 @@
 
 struct player g_player;
 
-void actor_init(struct actor *actor, SDL_Renderer *renderer)
+void actor_init(struct actor *actor)
 {
 	actor->draw_state = 0;
 	actor->hitpoints = ACTOR_HP;
@@ -145,7 +145,7 @@ void actor_jump(struct actor *actor, float speed)
 
 void player_init(struct player *player, SDL_Renderer *renderer) 
 { 
-	actor_init(&player->actor, renderer); 
+	actor_init(&player->actor); 
 	player->texture = load_texture(renderer, ACTOR_TEXTURE);
 }
 
@@ -176,4 +176,6 @@ void player_draw(const struct player *player, SDL_Renderer *renderer)
 void player_move(const struct player *player, const vec2 delta)
 {
 	actor_move(&player->actor, delta);
+	if (delta.x != 0)
+		; // Perhaps add some walk effect.
 }
