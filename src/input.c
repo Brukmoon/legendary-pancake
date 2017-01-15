@@ -135,7 +135,7 @@ static const vec2 calc_mouse_pos_map()
 		position.x = g_level->tile_map.width - 1;
 	else if (position.x < 0)
 		position.x = 0;
-	else if (position.y >= g_level->tile_map.height)
+	if (position.y >= g_level->tile_map.height)
 		position.y = g_level->tile_map.height - 1;
 	else if (position.y < 0)
 		position.y = 0;
@@ -169,14 +169,6 @@ void process_input_edit(struct game *game)
 			case SDLK_m:
 				game_set_state(game, MENU);
 				break;
-			case SDLK_PAGEDOWN:
-				curr_sprite_num += 1;
-				INFO("Current sprite changed to %d.", curr_sprite_num);
-				break;
-			case SDLK_PAGEUP:
-				curr_sprite_num -= 1;
-				INFO("Current sprite changed to %d.", curr_sprite_num);
-				break;
 			default:
 				break;
 			}
@@ -200,6 +192,13 @@ void process_input_edit(struct game *game)
 			default:
 				break;
 			}
+			break;
+		case SDL_MOUSEWHEEL:
+			if (event.wheel.y > 0)
+				curr_sprite_num += 1;
+			else if (event.wheel.y < 0)
+				curr_sprite_num -= 1;
+			INFO("Current sprite changed to %d.", curr_sprite_num);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			switch (event.button.button)
