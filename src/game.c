@@ -1,4 +1,5 @@
 #include <SDL_mixer.h>
+#include <stdlib.h>
 
 #include "actor.h"
 #include "text.h"
@@ -163,6 +164,9 @@ void to_menu_state(struct game *game)
 void to_edit_state(struct game *game)
 {
 	INFO("Editor opened.\n");
+#if PYTHON_ON
+	system("python ./assets/gen_empty_map.py");
+#endif // PYTHON_ON
 	//if (!g_level) // level not yet initialized
 		level_load(0, game->screen.renderer);
 	// set callbacks to menu state callbacks

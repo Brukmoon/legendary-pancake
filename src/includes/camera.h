@@ -21,6 +21,12 @@ enum initial_camera_coords
 	INITIAL_CAMERA_X = 0,
 	INITIAL_CAMERA_Y = 0
 };
+
+enum camera_type
+{
+	CAMERA_FREE,
+	CAMERA_FIXED
+};
 	
 extern struct camera
 {

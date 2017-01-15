@@ -11,6 +11,8 @@
 #include "input.h"
 #include "physics.h"
 
+int curr_sprite_num = 1;
+
 void process_input_menu(struct game* game)
 {
 	SDL_Event event;
@@ -117,6 +119,23 @@ static void write_map(const vec2 *position, int value)
 	g_level->tile_map.map[TMAP_TEXTURE_LAYER][position->y][position->x] = value;
 }
 
+static const vec2 calc_mouse_pos_map()
+{
+	vec2 position = { 0, 0 };
+	SDL_GetMouseState(&position.x, &position.y);
+	position.x = (int)(g_camera.position.x + position.x) / g_level->tile_map.tile_width;
+	position.y = (int)(g_camera.position.y + position.y) / g_level->tile_map.tile_height;
+	if (position.x >= g_level->tile_map.width)
+		position.x = g_level->tile_map.width - 1;
+	else if (position.x < 0)
+		position.x = 0;
+	else if (position.y >= g_level->tile_map.height)
+		position.y = g_level->tile_map.height - 1;
+	else if (position.y < 0)
+		position.y = 0;
+	return position;
+}
+
 void process_input_edit(struct game *game)
 {
 	SDL_Event event;
@@ -143,6 +162,14 @@ void process_input_edit(struct game *game)
 				break;
 			case SDLK_m:
 				game_set_state(game, MENU);
+				break;
+			case SDLK_PAGEDOWN:
+				curr_sprite_num += 1;
+				INFO("D:%d", curr_sprite_num);
+				break;
+			case SDLK_PAGEUP:
+				curr_sprite_num -= 1;
+				INFO("U:%d", curr_sprite_num);
 				break;
 			default:
 				break;
@@ -173,19 +200,14 @@ void process_input_edit(struct game *game)
 			{
 			case SDL_BUTTON_LEFT:
 			{
-				vec2 position = { 0, 0 };
-				SDL_GetMouseState(&position.x, &position.y);
-				position.x = (int)(g_camera.position.x + position.x)/g_level->tile_map.tile_width;
-				position.y = (int)(g_camera.position.y + position.y)/g_level->tile_map.tile_height;
-				if (position.x >= g_level->tile_map.width)
-					position.x = g_level->tile_map.width - 1;
-				else if (position.x < 0)
-					position.x = 0;
-				else if (position.y >= g_level->tile_map.height)
-					position.y = g_level->tile_map.height - 1;
-				else if (position.y < 0)
-					position.y = 0;
-				write_map(&position, 1);
+				vec2 position = calc_mouse_pos_map();
+				write_map(&position, curr_sprite_num);
+				break;
+			}
+			case SDL_BUTTON_RIGHT:
+			{
+				vec2 position = calc_mouse_pos_map();
+				write_map(&position, 0);
 				break;
 			}
 			}

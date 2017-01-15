@@ -55,6 +55,9 @@ struct game
 	void(*clean)(struct game*);
 };
 
+// Used in the process_input_edit --> 
+extern int curr_sprite_num;
+
 // Is the game running?
 inline bool game_running(const struct game *game) { return game->state; }
 // Set game paused.

@@ -34,6 +34,7 @@
 #define MUSIC_ON 0
 #define SOUND_ON 0
 #define DAMAGE_ON 1
+#define PYTHON_ON 1
 
 // TODO: Dynamic configuration, load on init.
 
