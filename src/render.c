@@ -17,12 +17,13 @@
 
 #define TILE_HEIGHT g_level->tile_map.tile_height
 #define TILE_WIDTH g_level->tile_map.tile_width
-
-#define MAP_NOT_OVERFLOW (y>=0&&y<=g_level->tile_map.height&&x>=0&&x<=g_level->tile_map.width)
+#define COLL_RECT_SIZE TILE_WIDTH/4
 
 static void render_grid(SDL_Renderer *const renderer, const SDL_Color color);
 
-void render_map(SDL_Renderer* const renderer)
+#define MAP_NOT_OVERFLOW (y>=0&&y<=g_level->tile_map.height&&x>=0&&x<=g_level->tile_map.width)
+
+void render_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 {
 	SDL_RenderCopy(renderer, g_level->background, NULL, NULL);
 	int start_y = g_camera.position.y/TILE_HEIGHT, start_x = g_camera.position.x/TILE_WIDTH;
@@ -38,22 +39,18 @@ void render_map(SDL_Renderer* const renderer)
 					SDL_RenderCopy(renderer, g_level->tileset, &(const struct SDL_Rect){ (((int)g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x] % 16)-1)*TILE_WIDTH, ((int)g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x]/16)*TILE_HEIGHT,TILE_WIDTH, TILE_HEIGHT },
 						&(const struct SDL_Rect){ x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT });
 				}
+				if(f & RENDER_GRID)
+					hollow_rect(renderer, x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT,
+						(SDL_Color) {
+					255, 255, 255, 1
+				});
+				if (f & RENDER_COLL)
+					if(g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x] == 1)
+						fill_rect(renderer, (x + 1)*TILE_WIDTH - (g_camera.position.x) - COLL_RECT_SIZE, y*TILE_HEIGHT - (g_camera.position.y),
+							COLL_RECT_SIZE, COLL_RECT_SIZE, (SDL_Color) {
+						255, 0, 0, 1
+					});
 			}
-		}
-}
-
-void render_grid(SDL_Renderer *const renderer, const SDL_Color color)
-{
-	int start_y = (g_camera.position.y) / TILE_HEIGHT, start_x = (g_camera.position.x) / TILE_WIDTH;
-	for (int y = start_y; y < g_level->tile_map.height; ++y)
-		for (int x = start_x; x < g_level->tile_map.width; ++x)
-		{
-			if (!is_visible(&g_camera, &(const vec2) { x*TILE_WIDTH, y*TILE_HEIGHT }, TILE_WIDTH, TILE_HEIGHT))
-				break;
-			if (MAP_NOT_OVERFLOW)
-			{
-				hollow_rect(renderer, x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT, color);
-			} 
 		}
 }
 
@@ -109,9 +106,10 @@ void render_play(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
 	SDL_RenderClear(renderer);
-	render_map(renderer);
 #if SHOW_GRID
-	render_grid(renderer, (SDL_Color) { 214, 214, 214, 1 });
+	render_map(renderer, RENDER_GRID);
+#else
+	render_map(renderer, RENDER_BASE);
 #endif // SHOW_GRID
 #if SHOW_CONSOLE
 	render_debug_console(renderer);
@@ -133,8 +131,7 @@ void render_edit(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
 	SDL_RenderClear(renderer);
-	render_map(renderer);
-	render_grid(renderer, (SDL_Color) { 0, 0, 0, 1 });
+	render_map(renderer, RENDER_ALL);
 	int x = 0, y = 0;
 	SDL_GetMouseState(&x, &y);
 	hollow_rect(renderer, x-(g_player.actor.skeleton.w)/2, y- (g_player.actor.skeleton.h) / 2, g_player.actor.skeleton.w, g_player.actor.skeleton.h,

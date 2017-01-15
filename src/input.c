@@ -171,11 +171,11 @@ void process_input_edit(struct game *game)
 				break;
 			case SDLK_PAGEDOWN:
 				curr_sprite_num += 1;
-				INFO("D:%d", curr_sprite_num);
+				INFO("Current sprite changed to %d.", curr_sprite_num);
 				break;
 			case SDLK_PAGEUP:
 				curr_sprite_num -= 1;
-				INFO("U:%d", curr_sprite_num);
+				INFO("Current sprite changed to %d.", curr_sprite_num);
 				break;
 			default:
 				break;
