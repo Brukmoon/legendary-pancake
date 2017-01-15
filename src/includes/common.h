@@ -28,4 +28,9 @@ enum log_level
 #define INFO(format, ...)
 #endif
 
+#ifndef UNUSED_PARAMETER
+// Suppress warning: unused parameter.
+#define UNUSED_PARAMETER(p) (void)p
+#endif // UNUSED_PARAMETER
+
 #endif // COMMON_H

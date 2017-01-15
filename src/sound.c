@@ -42,6 +42,8 @@ void music_set_pause(bool set)
 		Mix_ResumeMusic();
 		break;
 	}
+#else
+	UNUSED_PARAMETER(set);
 #endif // MUSIC_ON
 }
 
@@ -98,6 +100,9 @@ void music_add(const char *name, const char* type)
 	else
 		prev->next = new_bucket;
 	INFO("Music %s (%s) loaded to index %d.", name, name_buffer, index);
+#else
+	UNUSED_PARAMETER(type);
+	UNUSED_PARAMETER(name);
 #endif // MUSIC_ON
 }
 
@@ -160,10 +165,13 @@ void sound_add(const char* name, const char* type)
 	else
 		prev->next = new_bucket;
 	INFO("Sound %s (%s) loaded to index %d.", name, name_buffer, index);
+#else
+	UNUSED_PARAMETER(name);
+	UNUSED_PARAMETER(type);
 #endif // SOUND_ON
 }
 
-void music_play(const char *name, int ms)
+void music_play(const char *name, int fadein_ms)
 {
 #if MUSIC_ON
 		//Play the music
@@ -173,10 +181,13 @@ void music_play(const char *name, int ms)
 		ERROR("Music %s not found. Use function add_music first to load the music into the resource manager.", name);
 		return;
 	}
-	if (Mix_FadeInMusic(m, -1, ms) == -1)
+	if (Mix_FadeInMusic(m, -1, fadein_ms) == -1)
 	{
 		ERROR("Couldn't play music %s.", name);
 	}
+#else
+	UNUSED_PARAMETER(name);
+	UNUSED_PARAMETER(fadein_ms);
 #endif // MUSIC_ON
 }
 
@@ -193,6 +204,8 @@ void sound_play(const char *name)
 	{
 		ERROR("Couldn't play sound %s.", name);
 	}
+#else
+	UNUSED_PARAMETER(name);
 #endif // SOUND_ON
 }
 

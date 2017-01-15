@@ -5,9 +5,6 @@
  * Welcome to my personal hell.
  *
  **/
-// Suppress warning: unused parameter.
-#define UNUSED_PARAMETER(p) (void)p
-
 #include <stdlib.h>
 #ifdef _MSC_VER
 #define _CRTDBG_MAP_ALLOC
@@ -16,6 +13,11 @@
 
 #include "config.h"
 #include "game.h"
+
+#ifndef UNUSED_PARAMETER
+ // Suppress warning: unused parameter.
+#define UNUSED_PARAMETER(p) (void)p
+#endif // UNUSED_PARAMETER
 
 /*
  * Warning: SDL defines its own SDL_Main function which performs some initialization

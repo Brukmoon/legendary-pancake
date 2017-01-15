@@ -33,6 +33,8 @@ void actor_init(struct actor *actor)
 
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer)
 {
+	UNUSED_PARAMETER(actor);
+	UNUSED_PARAMETER(renderer);
 	/*SDL_Rect dest;
 	dest.w = dest.h = 34; // Draw a bit larger.
 	dest.x = actor->skeleton.x - g_camera.position.x;
@@ -55,7 +57,7 @@ void actor_draw(const struct actor *actor, SDL_Renderer *renderer)
 	}*/
 }
 
-void actor_move(struct actor *actor, vec2 delta)
+void actor_move(struct actor *actor, const vec2 delta)
 {
 	// Where is the actor after the movement?
 	SDL_Rect actor_after = { actor->skeleton.x + delta.x, actor->skeleton.y,
@@ -116,7 +118,7 @@ void actor_move(struct actor *actor, vec2 delta)
 	}
 }
 
-void actor_damage(struct actor *actor, int damage)
+void actor_damage(struct actor *actor, const Sint16 damage)
 {
 	sound_play("fall");
 #if DAMAGE_ON
@@ -127,7 +129,7 @@ void actor_damage(struct actor *actor, int damage)
 #endif // GOD_MODE
 }
 
-void actor_jump(struct actor *actor, float speed)
+bool actor_jump(struct actor *actor, float speed)
 {
 	/*
 	 * To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
@@ -138,10 +140,11 @@ void actor_jump(struct actor *actor, float speed)
 	{
 		actor->is_jumping = true;
 		actor->jump_count++;
-		sound_play("jump");
 		// Go against gravity.
 		actor->velocity.y = -speed;
+		return true;
 	}
+	return false;
 }
 
 void player_init(struct player *player, SDL_Renderer *renderer) 
@@ -174,9 +177,17 @@ void player_draw(const struct player *player, SDL_Renderer *renderer)
 	}
 }
 
-void player_move(const struct player *player, const vec2 delta)
+void player_move(struct player *player, const vec2 delta)
 {
 	actor_move(&player->actor, delta);
 	if (delta.x != 0)
 		; // Perhaps add some walk effect.
+}
+
+void player_jump(struct player *player, float speed) 
+{ 
+	if (actor_jump(&player->actor, speed))
+	{
+		sound_play("jump");
+	}
 }

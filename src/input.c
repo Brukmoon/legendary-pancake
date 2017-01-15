@@ -77,7 +77,7 @@ void process_input_play(struct game* game)
 				INFO("Game pause: %s", game->paused?"TRUE":"FALSE");
 				break;
 			case SDLK_SPACE:
-				actor_jump(&g_player.actor, 7.f);
+				player_jump(&g_player, 7.f);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -257,6 +257,7 @@ static void update_player_draw_state(struct player *player)
 
 void update_menu(struct game* game)
 {
+	UNUSED_PARAMETER(game);
 }
 
 void update_play(struct game* game)
@@ -282,5 +283,6 @@ void update_play(struct game* game)
 
 void update_edit(struct game* game)
 {
+	UNUSED_PARAMETER(game);
 	camera_scroll(&g_camera, (vec2) { (coord) g_player.actor.velocity.x*g_player.actor.skeleton.w, (coord) g_player.actor.velocity.y*g_player.actor.skeleton.h });
 }
