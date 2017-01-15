@@ -30,11 +30,12 @@ enum camera_type
 	
 extern struct camera
 {
+	enum camera_type t;
 	vec2 position;
 } g_camera; // main camera
 
 // Initialize the camera offsets.
-void camera_init(struct camera *camera);
+void camera_init(struct camera *camera, const enum camera_type t);
 
 // Set camera position to [x;y].
 void camera_set(struct camera *camera, vec2 position);

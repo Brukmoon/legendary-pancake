@@ -143,7 +143,7 @@ void to_play_state(struct game *game)
 	sound_add("death", ".wav");
 	sound_add("fall", ".wav");
 	music_play("music", 6000);
-	camera_init(&g_camera);
+	camera_init(&g_camera, CAMERA_FIXED);
 	player_init(&g_player, game->screen.renderer);
 }
 
@@ -176,6 +176,6 @@ void to_edit_state(struct game *game)
     player_set_vel_x(&g_player, 0);
 	player_set_vel_y(&g_player, 0);
 	SDL_ShowCursor(1);
-	camera_init(&g_camera);
+	camera_init(&g_camera, CAMERA_FREE);
 	player_init(&g_player, game->screen.renderer);
 }

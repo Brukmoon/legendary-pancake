@@ -34,6 +34,12 @@
 #define MUSIC_ON 0
 #define SOUND_ON 0
 #define DAMAGE_ON 1
+/*
+ * Python 3 must be supported by the system.
+ * On Linux: Install python package.
+ * On Windows: Install python application and modify PATH variable.
+ *
+ */
 #define PYTHON_ON 1
 
 // TODO: Dynamic configuration, load on init.
