@@ -5,7 +5,7 @@
 #include "button.h"
 
 #define M_MENU_PLAY "PLAY"
-#define M_MENU_EDIT "EDIT[NYI]"
+#define M_MENU_EDIT "EDITOR"
 #define M_MENU_QUIT "QUIT"
 
 struct menu

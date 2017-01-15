@@ -133,6 +133,13 @@ void render_edit(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
 	SDL_RenderClear(renderer);
+	render_map(renderer);
 	render_grid(renderer, (SDL_Color) { 0, 0, 0, 1 });
+	int x = 0, y = 0;
+	SDL_GetMouseState(&x, &y);
+	hollow_rect(renderer, x-(g_player.actor.skeleton.w)/2, y- (g_player.actor.skeleton.h) / 2, g_player.actor.skeleton.w, g_player.actor.skeleton.h,
+		(SDL_Color) {
+		255, 0, 0, 0
+	});
 	SDL_RenderPresent(renderer);
 }

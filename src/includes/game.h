@@ -3,12 +3,10 @@
  *
  * @author Michal H.
  *
- * pseudocode:
  * game.init
- * while(game_running)
- *     game.draw
- *     game.process_input
- *     game.update
+ *	game.draw
+ *	game.process_input
+ *	game.update
  * game.clean
  *
  **/
@@ -53,7 +51,7 @@ struct game
 	bool(*init)(struct game*);
 	void(*draw)(SDL_Renderer*);
 	void(*process_input)(struct game*);
-	void(*update)(void);
+	void(*update)(struct game*);
 	void(*clean)(struct game*);
 };
 

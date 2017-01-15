@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "common.h"
 #include "collision.h"
+#include "level.h"
 #include "menu.h"
 #include "sound.h"
 #include "input.h"
@@ -110,6 +111,12 @@ void process_input_play(struct game* game)
 	}
 }
 
+static void write_map(const vec2 *position, int value)
+{
+	INFO("Writing map at position [%d;%d]!", position->x, position->y);
+	g_level->tile_map.map[TMAP_TEXTURE_LAYER][position->y][position->x] = value;
+}
+
 void process_input_edit(struct game *game)
 {
 	SDL_Event event;
@@ -120,16 +127,16 @@ void process_input_edit(struct game *game)
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				player_set_vel_x(&g_player, g_player.actor.speed);
+				player_set_vel_x(&g_player, 1);
 				break;
 			case SDLK_LEFT:
-				player_set_vel_x(&g_player, -g_player.actor.speed);
+				player_set_vel_x(&g_player, -1);
 				break;
 			case SDLK_UP:
-				player_set_vel_y(&g_player, -g_player.actor.speed);
+				player_set_vel_y(&g_player, -1);
 				break;
 			case SDLK_DOWN:
-				player_set_vel_y(&g_player, g_player.actor.speed);
+				player_set_vel_y(&g_player, 1);
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
@@ -161,9 +168,27 @@ void process_input_edit(struct game *game)
 				break;
 			}
 			break;
-		case SDL_MOUSEMOTION:
 		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+			switch (event.button.button)
+			{
+			case SDL_BUTTON_LEFT:
+			{
+				vec2 position = { 0, 0 };
+				SDL_GetMouseState(&position.x, &position.y);
+				position.x = (int)(g_camera.position.x + position.x)/g_level->tile_map.tile_width;
+				position.y = (int)(g_camera.position.y + position.y)/g_level->tile_map.tile_height;
+				if (position.x >= g_level->tile_map.width)
+					position.x = g_level->tile_map.width - 1;
+				else if (position.x < 0)
+					position.x = 0;
+				else if (position.y >= g_level->tile_map.height)
+					position.y = g_level->tile_map.height - 1;
+				else if (position.y < 0)
+					position.y = 0;
+				write_map(&position, 1);
+				break;
+			}
+			}
 			break;
 		case SDL_QUIT:
 			game_set_state(game, EXIT);
@@ -197,11 +222,11 @@ static void update_player_draw_state(struct player *player)
 	}
 }
 
-void update_menu(void)
+void update_menu(struct game* game)
 {
 }
 
-void update_play(void)
+void update_play(struct game* game)
 {
 	// Update player.
 	if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
@@ -214,9 +239,15 @@ void update_play(void)
 	update_player_draw_state(&g_player);
 	// Update camera.
 	camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
+	if (g_player.actor.hitpoints == 0)
+	{
+		INFO("YOU DIED!");
+		sound_play("death");
+		game_set_state(game, MENU);
+	}
 }
 
-void update_edit(void)
+void update_edit(struct game* game)
 {
 	camera_scroll(&g_camera, (vec2) { (coord) g_player.actor.velocity.x*g_player.actor.skeleton.w, (coord) g_player.actor.velocity.y*g_player.actor.skeleton.h });
 }

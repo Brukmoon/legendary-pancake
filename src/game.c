@@ -132,14 +132,14 @@ bool game_set_pause(struct game *game, bool yesno)
 void to_play_state(struct game *game)
 {
 	INFO("Game started.\n");
-	if (!g_level) // level not yet initialized
-		level_load(1, game->screen.renderer); // load level 1
+	level_load(1, game->screen.renderer); // load level 1
 	// set callbacks to play state callbacks
 	game->update = update_play;
 	game->draw = render_play;
 	game->process_input = process_input_play;
 	music_add("music", ".ogg");
 	sound_add("jump", ".wav");
+	sound_add("death", ".wav");
 	sound_add("fall", ".wav");
 	music_play("music", 6000);
 	camera_init(&g_camera);
@@ -163,8 +163,8 @@ void to_menu_state(struct game *game)
 void to_edit_state(struct game *game)
 {
 	INFO("Editor opened.\n");
-	if (!g_level) // level not yet initialized
-		level_load(1, game->screen.renderer);
+	//if (!g_level) // level not yet initialized
+		level_load(0, game->screen.renderer);
 	// set callbacks to menu state callbacks
 	game->update = update_edit;
 	game->draw = render_edit;

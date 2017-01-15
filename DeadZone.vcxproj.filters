@@ -52,6 +52,9 @@
     <ClCompile Include="src\menu.c">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="src\sprite.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -121,6 +124,12 @@
     </ClInclude>
     <ClInclude Include="src\includes\menu.h">
       <Filter>Menu\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\animation.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\sprite.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

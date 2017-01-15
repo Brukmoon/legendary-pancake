@@ -32,6 +32,7 @@
     <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\render.c" />
     <ClCompile Include="src\sound.c" />
+    <ClCompile Include="src\sprite.c" />
     <ClCompile Include="src\stack.c" />
     <ClCompile Include="src\text.c" />
     <ClCompile Include="src\texture.c" />
@@ -39,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\includes\actor.h" />
+    <ClInclude Include="src\includes\animation.h" />
     <ClInclude Include="src\includes\button.h" />
     <ClInclude Include="src\includes\camera.h" />
     <ClInclude Include="src\includes\collision.h" />
@@ -53,6 +55,7 @@
     <ClInclude Include="src\includes\physics.h" />
     <ClInclude Include="src\includes\render.h" />
     <ClInclude Include="src\includes\sound.h" />
+    <ClInclude Include="src\includes\sprite.h" />
     <ClInclude Include="src\includes\stack.h" />
     <ClInclude Include="src\includes\text.h" />
     <ClInclude Include="src\includes\texture.h" />
