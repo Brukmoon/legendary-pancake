@@ -113,10 +113,16 @@ void process_input_play(struct game* game)
 	}
 }
 
-static void write_map(const vec2 *position, int value)
+static void write_map_texture(const vec2 *position, int value)
 {
-	INFO("Writing map at position [%d;%d]!", position->x, position->y);
+	INFO("Setting map tile texture at position [%d;%d] to value %d!", position->x, position->y, value);
 	g_level->tile_map.map[TMAP_TEXTURE_LAYER][position->y][position->x] = value;
+}
+static void toggle_map_tile_coll(const vec2 *position)
+{
+	bool t = !g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x];
+	INFO("Writing map tile collision data at position [%d;%d] to %s!", position->x, position->y, t?"TRUE":"FALSE");
+	g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x] = t;
 }
 
 static const vec2 calc_mouse_pos_map()
@@ -201,14 +207,19 @@ void process_input_edit(struct game *game)
 			case SDL_BUTTON_LEFT:
 			{
 				vec2 position = calc_mouse_pos_map();
-				write_map(&position, curr_sprite_num);
+				write_map_texture(&position, curr_sprite_num);
 				break;
 			}
 			case SDL_BUTTON_RIGHT:
 			{
 				vec2 position = calc_mouse_pos_map();
-				write_map(&position, 0);
+				write_map_texture(&position, 0);
 				break;
+			}
+			case SDL_BUTTON_MIDDLE:
+			{
+				vec2 position = calc_mouse_pos_map();
+				toggle_map_tile_coll(&position);
 			}
 			}
 			break;
