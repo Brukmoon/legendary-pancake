@@ -10,6 +10,8 @@ struct level;
 
 // Sets level#id as curr_level.
 bool level_load(int id, SDL_Renderer *renderer);
+// Saves level to file.
+bool level_save();
 // Must be called @ exit. Should be called when changing level.
 void level_clean(struct level **level);
 

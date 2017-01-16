@@ -121,6 +121,7 @@ void game_set_state(struct game *game, const enum game_state state)
 
 bool game_pause(struct game *game) 
 { 
+	INFO("Game paused: %s", game->paused ? "FALSE" : "TRUE");
 	return game_set_pause(game, !game->paused); 
 }
 
@@ -133,7 +134,6 @@ bool game_set_pause(struct game *game, bool yesno)
 void to_play_state(struct game *game)
 {
 	INFO("Game started.\n");
-	level_load(1, game->screen.renderer); // load level 1
 	// set callbacks to play state callbacks
 	game->update = update_play;
 	game->draw = render_play;
@@ -176,6 +176,7 @@ void to_edit_state(struct game *game)
     player_set_vel_x(&g_player, 0);
 	player_set_vel_y(&g_player, 0);
 	SDL_ShowCursor(1);
+	sound_add("click", ".wav");
 	camera_init(&g_camera, CAMERA_FREE);
 	player_init(&g_player, game->screen.renderer);
 }

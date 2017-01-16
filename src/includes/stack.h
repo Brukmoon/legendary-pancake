@@ -1,6 +1,6 @@
 #ifndef STACK_H
 #define STACK_H
-#define INITIAL_ALLOC_LENGTH 5
+#define INITIAL_ALLOC_LENGTH 3
 
 #include <stdbool.h>
 

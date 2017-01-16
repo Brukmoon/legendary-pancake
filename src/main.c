@@ -57,8 +57,7 @@ int main(int argc, char* argv[]) {
 	// Game loop: process events -> update if not paused -> render to screen -> sync FPS
 	while (game_running(&game)) {
 		game.process_input(&game);
-		if (!game.paused)
-			game.update(&game);
+		game.update(&game);
 		if (time > SDL_GetTicks()) // rendering rate can't exceed logic rate
 			game.draw(game.screen.renderer);
 		Sint32 delay = time - SDL_GetTicks();

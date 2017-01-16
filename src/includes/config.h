@@ -40,7 +40,7 @@
  * On Windows: Install python application and modify PATH variable.
  *
  */
-#define PYTHON_ON 0
+#define PYTHON_ON 1
 
 // TODO: Dynamic configuration, load on init.
 

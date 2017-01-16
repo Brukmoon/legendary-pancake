@@ -4,7 +4,6 @@
 #include "game.h"
 #include "camera.h"
 #include "common.h"
-#include "collision.h"
 #include "level.h"
 #include "menu.h"
 #include "sound.h"
@@ -30,9 +29,13 @@ void process_input_menu(struct game* game)
 				menu_next_button(g_menu);
 				break;
 			case SDLK_RETURN:
+				// TODO: Redesign - send accept message to menu.
 				sound_play("accept");
 				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list.current->text) == 0)
+				{
+					level_load(1, game->screen.renderer); // load level 1
 					game_set_state(game, PLAY);
+				}
 				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list.current->text) == 0)
 					game_set_state(game, EDIT);
 				else if(SDL_strcmp(M_MENU_QUIT, g_menu->button_list.current->text) == 0)
@@ -53,64 +56,73 @@ void process_input_menu(struct game* game)
 void process_input_play(struct game* game)
 {
 	SDL_Event event;
-	while (SDL_PollEvent(&event))
+	if (!game->paused)
 	{
-		switch (event.type)
+		while (SDL_PollEvent(&event))
 		{
-		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym) {
-			case SDLK_RIGHT:
-				player_set_vel_x(&g_player, g_player.actor.speed);
+			switch (event.type)
+			{
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+				case SDLK_RIGHT:
+					player_set_vel_x(&g_player, g_player.actor.speed);
+					break;
+				case SDLK_LEFT:
+					player_set_vel_x(&g_player, -g_player.actor.speed);
+					break;
+					/*
+					case SDLK_UP:
+						player.velocity.y = -1* PLAYER_SPEED;
+						break;*/
+						/*case SDLK_DOWN:
+							player.velocity.y = 1* PLAYER_SPEED;
+							break;*/
+				case SDLK_RETURN:
+					game_pause(game);
+					break;
+				case SDLK_SPACE:
+					player_jump(&g_player, 7.f);
+					break;
+				case SDLK_q:
+					game_set_state(game, EXIT);
+					break;
+				case SDLK_m:
+					game_set_state(game, MENU);
+					break;
+				default:
+					break;
+				}
 				break;
-			case SDLK_LEFT:
-				player_set_vel_x(&g_player, -g_player.actor.speed);
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym) {
+				case SDLK_RIGHT:
+				case SDLK_LEFT:
+					player_set_vel_x(&g_player, 0);
+					break;
+				case SDLK_q:
+					game_set_state(game, EXIT);
+					break;
+				case SDLK_m:
+					game_set_state(game, MENU);
+					break;
+				default:
+					break;
+				}
 				break;
-		    /*
-			case SDLK_UP:
-				player.velocity.y = -1* PLAYER_SPEED;
-				break;*/
-			/*case SDLK_DOWN:
-				player.velocity.y = 1* PLAYER_SPEED;
-				break;*/
-			case SDLK_RETURN:
-				game_pause(game);
-				INFO("Game pause: %s", game->paused?"TRUE":"FALSE");
-				break;
-			case SDLK_SPACE:
-				player_jump(&g_player, 7.f);
-				break;
-			case SDLK_q:
+			case SDL_QUIT:
 				game_set_state(game, EXIT);
-				break;
-			case SDLK_m:
-				game_set_state(game, MENU);
-				break;
-			default:
+				INFO("EXIT flag set.");
 				break;
 			}
-			break;
-		case SDL_KEYUP:
-			switch (event.key.keysym.sym) {
-			case SDLK_RIGHT:
-			case SDLK_LEFT:
-				player_set_vel_x(&g_player, 0);
-				break;
-			case SDLK_q:
-				game_set_state(game, EXIT);
-				break;
-			case SDLK_m:
-				game_set_state(game, MENU);
-				break;
-			default:
-				break;
-			}
-			break;
-		case SDL_QUIT:
-			game_set_state(game, EXIT);
-			INFO("EXIT flag set.");
-			break;
 		}
 	}
+	else
+		while (SDL_PollEvent(&event))
+		{
+			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN)
+				game_pause(game);
+		}
+
 }
 
 static void write_map_texture(const vec2 *position, int value)
@@ -163,6 +175,12 @@ void process_input_edit(struct game *game)
 			case SDLK_DOWN:
 				player_set_vel_y(&g_player, 1);
 				break;
+			case SDLK_p:
+				game_set_state(game, PLAY);
+				break;
+			case SDLK_s:
+				level_save();
+				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
 				break;
@@ -201,6 +219,7 @@ void process_input_edit(struct game *game)
 			INFO("Current sprite changed to %d.", curr_sprite_num);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
+			sound_play("click");
 			switch (event.button.button)
 			{
 			case SDL_BUTTON_LEFT:
@@ -261,22 +280,25 @@ void update_menu(struct game* game)
 
 void update_play(struct game* game)
 {
-	// Update player.
-	if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
-		g_player.actor.velocity.y += (float)GRAVITY;
-	else
-		player_set_vel_y(&g_player, T_VEL);
-	// Move him.
-	player_move(&g_player, (vec2) { (coord) g_player.actor.velocity.x, (coord) g_player.actor.velocity.y });
-	update_player_double_jump(&g_player);
-	update_player_draw_state(&g_player);
-	// Update camera.
-	camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
-	if (g_player.actor.hitpoints == 0)
+	if (!game->paused)
 	{
-		INFO("YOU DIED!");
-		sound_play("death");
-		game_set_state(game, MENU);
+		// Update player.
+		if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
+			g_player.actor.velocity.y += (float)GRAVITY;
+		else
+			player_set_vel_y(&g_player, T_VEL);
+		// Move him.
+		player_move(&g_player, (vec2) { (coord)g_player.actor.velocity.x, (coord)g_player.actor.velocity.y });
+		update_player_double_jump(&g_player);
+		update_player_draw_state(&g_player);
+		// Update camera.
+		camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
+		if (g_player.actor.hitpoints == 0)
+		{
+			INFO("YOU DIED!");
+			sound_play("death");
+			game_set_state(game, MENU);
+		}
 	}
 }
 

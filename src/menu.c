@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "common.h"
 #include "config.h"
+#include "sound.h"
 #include "text.h"
 #include "graphics.h"
 #include "menu.h"
@@ -82,28 +83,34 @@ void menu_draw(struct menu *menu, SDL_Renderer* renderer)
 
 void menu_prev_button(struct menu *menu)
 {
+	sound_play("select");
 	if (menu->button_list.current->prev)
 	{
-		button_active(menu->button_list.current->prev, menu->button_list.current);
+		set_button_active(menu->button_list.current->prev, true);
+		set_button_active(menu->button_list.current, false);
 		menu->button_list.current = menu->button_list.current->prev;
 	}
 	else
 	{
-		button_active(menu->button_list.head, menu->button_list.current);
+		set_button_active(menu->button_list.head, true);
+		set_button_active(menu->button_list.current, false);
 		menu->button_list.current = menu->button_list.head;
 	}
 }
 
 void menu_next_button(struct menu *menu)
 {
+	sound_play("select");
 	if (menu->button_list.current->next)
 	{
-		button_active(menu->button_list.current->next, menu->button_list.current);
+		set_button_active(menu->button_list.current->next, true);
+		set_button_active(menu->button_list.current, false);
 		menu->button_list.current = menu->button_list.current->next;
 	}
 	else
 	{
-		button_active(menu->button_list.root, menu->button_list.current);
+		set_button_active(menu->button_list.root, true);
+		set_button_active(menu->button_list.current, false);
 		menu->button_list.current = menu->button_list.root;
 	}
 }

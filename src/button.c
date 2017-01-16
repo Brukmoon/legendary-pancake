@@ -1,6 +1,5 @@
 #include "common.h"
 #include "button.h"
-#include "sound.h"
 #include "text.h"
 
 struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position)
@@ -20,7 +19,9 @@ struct button* button_create(SDL_Renderer* renderer, struct button* parent, cons
 	butt->texture[BUTTON_SPRITE_INACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 0, 0, 0 });
 	butt->texture[BUTTON_SPRITE_ACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 255, 0, 0 });
 	butt->position = position;
-	SDL_strlcpy(butt->text, text, BUTTON_TEXT_LENGTH);
+	size_t str_len = SDL_strlen(text) + 1;
+	butt->text = malloc(str_len);
+	SDL_strlcpy(butt->text, text, str_len);
 	butt->curr_sprite = BUTTON_SPRITE_INACTIVE; // inactive by default
 	butt->next = NULL;
 	butt->prev = parent;
@@ -38,13 +39,13 @@ void button_destroy(struct button *button)
 	for (int i = 0; i < BUTTON_SPRITE_COUNT; ++i)
 		SDL_DestroyTexture(button->texture[i]);
 	free(button->texture);
+	free(button->text);
 	INFO("Button at position [%d;%d] destroyed.", button->position.x, button->position.y);
 	free(button);
 }
 
-void button_active(struct button *button, struct button *prev_button)
+void set_button_active(struct button *button, bool yesno)
 {
-	sound_play("select");
-	button->curr_sprite = BUTTON_SPRITE_ACTIVE;
-	prev_button->curr_sprite = BUTTON_SPRITE_INACTIVE;
+	button->curr_sprite = yesno?BUTTON_SPRITE_ACTIVE:BUTTON_SPRITE_INACTIVE;
+	button->active = yesno;
 }

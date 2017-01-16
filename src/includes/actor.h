@@ -13,6 +13,7 @@
 
 #include "vector.h"
 
+// Size of the name storage.
 #define ACTOR_NAME_MAX_LENGTH 20
 
 // Beware: If you change JUMP_COUNT, modify the UI aswell.
@@ -39,6 +40,8 @@ struct actor
 	float draw_state;
 	// Number of sprites tied to the actor
 	int sprite_count;
+
+	vec2 spawn;
 	struct
 	{
 		int x, y, w, h;
@@ -73,16 +76,18 @@ struct player // : public actor;
 	SDL_Texture *texture;
 };
 
-void player_init(struct player *player, SDL_Renderer *renderer);
+// Initialize player.
+void player_init(struct player *player, const vec2 spawn, SDL_Renderer *renderer);
 void player_draw(const struct player *player, SDL_Renderer *renderer);
 void player_move(struct player *player, const vec2 delta);
 void player_jump(struct player *player, float speed);
+// Cause damage to player.
 inline void player_damage(struct player *player, const Sint16 damage) { actor_damage(&player->actor, damage); }
+// Set player velocity to vel.
 inline void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }
 inline void player_set_vel_y(struct player *player, float vel) { player->actor.velocity.y = vel; }
 
 // TODO: Move to player struct.
 extern struct player g_player;
-
 
 #endif // ACTOR_H

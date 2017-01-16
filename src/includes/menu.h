@@ -2,7 +2,9 @@
 #define MENU_H
 
 #include <SDL.h>
+
 #include "button.h"
+#include "stack.h"
 
 #define M_MENU_PLAY "PLAY"
 #define M_MENU_EDIT "EDITOR"
@@ -15,7 +17,7 @@ struct menu
 		struct button *root;
 		// Keep head in memory for quick access.
 		struct button *head;
-		// Currently active button.
+		// Pointer to the button currently active.
 		struct button *current;
 	} button_list;
 	int max_button_count;

@@ -1,6 +1,8 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#include <stdbool.h>
+
 #include "texture.h"
 #include "vector.h"
 
@@ -14,11 +16,11 @@ enum button_sprite
 
 struct button
 {
-#define BUTTON_TEXT_LENGTH 20
+	bool active;
 	enum button_sprite curr_sprite;
     vec2 position;
-	char text[BUTTON_TEXT_LENGTH];
-	// Every button has unique textures.
+	char *text;
+	// Every button has a unique textures.
 	SDL_Texture **texture;
 	// Linking buttons.
 	struct button* next;
@@ -28,6 +30,6 @@ struct button
 struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position);
 void button_destroy(struct button *button);
 // Set button as active.
-void button_active(struct button *button, struct button *prev_button);
+void set_button_active(struct button *button, bool yesno);
 
 #endif // BUTTON_H

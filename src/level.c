@@ -229,3 +229,26 @@ void level_destroy_textures(struct level *level)
 	*/
 	INFO("Textures destroyed.");
 }
+
+bool level_save()
+{
+	char file_name[LEVEL_NAME_LENGTH + 7];
+	SDL_strlcpy(file_name, LEVEL_PATH, LEVEL_NAME_LENGTH + 7);
+	SDL_strlcat(file_name, g_level->name, LEVEL_NAME_LENGTH + 7);
+	SDL_strlcat(file_name, ".level", LEVEL_NAME_LENGTH + 7);
+	FILE *f = NULL;
+	fopen_s(&f, file_name, "w");
+	fprintf(f, "%s\n", g_level->name);
+	fprintf(f, "%dx%d\n", g_level->tile_map.width, g_level->tile_map.height);
+	fprintf(f, "%dx%d\n", g_level->tile_map.tile_width, g_level->tile_map.tile_height);
+	for (int y = 0; y < g_level->tile_map.height; ++y)
+	{
+		for (int x = 0; x < g_level->tile_map.width; ++x)
+			fprintf(f, "%d:%d ", g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x], g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x]);
+		fprintf(f, "\n");
+	}
+	fprintf(f, "%s\n", "assets/gfx/editor_background.png");
+	INFO("Saving level to file %s.", file_name);
+	fclose(f);
+	return true;
+}

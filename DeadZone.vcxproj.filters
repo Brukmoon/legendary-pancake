@@ -10,9 +10,6 @@
     <ClCompile Include="src\text.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\stack.c">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\sound.c">
       <Filter>Core</Filter>
     </ClCompile>
@@ -54,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="src\sprite.c">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stack.c">
+      <Filter>Menu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,9 +110,6 @@
     <ClInclude Include="src\includes\sound.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\includes\stack.h">
-      <Filter>Core\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\includes\text.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
@@ -130,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="src\includes\sprite.h">
       <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\stack.h">
+      <Filter>Menu\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="text_box.h">
+      <Filter>Menu\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

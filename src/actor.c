@@ -147,7 +147,7 @@ bool actor_jump(struct actor *actor, float speed)
 	return false;
 }
 
-void player_init(struct player *player, SDL_Renderer *renderer) 
+void player_init(struct player *player, const vec2 spawn, SDL_Renderer *renderer)
 { 
 	actor_init(&player->actor); 
 	player->texture = load_texture(renderer, ACTOR_TEXTURE);

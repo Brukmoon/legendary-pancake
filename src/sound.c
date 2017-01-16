@@ -7,26 +7,27 @@
 #include "hash.h"
 #include "sound.h"
 
+#define MUSIC_ARR_SIZE 5
+#define SOUND_ARR_SIZE 10
+
 struct music_bucket
 {
 	struct music_bucket *next;
-	char key[MUSIC_FILE_NAME_LENGTH];
+	char *key;
 	Mix_Music *music;
 };
 struct sound_bucket
 {
 	struct sound_bucket *next;
-	char key[MUSIC_FILE_NAME_LENGTH];
+	char *key;
 	Mix_Chunk *sound;
 };
 
 static struct {
-#define MUSIC_ARR_SIZE 10
 	struct music_bucket *music[MUSIC_ARR_SIZE];
 } music_container;
 
 static struct {
-#define SOUND_ARR_SIZE 10
 	struct sound_bucket *sound[SOUND_ARR_SIZE];
 } sound_container;
 
@@ -77,8 +78,10 @@ void music_add(const char *name, const char* type)
 		return;
 	}
 	new_bucket->next = NULL;
+	size_t str_len = SDL_strlen(name) + 1;
+	new_bucket->key = malloc(str_len);
 	// Copy name to the new bucket.
-	strcpy_s(new_bucket->key, MUSIC_FILE_NAME_LENGTH, name);
+	strcpy_s(new_bucket->key, str_len, name);
 	// Create buffer, put path to data folder inside.
 	char name_buffer[MUSIC_FILE_NAME_LENGTH];
 	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, SOUND_PATH);
@@ -136,8 +139,10 @@ void sound_add(const char* name, const char* type)
 		return;
 	}
 	new_bucket->next = NULL;
+	size_t str_len = SDL_strlen(name) + 1;
+	new_bucket->key = malloc(str_len);
 	// Copy name to the new bucket.
-	strcpy_s(new_bucket->key, MUSIC_FILE_NAME_LENGTH, name);
+	strcpy_s(new_bucket->key, str_len, name);
 	// Create buffer, put name inside.
 	char name_buffer[MUSIC_FILE_NAME_LENGTH];
 	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, SOUND_PATH);
@@ -218,6 +223,7 @@ void audio_destroy(void)
 		{
 			struct music_bucket *iter = music_container.music[i];
 			music_container.music[i] = iter->next;
+			free(iter->key);
 			Mix_FreeMusic(iter->music);
 			free(iter);
 		}
@@ -229,6 +235,7 @@ void audio_destroy(void)
 		{
 			struct sound_bucket *iter = sound_container.sound[i];
 			sound_container.sound[i] = iter->next;
+			free(iter->key);
 			Mix_FreeChunk(iter->sound);
 			free(iter);
 		}
