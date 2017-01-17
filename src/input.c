@@ -34,14 +34,15 @@ void process_input_menu(struct game* game)
 				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list.current->text) == 0)
 				{
 					level_load(1, game->screen.renderer); // load level 1
-					player_init(&g_player, (vec2) { 50, 50 }, game->screen.renderer);
 					game_set_state(game, PLAY);
+					player_init(&g_player, game->screen.renderer);
 					player_spawn(&g_player);
 				}
 				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list.current->text) == 0)
 				{
 					game_set_state(game, EDIT);
-					player_init(&g_player, (vec2) { 50, 50 }, game->screen.renderer);
+					player_init(&g_player, game->screen.renderer);
+					player_spawn(&g_player);
 				}
 				else if(SDL_strcmp(M_MENU_QUIT, g_menu->button_list.current->text) == 0)
 					game_set_state(game, EXIT);
@@ -185,6 +186,15 @@ void process_input_edit(struct game *game)
 				break;
 			case SDLK_s:
 				level_save();
+				break;
+			case SDLK_x:
+			{
+				vec2 position = { 0, 0 };
+				SDL_GetMouseState(&position.x, &position.y);
+				position.x = position.x + g_camera.position.x - g_player.actor.skeleton.w/2;
+				position.y = position.y + g_camera.position.y - g_player.actor.skeleton.h/2;
+				player_set_spawn(&g_player, position);
+			}
 				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);

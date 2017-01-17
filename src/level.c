@@ -104,6 +104,12 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				INFO("tilewidth! %d", level->tile_map.tile_width);
 				INFO("tileheight! %d", level->tile_map.tile_height);
 			}
+			else if (SDL_strcmp(command, "SPAWN") == 0)
+			{
+				vec2 spawn = { 0, 0 };
+				sscanf_s(buffer, "%*s%d%d", &spawn.x, &spawn.y);
+				player_set_spawn(&g_player, spawn);
+			}
 			// Clear.
 			command[0] = '\0';
 		}
@@ -264,16 +270,18 @@ bool level_save()
 	SDL_strlcat(file_name, ".level", LEVEL_NAME_LENGTH + 7);
 	FILE *f = NULL;
 	fopen_s(&f, file_name, "w");
-	fprintf(f, "%s\n", g_level->name);
-	fprintf(f, "%dx%d\n", g_level->tile_map.width, g_level->tile_map.height);
-	fprintf(f, "%dx%d\n", g_level->tile_map.tile_width, g_level->tile_map.tile_height);
+	fprintf(f, "NAME %s\n", g_level->name);
+	fprintf(f, "TILE %d\n", g_level->tile_map.tile_width);
+	fprintf(f, "MAP %d %d\n", g_level->tile_map.width, g_level->tile_map.height);
 	for (int y = 0; y < g_level->tile_map.height; ++y)
 	{
 		for (int x = 0; x < g_level->tile_map.width; ++x)
 			fprintf(f, "%d:%d ", g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x], g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x]);
 		fprintf(f, "\n");
 	}
-	fprintf(f, "%s\n", "assets/gfx/editor_background.png");
+	fprintf(f, "%s\n", "SSHEET assets/gfx/spritesheet.png");
+	fprintf(f, "%s\n", "BACKGROUND assets/gfx/editor_background.png");
+	fprintf(f, "%s %d %d\n", "SPAWN", g_player.actor.spawn.x, g_player.actor.spawn.y);
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);
 	return true;

@@ -27,7 +27,6 @@ void actor_init(struct actor *actor)
 	actor->skeleton.w = actor->skeleton.h = 32;
 	actor->velocity = (vec2f) { 0, 0 };
 	actor->is_visible = false;
-	actor->spawn = (vec2) { 0, 0 };
 	actor->state = AIR;
 	actor->speed = ACTOR_STANDARD_SPEED;
 	actor->is_jumping = false;
@@ -135,10 +134,7 @@ void actor_damage(struct actor *actor, const Sint16 damage)
 
 bool actor_jump(struct actor *actor, float speed)
 {
-	/*
-	 * To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
-	 *
-	 */
+	// To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
 	if ((!actor->is_jumping && actor->state != AIR) || (actor->is_jumping && actor->jump_count < MULTI_JUMP))
 	{
 		actor->is_jumping = true;
@@ -158,10 +154,9 @@ void actor_spawn(struct actor *actor)
 	actor->is_visible = true;
 }
 
-void player_init(struct player *player, const vec2 spawn, SDL_Renderer *renderer)
+void player_init(struct player *player, SDL_Renderer *renderer)
 { 
 	actor_init(&player->actor); 
-	player->actor.spawn = spawn;
 	player->texture = load_texture(renderer, ACTOR_TEXTURE);
 }
 
@@ -202,9 +197,7 @@ void player_move(struct player *player, const vec2 delta)
 void player_jump(struct player *player, float speed) 
 { 
 	if (actor_jump(&player->actor, speed))
-	{
 		sound_play("jump");
-	}
 }
 
 void player_spawn(struct player *player)

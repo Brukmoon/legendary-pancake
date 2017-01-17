@@ -81,11 +81,10 @@ struct player // : public actor;
 };
 
 // Initialize player.
-void player_init(struct player *player, const vec2 spawn, SDL_Renderer *renderer);
+void player_init(struct player *player, SDL_Renderer *renderer);
 void player_draw(const struct player *player, SDL_Renderer *renderer);
 void player_move(struct player *player, const vec2 delta);
 void player_jump(struct player *player, float speed);
-
 inline void player_set_spawn(struct player *player, const vec2 spawn) { player->actor.spawn = spawn; }
 void player_spawn(struct player *player);
 
