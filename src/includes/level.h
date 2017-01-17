@@ -9,7 +9,7 @@
 struct level;
 
 // Sets level#id as curr_level.
-bool level_load(int id, SDL_Renderer *renderer);
+bool level_load(const char *name, SDL_Renderer *renderer);
 // Saves level to file.
 bool level_save();
 // Must be called @ exit. Should be called when changing level.
@@ -17,11 +17,6 @@ void level_clean(struct level **level);
 
 // Representation of a tile, integer for now.
 typedef int tile;
-/*struct tile
-{
-	int id;
-	...
-};*/
 
 // Map layers.
 enum tile_map_layer

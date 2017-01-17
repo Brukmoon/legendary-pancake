@@ -33,7 +33,7 @@ void process_input_menu(struct game* game)
 				sound_play("accept");
 				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list.current->text) == 0)
 				{
-					level_load(1, game->screen.renderer); // load level 1
+					level_load("level1", game->screen.renderer); // load level 1
 					game_set_state(game, PLAY);
 					player_init(&g_player, game->screen.renderer);
 					player_spawn(&g_player);
@@ -71,29 +71,18 @@ void process_input_play(struct game* game)
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {
 				case SDLK_RIGHT:
+				case SDLK_d:
 					player_set_vel_x(&g_player, g_player.actor.speed);
 					break;
 				case SDLK_LEFT:
+				case SDLK_a:
 					player_set_vel_x(&g_player, -g_player.actor.speed);
 					break;
-					/*
-					case SDLK_UP:
-						player.velocity.y = -1* PLAYER_SPEED;
-						break;*/
-						/*case SDLK_DOWN:
-							player.velocity.y = 1* PLAYER_SPEED;
-							break;*/
+				case SDLK_SPACE:
+					player_jump(&g_player, PLAYER_JUMP_INTENSITY);
+					break;
 				case SDLK_RETURN:
 					game_pause(game);
-					break;
-				case SDLK_SPACE:
-					player_jump(&g_player, 7.f);
-					break;
-				case SDLK_q:
-					game_set_state(game, EXIT);
-					break;
-				case SDLK_m:
-					game_set_state(game, MENU);
 					break;
 				default:
 					break;
@@ -131,7 +120,7 @@ void process_input_play(struct game* game)
 
 }
 
-static void write_map_texture(const vec2 *position, int value)
+static void set_tile_texture(const vec2 *position, int value)
 {
 	INFO("Setting map tile texture at position [%d;%d] to value %d!", position->x, position->y, value);
 	g_level->tile_map.map[TMAP_TEXTURE_LAYER][position->y][position->x] = value;
@@ -149,6 +138,7 @@ static const vec2 calc_mouse_pos_map()
 	SDL_GetMouseState(&position.x, &position.y);
 	position.x = (int)(g_camera.position.x + position.x) / g_level->tile_map.tile_width;
 	position.y = (int)(g_camera.position.y + position.y) / g_level->tile_map.tile_height;
+	// "Out of map" cases.
 	if (position.x >= g_level->tile_map.width)
 		position.x = g_level->tile_map.width - 1;
 	else if (position.x < 0)
@@ -183,10 +173,12 @@ void process_input_edit(struct game *game)
 				break;
 			case SDLK_p:
 				game_set_state(game, PLAY);
+				player_spawn(&g_player);
 				break;
 			case SDLK_s:
 				level_save();
 				break;
+				// Set the spawn point for the player.
 			case SDLK_x:
 			{
 				vec2 position = { 0, 0 };
@@ -240,13 +232,13 @@ void process_input_edit(struct game *game)
 			case SDL_BUTTON_LEFT:
 			{
 				vec2 position = calc_mouse_pos_map();
-				write_map_texture(&position, curr_sprite_num);
+				set_tile_texture(&position, curr_sprite_num);
 				break;
 			}
 			case SDL_BUTTON_RIGHT:
 			{
 				vec2 position = calc_mouse_pos_map();
-				write_map_texture(&position, 0);
+				set_tile_texture(&position, 0);
 				break;
 			}
 			case SDL_BUTTON_MIDDLE:

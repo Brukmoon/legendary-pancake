@@ -8,15 +8,22 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
+ // Size of the name storage
+ /*
+ * TODO: Allocate on heap --> save memory.
+ */
+#define ACTOR_NAME_MAX_LENGTH 20
+ // How much does a player jump.
+#define PLAYER_JUMP_INTENSITY 6.f
+#define ACTOR_STANDARD_SPEED 5.f
+#define ACTOR_HP 100
+
 #include <SDL.h>
 #include <stdbool.h>
 
 #include "vector.h"
 
-// Size of the name storage.
-#define ACTOR_NAME_MAX_LENGTH 20
-
-// Beware: If you change MULTI_JUMP, modify the UI aswell.
+// Beware: If you change MULTI_JUMP, modify the UI (stamina) aswell.
 enum 
 { 
 	MULTI_JUMP = 2 
@@ -24,33 +31,32 @@ enum
 
 struct actor
 {
-	// Name of the actor.
-	char name[ACTOR_NAME_MAX_LENGTH];
-	// Life: max 32,767 HPs.
-	Sint16 hitpoints;
-	// State of the actor.
 	enum
 	{
 		GROUND,
 		AIR
 	} state;
-	bool is_jumping;
-	// Should be drawn?
-	bool is_visible;
-	// TODO: Move to an animation struct.
-	// Current state of the animation.
-	float draw_state;
-	// Number of sprites tied to the actor
-	int sprite_count;
-	// Where should the actor spawn?
-	vec2 spawn;
 	struct
 	{
 		int x, y, w, h;
 	} skeleton;
-
-	unsigned short jump_count;
-
+	// Name of the actor.
+	char name[ACTOR_NAME_MAX_LENGTH];
+	// Life: max 32,767 HPs.
+	Sint16 hitpoints;
+	// State of the actor.
+	bool is_jumping;
+	// Should be drawn?
+	bool is_visible;
+	/*
+	 * TODO: Move to an animation struct.
+	 */
+	// Current state of the animation.
+	float draw_state;
+	// Number of sprites tied to the actor
+	Uint8 sprite_count, jump_count;
+	// Where should the actor spawn?
+	vec2 spawn;
 	// speed coefficient
 	float speed;
 	// current velocity
@@ -58,38 +64,38 @@ struct actor
 };
 
 // Initialize actor.
-// TODO: Add initialization options.
+/*
+ * TODO: Add initialization options --> make actor truly universal.
+ */
 void actor_init(struct actor *actor);
-// Spawn actor.
+// Spawn actor. Call actor_init first.
 void actor_spawn(struct actor *actor);
 // Move actor by delta.
 void actor_move(struct actor *actor, const vec2 delta);
-// Perform jump. Speed must be positive, not a vector.
+// Perform jump.
 bool actor_jump(struct actor *actor, float speed);
 // Subtract damage points from actor's HPs.
 void actor_damage(struct actor *actor, const Sint16 damage);
-// Draw actor on screen.
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
 
-// Player is a special case of actor.
+// Player is a special case of an actor.
 struct player // : public actor;
 {
 	// A player is an actor.
 	struct actor actor;
-	// Texture will be tied to him.
+	// Texture is unique.
 	SDL_Texture *texture;
 };
 
-// Initialize player.
 void player_init(struct player *player, SDL_Renderer *renderer);
 void player_draw(const struct player *player, SDL_Renderer *renderer);
 void player_move(struct player *player, const vec2 delta);
 void player_jump(struct player *player, float speed);
-inline void player_set_spawn(struct player *player, const vec2 spawn) { player->actor.spawn = spawn; }
 void player_spawn(struct player *player);
-
 // Cause damage to the player.
 inline void player_damage(struct player *player, const Sint16 damage) { actor_damage(&player->actor, damage); }
+
+inline void player_set_spawn(struct player *player, const vec2 spawn) { player->actor.spawn = spawn; }
 // Set player velocity to vel.
 inline void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }
 inline void player_set_vel_y(struct player *player, float vel) { player->actor.velocity.y = vel; }

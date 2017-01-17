@@ -55,9 +55,6 @@ struct game
 	void(*clean)(struct game*);
 };
 
-// Used in the process_input_edit --> 
-extern int curr_sprite_num;
-
 // Is the game running?
 inline bool game_running(const struct game *game) { return game->state; }
 // Set game paused.
@@ -65,5 +62,8 @@ bool game_set_pause(struct game *game, bool yesno);
 bool game_pause(struct game *game);
 // Set game state.
 void game_set_state(struct game* game, const enum game_state state);
+
+// Texture type currently selected. Needed by both the event handler and renderer.
+extern int curr_sprite_num;
 
 #endif // GAME_H

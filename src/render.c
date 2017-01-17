@@ -142,7 +142,7 @@ void render_edit(SDL_Renderer *renderer)
 		&(const struct SDL_Rect){ x - (g_player.actor.skeleton.w) / 2, y - (g_player.actor.skeleton.h) / 2, g_level->tile_map.tile_width, g_level->tile_map.tile_height });
 	hollow_rect(renderer, g_player.actor.spawn.x - g_camera.position.x,g_player.actor.spawn.y - g_camera.position.y, g_player.actor.skeleton.w, g_player.actor.skeleton.h,
 		(SDL_Color) {
-		0, 255, 0, 0
+		0, 0, 255, 0
 	});
 	SDL_RenderPresent(renderer);
 }

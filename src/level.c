@@ -26,9 +26,9 @@ static bool level_load_tilemap(struct level *level, FILE *f);
 static void level_destroy_textures(struct level *level);
 
 
-bool level_load(int id, SDL_Renderer *renderer)
+bool level_load(const char *name, SDL_Renderer *renderer)
 {
-	INFO("- Loading level %d.", id);
+	INFO("- Loading level %s.", name);
 	if (g_level) // Previous level not cleaned up.
 	{
 		INFO("Cleaning up previously loaded level %s (#%d).", g_level->name, g_level->id);
@@ -36,13 +36,13 @@ bool level_load(int id, SDL_Renderer *renderer)
 	}
 	level_init(&g_level);
 	char buffer[BUFFER_SIZE];
-	sprintf_s(buffer, BUFFER_SIZE, LEVEL_PATH"level%d.level", id);
+	sprintf_s(buffer, BUFFER_SIZE, LEVEL_PATH"%s.level", name);
 	if (level_load_data(g_level, renderer, buffer))
 	{
-		INFO("Level %d loaded.", id);
+		INFO("Level %s loaded.", name);
 		return true;
 	}
-	ERROR("Level %d not loaded.", id);
+	ERROR("Level %s not loaded.", name);
 	return false;
 }
 
@@ -121,26 +121,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 	/* Set this to correct value! */
 	level->id = 0;
 	INFO("level! %d", level->id);
-	
 	return true;
-	/*
-	FILE *f = NULL;
-	fopen_s(&f, file_name, "r");
-	if (!f)
-	{
-		ERROR("Level file couldn't be opened.");
-		return false;
-	}
-	INFO("Tilemap %s loaded.", file_name);
-	
-	if (!level_load_info(level, f) || !level_load_tilemap(level, f) || !level_load_textures(level, renderer, f))
-	{
-		fclose(f);
-		return false;
-	}
-	fclose(f);
-	return true;
-	*/
 }
 
 void level_init(struct level **level)
@@ -167,7 +148,6 @@ void level_clean(struct level **level)
 		return;
 	}
 	level_free_grid(*level);
-	//level_destroy_sprites();
 	level_destroy_textures(*level);
 	INFO("%p", *level);
 	free(*level);
@@ -220,45 +200,10 @@ void level_free_grid(struct level *level)
 	INFO("Level grid freed.");
 }
 
-static bool level_load_info(struct level *level, FILE *f)
-{
-	// TODO: Set this to correct value.
-	level->id = 0;
-	INFO("level! %d", level->id);
-	fscanf_s(f, "%s", level->name, LEVEL_NAME_LENGTH);
-	INFO("name! %s", level->name);
-	fscanf_s(f, "%d%*c%d", &level->tile_map.width, &level->tile_map.height);
-	INFO("width! %d", level->tile_map.width);
-	INFO("height! %d", level->tile_map.height);
-	fscanf_s(f, "%d%*c%d", &level->tile_map.tile_width, &level->tile_map.tile_height);
-	INFO("tilewidth! %d", level->tile_map.tile_width);
-	INFO("tileheight! %d", level->tile_map.tile_height);
-	return true;
-}
-
 void level_destroy_textures(struct level *level)
 {
 	SDL_DestroyTexture(level->tileset);
 	SDL_DestroyTexture(level->background);
-	/*
-	for (int i = 0; i < LEVEL_TEXTURES_ARR_SIZE; ++i)
-	{
-		while (textures_container.data[i])
-		{
-#ifdef _DEBUG
-			int ll_position = -1; // position in linked list
-			ll_position++;
-#endif // _DEBUG
-			struct level_texture_bucket *iter = textures_container.data[i];
-			textures_container.data[i] = iter->next;
-#ifdef _DEBUG
-			INFO("Freeing texture #%d from index %d (position %d).", iter->key, i, ll_position);
-#endif // _DEBUG
-			SDL_DestroyTexture(iter->texture);
-			free(iter);
-		}
-	}
-	*/
 	INFO("Textures destroyed.");
 }
 

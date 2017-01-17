@@ -6,7 +6,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-// Process input for every state.
+// Process input for each state.
 void process_input_menu(struct game* game);
 void process_input_play(struct game* game);
 void process_input_edit(struct game* game);

@@ -10,9 +10,7 @@
 #include "sound.h"
 #include "texture.h"
 
-#define ACTOR_TEXTURE IMG_PATH"player.png"
-#define ACTOR_STANDARD_SPEED 6.f
-#define ACTOR_HP 100
+#define PLAYER_TEXTURE IMG_PATH"player.png"
 
 struct player g_player;
 
@@ -137,6 +135,7 @@ bool actor_jump(struct actor *actor, float speed)
 	// To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
 	if ((!actor->is_jumping && actor->state != AIR) || (actor->is_jumping && actor->jump_count < MULTI_JUMP))
 	{
+		// He is jumping until he hits the ground.
 		actor->is_jumping = true;
 		actor->jump_count++;
 		// Go against gravity.
@@ -157,7 +156,7 @@ void actor_spawn(struct actor *actor)
 void player_init(struct player *player, SDL_Renderer *renderer)
 { 
 	actor_init(&player->actor); 
-	player->texture = load_texture(renderer, ACTOR_TEXTURE);
+	player->texture = load_texture(renderer, PLAYER_TEXTURE);
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)
