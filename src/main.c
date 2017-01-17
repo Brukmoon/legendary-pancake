@@ -5,6 +5,7 @@
  * Welcome to my personal hell.
  *
  **/
+#include <stdio.h>
 #include <stdlib.h>
 #ifdef _MSC_VER
 #define _CRTDBG_MAP_ALLOC
@@ -30,7 +31,6 @@ int main(int argc, char* argv[]) {
 	// Unused for now. Suppress warning.
 	UNUSED_PARAMETER(argc);
 	UNUSED_PARAMETER(argv);
-
 	// Global game state
 	struct game game = {
 		NONE, // RUNNING?
@@ -66,6 +66,7 @@ int main(int argc, char* argv[]) {
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
 	game.clean(&game);
+
 #ifdef _MSC_VER
 	/* 
 	 * Memory leak detection --> works only with VS libraries, implicit output to Debug window.

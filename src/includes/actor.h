@@ -16,10 +16,10 @@
 // Size of the name storage.
 #define ACTOR_NAME_MAX_LENGTH 20
 
-// Beware: If you change JUMP_COUNT, modify the UI aswell.
+// Beware: If you change MULTI_JUMP, modify the UI aswell.
 enum 
 { 
-	JUMP_COUNT = 2 
+	MULTI_JUMP = 2 
 };
 
 struct actor
@@ -35,12 +35,14 @@ struct actor
 		AIR
 	} state;
 	bool is_jumping;
+	// Should be drawn?
+	bool is_visible;
 	// TODO: Move to an animation struct.
 	// Current state of the animation.
 	float draw_state;
 	// Number of sprites tied to the actor
 	int sprite_count;
-
+	// Where should the actor spawn?
 	vec2 spawn;
 	struct
 	{
@@ -58,6 +60,8 @@ struct actor
 // Initialize actor.
 // TODO: Add initialization options.
 void actor_init(struct actor *actor);
+// Spawn actor.
+void actor_spawn(struct actor *actor);
 // Move actor by delta.
 void actor_move(struct actor *actor, const vec2 delta);
 // Perform jump. Speed must be positive, not a vector.
@@ -81,7 +85,11 @@ void player_init(struct player *player, const vec2 spawn, SDL_Renderer *renderer
 void player_draw(const struct player *player, SDL_Renderer *renderer);
 void player_move(struct player *player, const vec2 delta);
 void player_jump(struct player *player, float speed);
-// Cause damage to player.
+
+inline void player_set_spawn(struct player *player, const vec2 spawn) { player->actor.spawn = spawn; }
+void player_spawn(struct player *player);
+
+// Cause damage to the player.
 inline void player_damage(struct player *player, const Sint16 damage) { actor_damage(&player->actor, damage); }
 // Set player velocity to vel.
 inline void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }

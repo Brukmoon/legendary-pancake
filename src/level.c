@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "actor.h"
 #include "common.h"
 #include "config.h"
 #include "hash.h"
@@ -19,11 +20,9 @@ static void level_free_grid(struct level *level);
 
 // Load file_name level data into the level structure.
 static bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* file_name);
+
 // INTERNAL, load the grid into level, expects iobuf to point to the grid.
 static bool level_load_tilemap(struct level *level, FILE *f);
-
-// INTERNAL, load level textures into container
-static bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f);
 static void level_destroy_textures(struct level *level);
 
 
@@ -56,6 +55,70 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		return false;
 	}
 	FILE *f = NULL;
+	char buffer[256], command[20];
+	fopen_s(&f, file_name, "r");
+	if (f != NULL) {
+		while (!feof(f)) {
+			fgets(buffer, 256, f);
+			sscanf_s(buffer, "%s%*[^\n]", command, 20);
+			if (SDL_strcmp(command, "NAME") == 0)
+			{
+				sscanf_s(buffer, "%*s%s", level->name, LEVEL_NAME_LENGTH);
+				INFO("name! %s", level->name);
+			}
+			else if (SDL_strcmp(command, "MAP") == 0)
+			{
+				sscanf_s(buffer, "%*s%d%d", &level->tile_map.width, &level->tile_map.height);
+				INFO("width! %d", level->tile_map.width);
+				INFO("height! %d", level->tile_map.height);
+				level_load_tilemap(level, f);
+			}
+			else if (SDL_strcmp(command, "SSHEET") == 0)
+			{
+				char name[BUFFER_SIZE];
+				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
+				level->tileset = load_texture(renderer, name);
+				if (!level->tileset)
+				{
+					ERROR("Tileset %s couldn't be loaded.", name);
+					return false;
+				}
+				INFO("Tileset (file: %s) loaded.", name);
+			}
+			else if (SDL_strcmp(command, "BACKGROUND") == 0)
+			{
+				char name[BUFFER_SIZE];
+				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
+				g_level->background = load_texture(renderer, name);
+				if (!g_level->background)
+				{
+					INFO("Level background couldn't be loaded.");
+					fclose(f);
+					return false;
+				}
+			}
+			else if (SDL_strcmp(command, "TILE") == 0)
+			{
+				sscanf_s(buffer, "%*s%d", &level->tile_map.tile_width);
+				level->tile_map.tile_height = level->tile_map.tile_width;
+				INFO("tilewidth! %d", level->tile_map.tile_width);
+				INFO("tileheight! %d", level->tile_map.tile_height);
+			}
+			// Clear.
+			command[0] = '\0';
+		}
+	}
+	else {
+		ERROR("Level file couldn't be opened.");
+		return false;
+	}
+	/* Set this to correct value! */
+	level->id = 0;
+	INFO("level! %d", level->id);
+	
+	return true;
+	/*
+	FILE *f = NULL;
 	fopen_s(&f, file_name, "r");
 	if (!f)
 	{
@@ -63,24 +126,15 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		return false;
 	}
 	INFO("Tilemap %s loaded.", file_name);
-	// TODO: Set this to correct value.
-	level->id = 0;
-	INFO("level! %d", level->id);
-	fscanf_s(f, "%s", level->name, LEVEL_NAME_LENGTH);
-	INFO("name! %s", level->name);
-	fscanf_s(f, "%d%*c%d", &level->tile_map.width, &level->tile_map.height);
-	INFO("width! %d", level->tile_map.width);
-	INFO("height! %d", level->tile_map.height);
-	fscanf_s(f, "%d%*c%d", &level->tile_map.tile_width, &level->tile_map.tile_height);
-	INFO("tilewidth! %d", level->tile_map.tile_width);
-	INFO("tileheight! %d", level->tile_map.tile_height);
-	if (!level_load_tilemap(level, f) || !level_load_textures(level, renderer, f))
+	
+	if (!level_load_info(level, f) || !level_load_tilemap(level, f) || !level_load_textures(level, renderer, f))
 	{
 		fclose(f);
 		return false;
 	}
 	fclose(f);
 	return true;
+	*/
 }
 
 void level_init(struct level **level)
@@ -160,47 +214,19 @@ void level_free_grid(struct level *level)
 	INFO("Level grid freed.");
 }
 
-bool level_load_textures(struct level *level, SDL_Renderer *renderer, FILE *f)
+static bool level_load_info(struct level *level, FILE *f)
 {
-	INFO("Loading textures...");
-	char file_name[BUFFER_SIZE];
-	fscanf_s(f, "%s", file_name, BUFFER_SIZE);
-	level->tileset = load_texture(renderer, file_name);
-	if (!level->tileset)
-	{
-		ERROR("Tileset %s couldn't be loaded.", file_name);
-		return false;
-	}
-	INFO("Tileset (file: %s) loaded.", file_name);
-	fscanf_s(f, "%s", file_name, BUFFER_SIZE);
-	g_level->background = load_texture(renderer, file_name);
-	if (!g_level->background)
-	{
-		INFO("Level background couldn't be loaded.");
-		fclose(f);
-		return false;
-	}
-	/*
-	char buffer[BUFFER_SIZE];
-	while (fgets(file_name, BUFFER_SIZE, f))
-	{
-		int curr_id = 0; // currently processing texture id #curr_id
-		SDL_Rect temp;
-		if (sscanf_s(file_name, "SPRITE: %s %d %d %d %d", buffer, BUFFER_SIZE, &temp.x, &temp.y, &temp.w, &temp.h) == 5)
-		{
-			SDL_Rect *target = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-			target->x = temp.x;
-			target->y = temp.y;
-			target->w = temp.w;
-			target->h = temp.h;
-			level_sprite_add(buffer, curr_id, target);
-		}
-		else if (sscanf_s(file_name, "FILE: %s", buffer, BUFFER_SIZE) == 1)
-			curr_id = level_texture_add(buffer, renderer);
-		else if (SDL_strcmp("OBJECTS\n", file_name) == 0)
-			break;
-	}
-	*/
+	// TODO: Set this to correct value.
+	level->id = 0;
+	INFO("level! %d", level->id);
+	fscanf_s(f, "%s", level->name, LEVEL_NAME_LENGTH);
+	INFO("name! %s", level->name);
+	fscanf_s(f, "%d%*c%d", &level->tile_map.width, &level->tile_map.height);
+	INFO("width! %d", level->tile_map.width);
+	INFO("height! %d", level->tile_map.height);
+	fscanf_s(f, "%d%*c%d", &level->tile_map.tile_width, &level->tile_map.tile_height);
+	INFO("tilewidth! %d", level->tile_map.tile_width);
+	INFO("tileheight! %d", level->tile_map.tile_height);
 	return true;
 }
 

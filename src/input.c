@@ -34,10 +34,15 @@ void process_input_menu(struct game* game)
 				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list.current->text) == 0)
 				{
 					level_load(1, game->screen.renderer); // load level 1
+					player_init(&g_player, (vec2) { 50, 50 }, game->screen.renderer);
 					game_set_state(game, PLAY);
+					player_spawn(&g_player);
 				}
 				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list.current->text) == 0)
+				{
 					game_set_state(game, EDIT);
+					player_init(&g_player, (vec2) { 50, 50 }, game->screen.renderer);
+				}
 				else if(SDL_strcmp(M_MENU_QUIT, g_menu->button_list.current->text) == 0)
 					game_set_state(game, EXIT);
 				break;

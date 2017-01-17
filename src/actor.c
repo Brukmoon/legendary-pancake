@@ -18,12 +18,16 @@ struct player g_player;
 
 void actor_init(struct actor *actor)
 {
+	// default draw state
 	actor->draw_state = 0;
+	SDL_strlcpy(actor->name, "player", ACTOR_NAME_MAX_LENGTH);
 	actor->hitpoints = ACTOR_HP;
 	actor->sprite_count = 3;
 	actor->skeleton.x = actor->skeleton.y = 32;
 	actor->skeleton.w = actor->skeleton.h = 32;
 	actor->velocity = (vec2f) { 0, 0 };
+	actor->is_visible = false;
+	actor->spawn = (vec2) { 0, 0 };
 	actor->state = AIR;
 	actor->speed = ACTOR_STANDARD_SPEED;
 	actor->is_jumping = false;
@@ -133,10 +137,9 @@ bool actor_jump(struct actor *actor, float speed)
 {
 	/*
 	 * To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
-	 * TODO: Maybe make the engine more flexible by making double jump optional?
 	 *
 	 */
-	if ((!actor->is_jumping && actor->state != AIR) || (actor->is_jumping && actor->jump_count < JUMP_COUNT))
+	if ((!actor->is_jumping && actor->state != AIR) || (actor->is_jumping && actor->jump_count < MULTI_JUMP))
 	{
 		actor->is_jumping = true;
 		actor->jump_count++;
@@ -147,33 +150,45 @@ bool actor_jump(struct actor *actor, float speed)
 	return false;
 }
 
+void actor_spawn(struct actor *actor)
+{
+	actor->skeleton.x = actor->spawn.x;
+	actor->skeleton.y = actor->spawn.y;
+	INFO("Actor %s spawned at [%d;%d].", actor->name, actor->spawn.x, actor->spawn.y);
+	actor->is_visible = true;
+}
+
 void player_init(struct player *player, const vec2 spawn, SDL_Renderer *renderer)
 { 
 	actor_init(&player->actor); 
+	player->actor.spawn = spawn;
 	player->texture = load_texture(renderer, ACTOR_TEXTURE);
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)
 {
-	SDL_Rect dest;
-	dest.w = dest.h = 34; // Draw a bit larger.
-	dest.x = player->actor.skeleton.x - g_camera.position.x;
-	dest.y = player->actor.skeleton.y - g_camera.position.y;
-	SDL_Rect src;
-	src.w = src.h = 32;
-	if (player->actor.velocity.x == 0) // If standing.
+	if (player->actor.is_visible)
 	{
-		src.y = src.x = 0;
-		SDL_RenderCopy(renderer, player->texture, &src, &dest);
-	}
-	else // moving
-	{
-		src.x = ((int)player->actor.draw_state)*player->actor.skeleton.w;
-		src.y = 96;
-		if (player->actor.velocity.x < 0) // Moving left.
-			SDL_RenderCopyEx(renderer, player->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
-		else
+		SDL_Rect dest;
+		dest.w = dest.h = 34; // Draw a bit larger.
+		dest.x = player->actor.skeleton.x - g_camera.position.x;
+		dest.y = player->actor.skeleton.y - g_camera.position.y;
+		SDL_Rect src;
+		src.w = src.h = 32;
+		if (player->actor.velocity.x == 0) // If standing.
+		{
+			src.y = src.x = 0;
 			SDL_RenderCopy(renderer, player->texture, &src, &dest);
+		}
+		else // moving
+		{
+			src.x = ((int)player->actor.draw_state)*player->actor.skeleton.w;
+			src.y = 96;
+			if (player->actor.velocity.x < 0) // Moving left.
+				SDL_RenderCopyEx(renderer, player->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
+			else
+				SDL_RenderCopy(renderer, player->texture, &src, &dest);
+		}
 	}
 }
 
@@ -190,4 +205,9 @@ void player_jump(struct player *player, float speed)
 	{
 		sound_play("jump");
 	}
+}
+
+void player_spawn(struct player *player)
+{
+	actor_spawn(&player->actor);
 }
