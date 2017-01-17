@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#define BUTTON_FONT_SIZE 25
+
 #include "texture.h"
 #include "vector.h"
 

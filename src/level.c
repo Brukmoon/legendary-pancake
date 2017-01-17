@@ -81,6 +81,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				if (!level->tileset)
 				{
 					ERROR("Tileset %s couldn't be loaded.", name);
+					fclose(f);
 					return false;
 				}
 				INFO("Tileset (file: %s) loaded.", name);
@@ -118,6 +119,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		ERROR("Level file couldn't be opened.");
 		return false;
 	}
+	fclose(f);
 	/* Set this to correct value! */
 	level->id = 0;
 	INFO("level! %d", level->id);

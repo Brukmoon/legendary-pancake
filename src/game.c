@@ -41,7 +41,7 @@ bool g_init(struct game *game)
 				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) != -1)
 				{
 					INFO("Sound system activated.");
-					if (fonts_init(10)) {
+					if (fonts_init(FONT_BUFFER_SIZE)) {
 						INFO("Text engine activated.");
 						INFO("> Game initialization sequence finished.\n");
 						game_set_state(game, MENU);
@@ -163,11 +163,10 @@ void to_menu_state(struct game *game)
 void to_edit_state(struct game *game)
 {
 	INFO("Editor opened.\n");
-#if PYTHON_ON
-	system("python ./assets/gen_empty_map.py");
-#endif // PYTHON_ON
-	//if (!g_level) // level not yet initialized
-		level_load(0, game->screen.renderer);
+	char level_name[30];
+	printf("Level to edit: ");
+	scanf_s("%s", level_name, 30);
+	level_load(level_name, game->screen.renderer);
 	// set callbacks to menu state callbacks
 	game->update = update_edit;
 	game->draw = render_edit;

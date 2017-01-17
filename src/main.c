@@ -5,7 +5,6 @@
  * Welcome to my personal hell.
  *
  **/
-#include <stdio.h>
 #include <stdlib.h>
 #ifdef _MSC_VER
 #define _CRTDBG_MAP_ALLOC
@@ -31,6 +30,7 @@ int main(int argc, char* argv[]) {
 	// Unused for now. Suppress warning.
 	UNUSED_PARAMETER(argc);
 	UNUSED_PARAMETER(argv);
+
 	// Global game state
 	struct game game = {
 		NONE, // RUNNING?
@@ -65,6 +65,7 @@ int main(int argc, char* argv[]) {
 			SDL_Delay(delay);
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
+
 	game.clean(&game);
 
 #ifdef _MSC_VER
@@ -75,5 +76,6 @@ int main(int argc, char* argv[]) {
 	 */
 	_CrtDumpMemoryLeaks();
 #endif // _MSC_VER
+
 	return EXIT_SUCCESS;
 }

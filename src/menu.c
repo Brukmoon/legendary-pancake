@@ -22,9 +22,9 @@ void menu_load(SDL_Renderer* renderer)
 	g_menu->button_count = 0;
 	g_menu->button_list.root = g_menu->button_list.head = NULL;
 	INFO("Menu memory allocated.");
-	button_add(renderer, M_MENU_PLAY, (const vec2) { CENTER_X-2*FONT_SIZE, CENTER_Y });
-	button_add(renderer, M_MENU_EDIT, (const vec2) { CENTER_X-(int)(2.5*FONT_SIZE), CENTER_Y+FONT_SIZE });
-	button_add(renderer, M_MENU_QUIT, (const vec2) { CENTER_X-2*FONT_SIZE, CENTER_Y+2*FONT_SIZE });
+	button_add(renderer, M_MENU_PLAY, (const vec2) { CENTER_X-2*BUTTON_FONT_SIZE, CENTER_Y });
+	button_add(renderer, M_MENU_EDIT, (const vec2) { CENTER_X-(int)(2.5*BUTTON_FONT_SIZE), CENTER_Y+BUTTON_FONT_SIZE});
+	button_add(renderer, M_MENU_QUIT, (const vec2) { CENTER_X-2* BUTTON_FONT_SIZE, CENTER_Y+2*BUTTON_FONT_SIZE});
 	g_menu->button_list.current = g_menu->button_list.root;
 	g_menu->button_list.root->curr_sprite = BUTTON_SPRITE_ACTIVE;
 	g_menu->background = load_texture(renderer, IMG_PATH"background1.jpg");

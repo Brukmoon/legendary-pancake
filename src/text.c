@@ -3,6 +3,8 @@
 #include "hash.h"
 #include "text.h"
 
+static bool colors_equal(const SDL_Color *first, const SDL_Color *second);
+
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color)
 {
 	SDL_Surface* surface = TTF_RenderText_Solid(font_get(&g_fonts, size, &color), text, color);
@@ -90,6 +92,7 @@ void fonts_destroy(void)
 	{
 		while (g_fonts.hash_array[i])
 		{
+			INFO("Destroying font %d on index %d.", g_fonts.hash_array[i]->key, i);
 			struct bucket *iter = g_fonts.hash_array[i];
 			g_fonts.hash_array[i] = iter->next;
 			TTF_CloseFont(iter->font);
@@ -99,7 +102,7 @@ void fonts_destroy(void)
 	free(g_fonts.hash_array);
 }
 
-static bool colors_equal(const SDL_Color *first, const SDL_Color *second) 
+bool colors_equal(const SDL_Color *first, const SDL_Color *second) 
 { 
 	return first->a == second->a && first->b == second->b && first->g == second->g && first->a == second->a; 
 }
