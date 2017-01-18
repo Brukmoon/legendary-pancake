@@ -55,6 +55,9 @@
     <ClCompile Include="src\stack.c">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="src\includes\map.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="text_box.h">
       <Filter>Menu\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\map.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

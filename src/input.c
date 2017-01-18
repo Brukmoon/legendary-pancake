@@ -188,6 +188,22 @@ void process_input_edit(struct game *game)
 				player_set_spawn(&g_player, position);
 			}
 				break;
+			case SDLK_2:
+			case SDLK_KP_2:
+				tile_map_expand(&g_level->tile_map, EXPAND_HEIGHT, 1);
+				break;
+			case SDLK_6:
+			case SDLK_KP_6:
+				tile_map_expand(&g_level->tile_map, EXPAND_WIDTH, 1);
+				break;
+			case SDLK_4:
+			case SDLK_KP_4:
+				tile_map_shrink(&g_level->tile_map, EXPAND_WIDTH, 1);
+				break;
+			case SDLK_8:
+			case SDLK_KP_8:
+				tile_map_shrink(&g_level->tile_map, EXPAND_HEIGHT, 1);
+				break;
 			case SDLK_q:
 				game_set_state(game, EXIT);
 				break;

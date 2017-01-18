@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 
+#include "map.h"
+
 // Max length of level name.
 #define LEVEL_NAME_LENGTH 30
 
@@ -15,34 +17,17 @@ bool level_save();
 // Must be called @ exit. Should be called when changing level.
 void level_clean(struct level **level);
 
-// Representation of a tile, integer for now.
-typedef int tile;
-
-// Map layers.
-enum tile_map_layer
-{
-	TMAP_TEXTURE_LAYER,
-	TMAP_COLLISION_LAYER,
-	TMAP_LAYER_COUNT
-};
-
 extern struct level
 {
 	// Level id.
 	unsigned id;
 	// Name of the level.
 	char name[LEVEL_NAME_LENGTH];
-	// Level background.
-	SDL_Texture* background;
-	// TODO: Implement sounds.
-	struct
-	{
-		tile **map[TMAP_LAYER_COUNT];
-		int width, height;
-		int tile_width, tile_height;
-	} tile_map;
+	struct tile_map tile_map;
 	// Map tileset.
 	SDL_Texture *tileset;
+	// Level background.
+	SDL_Texture* background;
 } *g_level;
 
 #endif // LEVEL_H
