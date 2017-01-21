@@ -69,7 +69,7 @@ struct game_state
 
 struct game_state *game_state_main_menu(void);
 struct game_state *game_state_play(char* level_name);
-struct game_state *game_state_edit(void);
+struct game_state *game_state_edit(const char* level_name);
 struct game_state *game_state_preedit(void);
 
 bool game_state_change(struct game *game, struct game_state *new_state);

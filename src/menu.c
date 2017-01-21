@@ -94,6 +94,7 @@ void menu_destroy(void)
 			g_menu->text_box_list->root = g_menu->text_box_list->root->next;
 			text_box_destroy(temp);
 		}
+		free(g_menu->text_box_list);
 	}
 	SDL_DestroyTexture(g_menu->background);
 	free(g_menu);

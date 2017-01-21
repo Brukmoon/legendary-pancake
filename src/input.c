@@ -77,7 +77,7 @@ bool process_input_play(struct game* game)
 					player_set_vel_x(&g_player, 0);
 					break;
 				case SDLK_e:
-					game_state_change(game, game_state_edit());
+					game_state_change(game, game_state_edit(NULL));
 					break;
 				case SDLK_SPACE:
 					player_jump(&g_player, PLAYER_JUMP_INTENSITY);
