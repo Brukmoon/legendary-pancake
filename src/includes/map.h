@@ -3,13 +3,21 @@
 
 #include <stdbool.h>
 
-// Representation of a tile, integer for now.
+// Representation of a tile bit.
+/*
+ * MAP w h
+ * 0:0 0:0 ... 0:0
+ * 0:0 0:0 ... 0:1
+ *
+ * texture_id:collision
+ */
 typedef int tile;
 
-enum expansion_type
+// Resize mode.
+enum resize_type
 {
-	EXPAND_WIDTH,
-	EXPAND_HEIGHT
+	RESIZE_WIDTH,
+	RESIZE_HEIGHT
 };
 
 // Map layers.
@@ -22,12 +30,18 @@ enum tile_map_layer
 
 struct tile_map
 {
+	/*
+	 * You can have multiple layers. For now, there are only two - collision and textures.
+	 * But it would be possible to have background, foreground and collision layers.
+	 * Player enters a "tunnel" --> becomes invisible.
+	 *
+	 */
 	tile **map[TMAP_LAYER_COUNT];
 	int width, height;
 	int tile_width, tile_height;
 };
 
-bool tile_map_shrink(struct tile_map *map, enum expansion_type t, int value);
-bool tile_map_expand(struct tile_map *map, enum expansion_type t, int value);
+// Expand or shrink the tile map.
+bool tile_map_resize(struct tile_map *map, enum resize_type t, int value);
 
 #endif // MAP_H

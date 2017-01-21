@@ -31,7 +31,7 @@
 #define CAMERA_LIMIT 1
 #define SHOW_CONSOLE 1
 #define SHOW_GRID 0
-#define MUSIC_ON 0
+#define MUSIC_ON 1
 #define SOUND_ON 1
 #define DAMAGE_ON 1
 /*

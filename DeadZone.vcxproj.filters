@@ -58,6 +58,9 @@
     <ClCompile Include="src\includes\map.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="text_box.c">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -134,11 +137,11 @@
     <ClInclude Include="src\includes\stack.h">
       <Filter>Menu\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="text_box.h">
-      <Filter>Menu\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\includes\map.h">
       <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\text_box.h">
+      <Filter>Menu\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

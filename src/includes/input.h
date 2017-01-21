@@ -6,10 +6,13 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include <stdbool.h>
+
 // Process input for each state.
-void process_input_menu(struct game* game);
-void process_input_play(struct game* game);
-void process_input_edit(struct game* game);
+bool process_input_menu(struct game* game);
+bool process_input_play(struct game* game);
+bool process_input_edit(struct game* game);
+bool process_input_preedit(struct game* game);
 
 // Update the game.
 void update_menu(struct game* game);

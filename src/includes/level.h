@@ -13,9 +13,9 @@ struct level;
 // Sets level#id as curr_level.
 bool level_load(const char *name, SDL_Renderer *renderer);
 // Saves level to file.
-bool level_save();
+bool level_save(void);
 // Must be called @ exit. Should be called when changing level.
-void level_clean(struct level **level);
+void level_clean(void);
 
 extern struct level
 {

@@ -25,9 +25,9 @@ void actor_init(struct actor *actor)
 	actor->skeleton.w = actor->skeleton.h = 32;
 	actor->velocity = (vec2f) { 0, 0 };
 	actor->is_visible = false;
+	actor->is_jumping = false;
 	actor->state = AIR;
 	actor->speed = ACTOR_STANDARD_SPEED;
-	actor->is_jumping = false;
 	actor->jump_count = 0;
 	camera_set(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }

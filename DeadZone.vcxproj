@@ -38,6 +38,7 @@
     <ClCompile Include="src\text.c" />
     <ClCompile Include="src\texture.c" />
     <ClCompile Include="src\timer.c" />
+    <ClCompile Include="text_box.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\includes\actor.h" />
@@ -61,7 +62,7 @@
     <ClInclude Include="src\includes\stack.h" />
     <ClInclude Include="src\includes\text.h" />
     <ClInclude Include="src\includes\texture.h" />
-    <ClInclude Include="text_box.h" />
+    <ClInclude Include="src\includes\text_box.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F01DC806-0612-472D-965B-B53E40F4350A}</ProjectGuid>

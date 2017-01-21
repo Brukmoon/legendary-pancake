@@ -33,40 +33,36 @@ int main(int argc, char* argv[]) {
 
 	// Global game state
 	struct game game = {
-		NONE, // RUNNING?
-		false, // paused?
-		NULL, // window not yet created
+		false, // paused? 
 		{
+			NULL,
 			SCREEN_WIDTH,
 			SCREEN_HEIGHT,
-		NULL // renderer not yet created
+			NULL
 		},
-		// callbacks
-		g_init,  // initialization function, must be called before entering the game loop
-		// draw, events, update
-		NULL,
-		NULL,
-		NULL,
-		g_clean // cleaner function, should be made an atexit callback or called every time the program exits
+		NULL
 	};
-	if (!game.init(&game))
+
+	if (!game_init(&game, &game.screen))
 		return EXIT_FAILURE;
 	
 	// Overflow @ 2^32-1 is safe. Happens in ~50 days.
 	Uint32 time = SDL_GetTicks();
 	// Game loop: process events -> update if not paused -> render to screen -> sync FPS
-	while (game_running(&game)) {
-		game.process_input(&game);
-		game.update(&game);
+	while (game_running(&game)) 
+	{
+		if (!game.run->process_input(&game))
+			continue; // State changed, re-evaluate.
+		game.run->update(&game);
 		if (time > SDL_GetTicks()) // rendering rate can't exceed logic rate
-			game.draw(game.screen.renderer);
+			game.run->draw(game.screen.renderer);
 		Sint32 delay = time - SDL_GetTicks();
 		if (delay > 0)
 			SDL_Delay(delay);
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
 
-	game.clean(&game);
+	game_clean(&game.screen);
 
 #ifdef _MSC_VER
 	/* 

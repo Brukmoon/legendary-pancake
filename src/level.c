@@ -32,7 +32,7 @@ bool level_load(const char *name, SDL_Renderer *renderer)
 	if (g_level) // Previous level not cleaned up.
 	{
 		INFO("Cleaning up previously loaded level %s (#%d).", g_level->name, g_level->id);
-		level_clean(&g_level);
+		level_clean();
 	}
 	level_init(&g_level);
 	char buffer[BUFFER_SIZE];
@@ -55,26 +55,32 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		return false;
 	}
 	FILE *f = NULL;
-	char buffer[256], command[20];
+	char buffer[BUFFER_SIZE], 
+		// A command can be 20 characters long (+ '\0').
+		command[21];
 	fopen_s(&f, file_name, "r");
 	if (f != NULL) {
 		while (!feof(f)) {
-			fgets(buffer, 256, f);
-			sscanf_s(buffer, "%s%*[^\n]", command, 20);
+			fgets(buffer, BUFFER_SIZE, f);
+			// Parse first string and ignore everything else except a newline.
+			sscanf_s(buffer, "%s%*[^\n]", command, 21);
 			if (SDL_strcmp(command, "NAME") == 0)
 			{
+				// Name of the level.
 				sscanf_s(buffer, "%*s%s", level->name, LEVEL_NAME_LENGTH);
 				INFO("name! %s", level->name);
 			}
 			else if (SDL_strcmp(command, "MAP") == 0)
 			{
+				// Level width and height.
 				sscanf_s(buffer, "%*s%d%d", &level->tile_map.width, &level->tile_map.height);
-				INFO("width! %d", level->tile_map.width);
-				INFO("height! %d", level->tile_map.height);
+				INFO("width! %d\nheight! %d", level->tile_map.width, level->tile_map.height);
+				// Load the grid.
 				level_load_tilemap(level, f);
 			}
 			else if (SDL_strcmp(command, "SSHEET") == 0)
 			{
+				// Path to the spritesheet.
 				char name[BUFFER_SIZE];
 				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
 				level->tileset = load_texture(renderer, name);
@@ -116,7 +122,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 		}
 	}
 	else {
-		ERROR("Level file couldn't be opened.");
+		ERROR("Level file %s couldn't be opened.", file_name);
 		return false;
 	}
 	fclose(f);
@@ -142,18 +148,17 @@ void level_init(struct level **level)
 	INFO("Level structure initialized.");
 }
 
-void level_clean(struct level **level)
+void level_clean(void)
 {
-	if (!*level)
+	if (!g_level)
 	{
 		INFO("Level not initialized. Skipping clean.");
 		return;
 	}
-	level_free_grid(*level);
-	level_destroy_textures(*level);
-	INFO("%p", *level);
-	free(*level);
-	*level = NULL;
+	level_free_grid(g_level);
+	level_destroy_textures(g_level);
+	free(g_level);
+	g_level = NULL;
 	INFO("Level structure freed.");
 }
 
@@ -217,6 +222,11 @@ bool level_save()
 	SDL_strlcat(file_name, ".level", LEVEL_NAME_LENGTH + 7);
 	FILE *f = NULL;
 	fopen_s(&f, file_name, "w");
+	if (!f)
+	{
+		ERROR("Couldn't open file %s.", file_name);
+		return false;
+	}
 	fprintf(f, "NAME %s\n", g_level->name);
 	fprintf(f, "TILE %d\n", g_level->tile_map.tile_width);
 	fprintf(f, "MAP %d %d\n", g_level->tile_map.width, g_level->tile_map.height);

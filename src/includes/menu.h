@@ -4,30 +4,51 @@
 #include <SDL.h>
 
 #include "button.h"
-#include "stack.h"
+#include "text_box.h"
 
 #define M_MENU_PLAY "PLAY"
 #define M_MENU_EDIT "EDITOR"
 #define M_MENU_QUIT "QUIT"
 
+#define E_MENU_OK "OK"
+#define E_MENU_CANCEL "BACK"
+
+struct button_list
+{
+	struct button *root;
+	// Keep head in memory for quick access.
+	struct button *head;
+	// Pointer to the button currently active.
+	struct button *current;
+};
+
+struct text_box_list
+{
+	struct text_box* root;
+	struct text_box* head, *current;
+};
+
+enum menu_flags
+{
+	MENU_BUTTON = 1 << 0,
+	MENU_TEXT_BOX = 1 << 1,
+	MENU_ALL = MENU_BUTTON | MENU_TEXT_BOX,
+};
+
 struct menu
 {
-	struct
-	{
-		struct button *root;
-		// Keep head in memory for quick access.
-		struct button *head;
-		// Pointer to the button currently active.
-		struct button *current;
-	} button_list;
-	int max_button_count;
+	struct button_list* button_list;
+	struct text_box_list *text_box_list;
 	int button_count;
 	SDL_Texture *background;
 } *g_menu;
 
 void button_add(SDL_Renderer* renderer, const char* text, const vec2 position);
+void text_box_add(const SDL_Rect skeleton, int max_length);
+void main_menu_load(SDL_Renderer* renderer);
+void preedit_menu_load(SDL_Renderer* renderer);
 
-void menu_load(SDL_Renderer* renderer);
+void menu_create(struct menu **menu, const enum menu_flags flags);
 void menu_draw(struct menu *menu, SDL_Renderer* renderer);
 void menu_destroy(void);
 void menu_prev_button(struct menu *menu);
