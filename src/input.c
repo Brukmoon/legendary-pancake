@@ -154,9 +154,17 @@ bool process_input_preedit(struct game* game)
 			}
 			else if (e.key.keysym.sym == SDLK_RETURN)
 			{
+				INFO("Clicked button %s.", g_menu->button_list->current->text);
+				sound_play("accept");
 				if (SDL_strcmp(E_MENU_OK, g_menu->button_list->current->text) == 0)
+				{
 					// BEWARE: Possible error here. Can text get freed before the state exits?
-					game_state_change(game, game_state_edit(g_menu->text_box_list->current->text));
+					if (!game_state_change(game, game_state_edit(g_menu->text_box_list->current->text)))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+				}
 				else if (SDL_strcmp(E_MENU_CANCEL, g_menu->button_list->current->text) == 0)
 					game_state_exit(game);
 			}

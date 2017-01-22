@@ -179,20 +179,29 @@ void sound_add(const char* name, const char* type)
 void music_play(const char *name, int fadein_ms)
 {
 #if MUSIC_ON
+
 		//Play the music
-	Mix_Music* m = music_get(name);
-	if (m == NULL)
-	{
-		ERROR("Music %s not found. Use function add_music first to load the music into the resource manager.", name);
-		return;
-	}
-	if (Mix_FadeInMusic(m, -1, fadein_ms) == -1)
-	{
-		ERROR("Couldn't play music %s.", name);
-	}
+		Mix_Music* m = music_get(name);
+		if (m == NULL)
+		{
+			ERROR("Music %s not found. Use function add_music first to load the music into the resource manager.", name);
+			return;
+		}
+
+		if (Mix_FadeInMusic(m, -1, fadein_ms) == -1)
+		{
+			ERROR("Couldn't play music %s.", name);
+		}
 #else
 	UNUSED_PARAMETER(name);
 	UNUSED_PARAMETER(fadein_ms);
+#endif // MUSIC_ON
+}
+
+void music_stop(void)
+{
+#if MUSIC_ON
+	Mix_HaltMusic();
 #endif // MUSIC_ON
 }
 

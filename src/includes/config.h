@@ -13,9 +13,11 @@
 #define FPS 60
 
 // Normalized screen width and height.
-// 1024x800 during development, tested up to 1980x1080 (FullHD)
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 800
+// 1024x768 during development, tested up to 1920x1080 (FullHD)
+#define SCREEN_WIDTH 1152
+#define SCREEN_HEIGHT 864
+//#define SCREEN_WIDTH 1920
+//#define SCREEN_HEIGHT 1080
 
 #define DATA_PATH "./assets/"
 #define IMG_PATH DATA_PATH##"gfx/"
@@ -34,6 +36,7 @@
 #define MUSIC_ON 1
 #define SOUND_ON 1
 #define DAMAGE_ON 1
+#define FULLSCREEN_ON 0
 /*
  * Python 3 must be supported by the system.
  * On Linux: Install python package.

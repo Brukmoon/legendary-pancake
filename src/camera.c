@@ -33,11 +33,12 @@ void camera_set(struct camera *camera, vec2 position)
 	if (camera->t == CAMERA_FIXED)
 	{
 		// Is camera out of map?
-		if (position.x < 0)
+		if (position.x < 0 || g_level->tile_map.width*g_level->tile_map.tile_width < SCREEN_WIDTH)
 			position.x = 0;
 		else if (g_level->tile_map.width*g_level->tile_map.tile_width > SCREEN_WIDTH && position.x > MAX_CAMERA_X)
 			position.x = MAX_CAMERA_X;
-		if (position.y < 0)
+	
+		if (position.y < 0 || g_level->tile_map.height*g_level->tile_map.tile_height < SCREEN_HEIGHT)
 			position.y = 0;
 		else if (g_level->tile_map.height*g_level->tile_map.tile_height > SCREEN_HEIGHT && position.y > MAX_CAMERA_Y)
 			position.y = MAX_CAMERA_Y;

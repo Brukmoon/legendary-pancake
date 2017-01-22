@@ -42,6 +42,7 @@ bool level_load(const char *name, SDL_Renderer *renderer)
 		INFO("Level %s loaded.", name);
 		return true;
 	}
+	//g_level = NULL;
 	ERROR("Level %s not loaded.", name);
 	return false;
 }
@@ -56,8 +57,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 	}
 	FILE *f = NULL;
 	char buffer[BUFFER_SIZE], 
-		// A command can be 20 characters long (+ '\0').
-		command[21];
+		command[21]; // A command can be 20 characters long (+ '\0').
 	fopen_s(&f, file_name, "r");
 	if (f != NULL) {
 		while (!feof(f)) {
@@ -145,6 +145,10 @@ void level_init(struct level **level)
 		ERROR("Allocation error at level structure initialization.");
 		return;
 	}
+	(*level)->background = NULL;
+	(*level)->tileset = NULL;
+	for (int i = 0; i < TMAP_LAYER_COUNT; ++i)
+		(*level)->tile_map.map[i] = NULL;
 	INFO("Level structure initialized.");
 }
 
@@ -155,8 +159,11 @@ void level_clean(void)
 		INFO("Level not initialized. Skipping clean.");
 		return;
 	}
-	level_free_grid(g_level);
-	level_destroy_textures(g_level);
+	if (g_level->tile_map.map[0])
+	{
+		level_free_grid(g_level);
+		level_destroy_textures(g_level);
+	}
 	free(g_level);
 	g_level = NULL;
 	INFO("Level structure freed.");
@@ -198,13 +205,13 @@ void level_alloc_grid(struct level *level)
 
 void level_free_grid(struct level *level)
 {
-	for (int j = 0; j < TMAP_LAYER_COUNT; ++j)
-	{
-		for (int i = 0; i < level->tile_map.height; ++i)
-			free(level->tile_map.map[j][i]);
-		free(level->tile_map.map[j]);
-	}
-	INFO("Level grid freed.");
+		for (int j = 0; j < TMAP_LAYER_COUNT; ++j)
+		{
+			for (int i = 0; i < level->tile_map.height; ++i)
+				free(level->tile_map.map[j][i]);
+			free(level->tile_map.map[j]);
+		}
+		INFO("Level grid freed.");
 }
 
 void level_destroy_textures(struct level *level)

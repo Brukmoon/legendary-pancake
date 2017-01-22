@@ -16,11 +16,11 @@
 // Outputs SDL version info.
 static void SDL_version_info(void);
 // State transitions.
-static void to_play_state(SDL_Renderer* game, const char *level_name);
+static bool to_play_state(SDL_Renderer* game, const char *level_name);
 static void from_play_state(void);
-static void to_main_menu_state(SDL_Renderer* game, char*);
+static bool to_main_menu_state(SDL_Renderer* game, char*);
 static void from_main_menu_state(void);
-static void to_edit_state(SDL_Renderer* game, const char* level_name);
+static bool to_edit_state(SDL_Renderer* game, const char* level_name);
 static void from_edit_state(void);
 
 static bool game_set_pause(struct game *game, bool yesno)
@@ -37,10 +37,14 @@ bool game_init(struct game* game, struct game_screen* screen)
 	if (SDL_Init(SDL_INIT_EVERYTHING) >= 0)
 	{
 		INFO("SDL activated.");
-		screen->window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen->width, screen->height, SDL_WINDOW_SHOWN);
+		screen->window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen->width, screen->height, 
+			SDL_WINDOW_SHOWN);
 		if (screen->window)
 		{
 			INFO("Window activated.");
+			SDL_DisplayMode mode;
+			SDL_GetWindowDisplayMode(screen->window, &mode);
+			INFO("Display mode: %d %d %d Hz", mode.w, mode.h, mode.refresh_rate);
 			// Renderer with HW acceleration enabled.
 			screen->renderer = SDL_CreateRenderer(screen->window, -1, SDL_RENDERER_ACCELERATED);
 			if (screen->renderer)
@@ -110,14 +114,15 @@ bool game_state_change(struct game *game, struct game_state *new_state)
 	if (game_running(game))
 		new_state->next = game->run;
 	game->run = new_state;
-	if(game->run->enter)
-		game->run->enter(game->screen.renderer, game->run->state_param);
-	struct game_state *it = game->run;
-	while (it)
+	struct game_state *iter = game->run;
+	while (iter)
 	{
-		printf("%d -> ", it->id);
-		it = it->next;
+		INFO("%d -> ", iter->id);
+		iter = iter->next;
 	}
+	if (game->run->enter)
+		if (!game->run->enter(game->screen.renderer, game->run->state_param))
+			return false;
 	return true;
 }
 
@@ -152,14 +157,15 @@ bool game_pause(struct game *game)
 }
 
 
-static void to_play_state(SDL_Renderer *renderer, const char *level_name)
+static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 {
 	INFO("Game started.\n");
 	if (g_level)
 		INFO("There is a level already. Using it.");
 	else
 	{
-		level_load(level_name, renderer);
+		if (!level_load(level_name, renderer))
+			return false;
 		// set callbacks to play state callbacks
 		music_add("music", ".ogg");
 		sound_add("jump", ".wav");
@@ -170,6 +176,7 @@ static void to_play_state(SDL_Renderer *renderer, const char *level_name)
 	camera_init(&g_camera, CAMERA_FIXED);
 	player_init(&g_player, renderer);
 	player_spawn(&g_player);
+	return true;
 }
 
 static void from_play_state(void)
@@ -177,7 +184,7 @@ static void from_play_state(void)
 	level_clean();
 }
 
-static void to_main_menu_state(SDL_Renderer *renderer, char* unused)
+static bool to_main_menu_state(SDL_Renderer *renderer, char* unused)
 {
 	UNUSED_PARAMETER(unused);
 	INFO("Menu opened.\n");
@@ -187,6 +194,7 @@ static void to_main_menu_state(SDL_Renderer *renderer, char* unused)
 	sound_add("accept", ".wav");
 	sound_add("select", ".wav");
 	music_play("menu", 4000);
+	return true;
 }
 
 static void from_main_menu_state(void)
@@ -194,7 +202,7 @@ static void from_main_menu_state(void)
 	menu_destroy();
 }
 
-static void to_preedit_state(SDL_Renderer *renderer, char* unused)
+static bool to_preedit_state(SDL_Renderer *renderer, char* unused)
 {
 	UNUSED_PARAMETER(unused);
 	INFO("Preedit menu opened.\n");
@@ -204,9 +212,10 @@ static void to_preedit_state(SDL_Renderer *renderer, char* unused)
 	sound_add("accept", ".wav");
 	sound_add("select", ".wav");
 	music_play("menu", 4000);
+	return true;
 }
 
-void to_edit_state(SDL_Renderer *renderer, const char *level_name)
+static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 {
 	INFO("Editor opened.\n");
 	if (g_level)
@@ -215,7 +224,8 @@ void to_edit_state(SDL_Renderer *renderer, const char *level_name)
 	}
 	else
 	{
-		level_load(level_name, renderer);
+		if (!level_load(level_name, renderer))
+			return false;
 	}
 	// set callbacks to menu state callbacks
     player_set_vel_x(&g_player, 0);
@@ -225,13 +235,13 @@ void to_edit_state(SDL_Renderer *renderer, const char *level_name)
 	camera_init(&g_camera, CAMERA_FREE);
 	player_init(&g_player, renderer);
 	player_spawn(&g_player);
+	return true;
 }
 
 static void from_edit_state(void)
 {
 	level_clean();
 }
-
 
 struct game_state *game_state_main_menu(void)
 {
@@ -288,7 +298,7 @@ struct game_state *game_state_preedit(void)
 	return preedit;
 }
 
-struct game_state *game_state_edit(const char *level_name)
+struct game_state *game_state_edit(char *level_name)
 {
 	struct game_state *edit = malloc(sizeof(struct game_state));
 
