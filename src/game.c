@@ -184,6 +184,7 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 static void from_play_state(void)
 {
 	level_clean();
+	player_destroy(&g_player);
 }
 
 static bool to_main_menu_state(SDL_Renderer *renderer, char* unused)
@@ -239,6 +240,7 @@ static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 static void from_edit_state(void)
 {
 	level_clean();
+	player_destroy(&g_player);
 }
 
 struct game_state *game_state_main_menu(void)

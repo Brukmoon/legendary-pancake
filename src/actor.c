@@ -10,7 +10,7 @@
 #include "sound.h"
 #include "texture.h"
 
-#define PLAYER_TEXTURE IMG_PATH"player.png"
+#define PLAYER_PATH IMG_PATH"player.png"
 
 struct player g_player;
 
@@ -18,7 +18,8 @@ void actor_init(struct actor *actor)
 {
 	// default draw state
 	actor->draw_state = 0;
-	SDL_strlcpy(actor->name, "player", ACTOR_NAME_MAX_LENGTH);
+	actor->name = malloc(7);
+	SDL_strlcpy(actor->name, "player", 7);
 	actor->hitpoints = ACTOR_HP;
 	actor->sprite_count = 3;
 	actor->skeleton.x = actor->skeleton.y = 32;
@@ -30,6 +31,11 @@ void actor_init(struct actor *actor)
 	actor->speed = ACTOR_STANDARD_SPEED;
 	actor->jump_count = 0;
 	camera_set(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
+}
+
+void actor_destroy(struct actor *actor)
+{
+	free(actor->name);
 }
 
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer)
@@ -60,7 +66,7 @@ void actor_move(struct actor *actor, const vec2 delta)
 				else // Collision from left.
 					actor_after.x++;
 				if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
-					break;
+					break; // stop stepping
 			}
 			actor->skeleton.x = actor_after.x;
 		}
@@ -70,6 +76,7 @@ void actor_move(struct actor *actor, const vec2 delta)
 	{
 		if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 		{
+			// if not collide with ladder
 			if(!tilemap_collision(g_level, &actor_after, LADDER_COLLISION))
 				actor->state = AIR;
 			actor->skeleton.y += delta.y;
@@ -89,8 +96,8 @@ void actor_move(struct actor *actor, const vec2 delta)
 			{
 				if (actor->state == AIR)
 				{
-					if (actor->velocity.y > 12)
-						actor_damage(actor, ((int)actor->velocity.y % 10)*10);
+					if (actor->velocity.y > FALLDAMAGE_TRESHHOLD)
+						actor_damage(actor, ((int)actor->velocity.y % 8)*DAMAGE_RATE);
 				}
 			}
 			actor->state = GROUND;
@@ -114,7 +121,7 @@ void actor_damage(struct actor *actor, const Sint16 damage)
 bool actor_jump(struct actor *actor, float speed)
 {
 	// To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
-	if ((!actor->is_jumping && actor->state == GROUND) || (actor->is_jumping && actor->jump_count < MULTI_JUMP))
+	if ((!actor->is_jumping && actor->state == GROUND) || (actor->is_jumping && actor->jump_count < MULTI_JUMP && actor->state != LADDER))
 	{
 		// He is jumping until he hits the ground.
 		actor->is_jumping = true;
@@ -138,7 +145,13 @@ void player_init(struct player *player, SDL_Renderer *renderer)
 { 
 	actor_init(&player->actor); 
 	player->climb[0] = player->climb[1] = false;
-	player->texture = load_texture(renderer, PLAYER_TEXTURE);
+	player->texture = load_texture(renderer, PLAYER_PATH);
+}
+
+void player_destroy(struct player *player)
+{
+	actor_destroy(&player->actor);
+	SDL_DestroyTexture(player->texture);
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)

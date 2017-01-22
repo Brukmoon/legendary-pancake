@@ -8,16 +8,13 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
- // Size of the name storage
- /*
- * TODO: Allocate on heap --> save memory.
- */
-#define ACTOR_NAME_MAX_LENGTH 20
  // How much does a player jump.
 #define PLAYER_JUMP_INTENSITY 6.f
 #define ACTOR_STANDARD_SPEED 5.f
 #define ACTOR_HP 100
 #define CLIMB_SPEED 5
+#define FALLDAMAGE_TRESHHOLD 10
+#define DAMAGE_RATE 20
 
 #include <SDL.h>
 #include <stdbool.h>
@@ -40,7 +37,7 @@ struct actor
 	} state;
 	SDL_Rect skeleton;
 	// Name of the actor.
-	char name[ACTOR_NAME_MAX_LENGTH];
+	char *name;
 	// Life: max 32,767 HPs.
 	Sint16 hitpoints;
 	// State of the actor.
@@ -67,6 +64,8 @@ struct actor
  * TODO: Add initialization options --> make actor truly universal.
  */
 void actor_init(struct actor *actor);
+void actor_destroy(struct actor *actor);
+
 // Spawn actor. Call actor_init first.
 void actor_spawn(struct actor *actor);
 // Move actor by delta.
@@ -89,6 +88,8 @@ struct player // : public actor;
 };
 
 void player_init(struct player *player, SDL_Renderer *renderer);
+void player_destroy(struct player *player);
+
 void player_draw(const struct player *player, SDL_Renderer *renderer);
 void player_move(struct player *player, const vec2 delta);
 void player_jump(struct player *player, float speed);

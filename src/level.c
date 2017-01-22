@@ -90,6 +90,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 					fclose(f);
 					return false;
 				}
+				INFO("SHEET loaded.");
 				INFO("Tileset (file: %s) loaded.", name);
 			}
 			else if (SDL_strcmp(command, "BACKGROUND") == 0)
@@ -99,15 +100,32 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				g_level->background = load_texture(renderer, name);
 				if (!g_level->background)
 				{
-					INFO("Level background couldn't be loaded.");
+					INFO("Static background couldn't be loaded.");
+					g_level->background = NULL;
 					fclose(f);
 					return false;
 				}
+				INFO("BACKGROUND loaded.");
+			}
+			else if (SDL_strcmp(command, "D_BACKGROUND") == 0)
+			{
+				char name[BUFFER_SIZE];
+				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
+				g_level->d_background = load_texture(renderer, name);
+				if (!g_level->d_background)
+				{
+					INFO("Dynamic background couldn't be loaded.");
+					g_level->d_background = NULL;
+					fclose(f);
+					return false;
+				}
+				INFO("D_BACKGROUND loaded.");
 			}
 			else if (SDL_strcmp(command, "TILE") == 0)
 			{
 				sscanf_s(buffer, "%*s%d", &level->tile_map.tile_width);
 				level->tile_map.tile_height = level->tile_map.tile_width;
+				INFO("TILE loaded.");
 				INFO("tilewidth! %d", level->tile_map.tile_width);
 				INFO("tileheight! %d", level->tile_map.tile_height);
 			}
@@ -116,6 +134,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				vec2 spawn = { 0, 0 };
 				sscanf_s(buffer, "%*s%d%d", &spawn.x, &spawn.y);
 				player_set_spawn(&g_player, spawn);
+				INFO("SPAWN loaded.");
 			}
 			// Clear.
 			command[0] = '\0';
@@ -218,6 +237,7 @@ void level_destroy_textures(struct level *level)
 {
 	SDL_DestroyTexture(level->tileset);
 	SDL_DestroyTexture(level->background);
+	SDL_DestroyTexture(level->d_background);
 	INFO("Textures destroyed.");
 }
 
@@ -245,6 +265,7 @@ bool level_save()
 	}
 	fprintf(f, "%s\n", "SSHEET assets/gfx/spritesheet.png");
 	fprintf(f, "%s\n", "BACKGROUND assets/gfx/level1_background.png");
+	fprintf(f, "%s\n", "D_BACKGROUND assets/gfx/clouds.png");
 	fprintf(f, "%s %d %d\n", "SPAWN", g_player.actor.spawn.x, g_player.actor.spawn.y);
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);

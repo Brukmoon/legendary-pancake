@@ -19,13 +19,29 @@
 #define TILE_WIDTH g_level->tile_map.tile_width
 #define COLL_RECT_SIZE TILE_WIDTH/4
 
-static void render_grid(SDL_Renderer *const renderer, const SDL_Color color);
+static void render_map_grid(SDL_Renderer *const renderer);
 
 #define MAP_NOT_OVERFLOW (y>=0&&y<=g_level->tile_map.height&&x>=0&&x<=g_level->tile_map.width)
 
 void render_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 {
+	//Render background
 	SDL_RenderCopy(renderer, g_level->background, NULL, NULL);
+
+	static float scrollingOffset = 0;
+	scrollingOffset -= 0.5f;
+	int w = 0, h = 0;
+	SDL_QueryTexture(g_level->d_background, NULL, NULL, &w, &h);
+	if ((int)scrollingOffset < -w)
+	{
+		scrollingOffset = 0;
+	}
+	SDL_Rect dst_rect = { (int)scrollingOffset, 0, w, h };
+	SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
+	dst_rect.x = (int)scrollingOffset + w;
+	SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
+
+
 	int start_y = g_camera.position.y/TILE_HEIGHT, start_x = g_camera.position.x/TILE_WIDTH;
 	for (int y = start_y; y < g_level->tile_map.height; ++y)
 		for (int x = start_x; x < g_level->tile_map.width; ++x)
@@ -39,11 +55,6 @@ void render_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 					SDL_RenderCopy(renderer, g_level->tileset, &(const struct SDL_Rect){ (((int)g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x] % 16)-1)*TILE_WIDTH, ((int)g_level->tile_map.map[TMAP_TEXTURE_LAYER][y][x]/16)*TILE_HEIGHT,TILE_WIDTH, TILE_HEIGHT },
 						&(const struct SDL_Rect){ x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT });
 				}
-				if(f & RENDER_GRID)
-					hollow_rect(renderer, x*TILE_WIDTH - (g_camera.position.x), y*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH, TILE_HEIGHT,
-						(SDL_Color) {
-					255, 255, 255, 1
-				});
 				if (f & RENDER_COLL)
 				{
 					if (g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x] == 1)
@@ -59,6 +70,8 @@ void render_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 				}
 			}
 		}
+	if (f & RENDER_GRID)
+		render_map_grid(renderer);
 }
 
 #undef MAP_NOT_OVERFLOW
@@ -169,4 +182,13 @@ void render_edit(SDL_Renderer *renderer)
 		0, 0, 255, 0
 	});
 	SDL_RenderPresent(renderer);
+}
+
+static void render_map_grid(SDL_Renderer *const renderer)
+{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
+	for (int i = 0; i < g_level->tile_map.width+1; ++i)
+		SDL_RenderDrawLine(renderer, i*g_level->tile_map.tile_width - (g_camera.position.x), 0 - (g_camera.position.y), i*g_level->tile_map.tile_width - (g_camera.position.x), g_level->tile_map.tile_height*g_level->tile_map.height - (g_camera.position.y));
+	for (int i = 0; i < g_level->tile_map.height+1; ++i)
+		SDL_RenderDrawLine(renderer, 0 - (g_camera.position.x), i*g_level->tile_map.tile_height - (g_camera.position.y), g_level->tile_map.tile_width*g_level->tile_map.width - (g_camera.position.x), i*g_level->tile_map.tile_height - (g_camera.position.y));
 }

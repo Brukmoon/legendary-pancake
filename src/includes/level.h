@@ -28,6 +28,8 @@ extern struct level
 	SDL_Texture *tileset;
 	// Level background.
 	SDL_Texture* background;
+	// Dynamic background /*optional*/
+	SDL_Texture* d_background;
 } *g_level;
 
 #endif // LEVEL_H
