@@ -25,6 +25,7 @@ static void from_edit_state(void);
 
 static bool game_set_pause(struct game *game, bool yesno)
 {
+	// Also pause music.
 	music_set_pause(yesno);
 	return game->paused = yesno;
 }
@@ -33,6 +34,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 {
 	INFO("Startup: %s\nVersion: %s\nAuthor: Brukmoon\n", GAME_NAME, GAME_VERSION);
 	INFO("< Game initialization sequence started.");
+	// Logs version info.
 	SDL_version_info();
 	if (SDL_Init(SDL_INIT_EVERYTHING) >= 0)
 	{
@@ -50,7 +52,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 			if (screen->renderer)
 			{
 				INFO("Renderer activated.");
-				// Stereo, high frequency, low latency
+				// Stereo, high frequency, low latency.
 				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) != -1)
 				{
 					INFO("Sound system activated.");
@@ -66,7 +68,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 		}
 	}
 	// shouldn't get here unless SDL errors
-	ERROR("SDL wasn't initialized!");
+	ERROR("SDL wasn't initialized. %s", SDL_GetError());
 	return false;
 }
 
@@ -208,10 +210,6 @@ static bool to_preedit_state(SDL_Renderer *renderer, char* unused)
 	INFO("Preedit menu opened.\n");
 	// set callbacks to menu state callbacks
 	preedit_menu_load(renderer);
-	music_add("menu", ".ogg");
-	sound_add("accept", ".wav");
-	sound_add("select", ".wav");
-	music_play("menu", 4000);
 	return true;
 }
 

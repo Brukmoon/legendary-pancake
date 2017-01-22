@@ -244,7 +244,7 @@ bool level_save()
 		fprintf(f, "\n");
 	}
 	fprintf(f, "%s\n", "SSHEET assets/gfx/spritesheet.png");
-	fprintf(f, "%s\n", "BACKGROUND assets/gfx/editor_background.png");
+	fprintf(f, "%s\n", "BACKGROUND assets/gfx/level1_background.png");
 	fprintf(f, "%s %d %d\n", "SPAWN", g_player.actor.spawn.x, g_player.actor.spawn.y);
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);

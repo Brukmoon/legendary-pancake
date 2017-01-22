@@ -16,6 +16,7 @@ struct button* button_create(SDL_Renderer* renderer, struct button* parent, cons
 		ERROR("Not enough memory!");
 		return NULL;
 	}
+
 	butt->texture[BUTTON_SPRITE_INACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 0, 0, 0 });
 	butt->texture[BUTTON_SPRITE_ACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 255, 0, 0 });
 	butt->position = position;

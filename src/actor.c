@@ -36,26 +36,6 @@ void actor_draw(const struct actor *actor, SDL_Renderer *renderer)
 {
 	UNUSED_PARAMETER(actor);
 	UNUSED_PARAMETER(renderer);
-	/*SDL_Rect dest;
-	dest.w = dest.h = 34; // Draw a bit larger.
-	dest.x = actor->skeleton.x - g_camera.position.x;
-	dest.y = actor->skeleton.y - g_camera.position.y;
-	SDL_Rect src;
-	src.w = src.h = 32;
-	if (actor->velocity.x == 0) // If standing.
-	{
-		src.y = src.x = 0;
-		SDL_RenderCopy(renderer, actor->texture, &src, &dest);
-	}
-	else // moving
-	{
-		src.x = ((int)actor->draw_state)*actor->skeleton.w;
-		src.y = 96;
-		if (actor->velocity.x < 0) // Moving left.
-			SDL_RenderCopyEx(renderer, actor->texture, &src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
-		else
-			SDL_RenderCopy(renderer, actor->texture, &src, &dest);
-	}*/
 }
 
 void actor_move(struct actor *actor, const vec2 delta)
@@ -66,7 +46,7 @@ void actor_move(struct actor *actor, const vec2 delta)
 	// Handle each axis collision separately.
 	if (delta.x != 0) // check x axis collision
 	{
-		if (!tilemap_collision(g_level, &actor_after)) // No collision, simple case.
+		if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION)) // No collision, simple case.
 			actor->skeleton.x += delta.x;
 		else
 		{
@@ -79,7 +59,7 @@ void actor_move(struct actor *actor, const vec2 delta)
 					actor_after.x--;
 				else // Collision from left.
 					actor_after.x++;
-				if (!tilemap_collision(g_level, &actor_after))
+				if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 					break;
 			}
 			actor->skeleton.x = actor_after.x;
@@ -88,9 +68,10 @@ void actor_move(struct actor *actor, const vec2 delta)
 	actor_after.y += delta.y;
 	if (delta.y != 0) // check y axis collision
 	{
-		if (!tilemap_collision(g_level, &actor_after))
+		if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 		{
-			actor->state = AIR;
+			if(!tilemap_collision(g_level, &actor_after, LADDER_COLLISION))
+				actor->state = AIR;
 			actor->skeleton.y += delta.y;
 		}
 		else
@@ -101,18 +82,18 @@ void actor_move(struct actor *actor, const vec2 delta)
 					actor_after.y--;
 				else
 					actor_after.y++;
-				if (!tilemap_collision(g_level, &actor_after))
+				if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 					break;
 			}
 			if (actor_after.y >= actor->skeleton.y) // If the position after move hasn't changed.
 			{
-				if (actor->state != GROUND)
+				if (actor->state == AIR)
 				{
 					if (actor->velocity.y > 12)
 						actor_damage(actor, ((int)actor->velocity.y % 10)*10);
-					actor->state = GROUND;
 				}
 			}
+			actor->state = GROUND;
 			actor->velocity.y = 0;
 			actor->skeleton.y = actor_after.y;
 		}
@@ -133,7 +114,7 @@ void actor_damage(struct actor *actor, const Sint16 damage)
 bool actor_jump(struct actor *actor, float speed)
 {
 	// To jump, actor must be either not jumping and on ground or jumping and meeting jump count requirement.
-	if ((!actor->is_jumping && actor->state != AIR) || (actor->is_jumping && actor->jump_count < MULTI_JUMP))
+	if ((!actor->is_jumping && actor->state == GROUND) || (actor->is_jumping && actor->jump_count < MULTI_JUMP))
 	{
 		// He is jumping until he hits the ground.
 		actor->is_jumping = true;
@@ -156,6 +137,7 @@ void actor_spawn(struct actor *actor)
 void player_init(struct player *player, SDL_Renderer *renderer)
 { 
 	actor_init(&player->actor); 
+	player->climb[0] = player->climb[1] = false;
 	player->texture = load_texture(renderer, PLAYER_TEXTURE);
 }
 
@@ -169,7 +151,13 @@ void player_draw(const struct player *player, SDL_Renderer *renderer)
 		dest.y = player->actor.skeleton.y - g_camera.position.y;
 		SDL_Rect src;
 		src.w = src.h = 32;
-		if (player->actor.velocity.x == 0) // If standing.
+		if (player->actor.state == LADDER)
+		{
+			src.x = ((int)player->actor.draw_state)*player->actor.skeleton.w;
+			src.y = 64;
+			SDL_RenderCopy(renderer, player->texture, &src, &dest);
+		}
+		else if (player->actor.velocity.x == 0) // If standing.
 		{
 			src.y = src.x = 0;
 			SDL_RenderCopy(renderer, player->texture, &src, &dest);
@@ -202,4 +190,20 @@ void player_jump(struct player *player, float speed)
 void player_spawn(struct player *player)
 {
 	actor_spawn(&player->actor);
+}
+
+bool player_can_climb(struct player *player)
+{
+	return tilemap_collision(g_level, &player->actor.skeleton, LADDER_COLLISION);
+}
+
+void player_climb(struct player *player)
+{
+	player->actor.state = LADDER;
+	if (player->climb[0])
+		player_set_vel_y(player, CLIMB_SPEED);
+	else if (player->climb[1])
+		player_set_vel_y(player, -CLIMB_SPEED);
+	else
+		player_set_vel_y(player, 0);
 }

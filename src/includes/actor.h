@@ -17,6 +17,7 @@
 #define PLAYER_JUMP_INTENSITY 6.f
 #define ACTOR_STANDARD_SPEED 5.f
 #define ACTOR_HP 100
+#define CLIMB_SPEED 5
 
 #include <SDL.h>
 #include <stdbool.h>
@@ -34,12 +35,10 @@ struct actor
 	enum
 	{
 		GROUND,
-		AIR
+		AIR,
+		LADDER
 	} state;
-	struct
-	{
-		int x, y, w, h;
-	} skeleton;
+	SDL_Rect skeleton;
 	// Name of the actor.
 	char name[ACTOR_NAME_MAX_LENGTH];
 	// Life: max 32,767 HPs.
@@ -83,6 +82,8 @@ struct player // : public actor;
 {
 	// A player is an actor.
 	struct actor actor;
+	// climb[0] -> down, climb[1] -> up
+	bool climb[2];
 	// Texture is unique.
 	SDL_Texture *texture;
 };
@@ -92,6 +93,9 @@ void player_draw(const struct player *player, SDL_Renderer *renderer);
 void player_move(struct player *player, const vec2 delta);
 void player_jump(struct player *player, float speed);
 void player_spawn(struct player *player);
+bool player_can_climb(struct player *player);
+void player_climb(struct player *player);
+
 // Cause damage to the player.
 inline void player_damage(struct player *player, const Sint16 damage) { actor_damage(&player->actor, damage); }
 

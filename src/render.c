@@ -45,11 +45,18 @@ void render_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 					255, 255, 255, 1
 				});
 				if (f & RENDER_COLL)
-					if(g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x] == 1)
+				{
+					if (g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x] == 1)
 						fill_rect(renderer, (x + 1)*TILE_WIDTH - (g_camera.position.x) - COLL_RECT_SIZE, y*TILE_HEIGHT - (g_camera.position.y),
 							COLL_RECT_SIZE, COLL_RECT_SIZE, (SDL_Color) {
 						255, 0, 0, 1
 					});
+					else if (g_level->tile_map.map[TMAP_COLLISION_LAYER][y][x] == 2)
+						fill_rect(renderer, (x + 1)*TILE_WIDTH - (g_camera.position.x) - COLL_RECT_SIZE, y*TILE_HEIGHT - (g_camera.position.y),
+							COLL_RECT_SIZE, COLL_RECT_SIZE, (SDL_Color) {
+						0, 255, 0, 1
+					});
+				}
 			}
 		}
 }
@@ -75,7 +82,21 @@ static void render_debug_console(SDL_Renderer* const renderer)
 	sprintf_s(buffer, 50, "Player speed: [%f;%f]", g_player.actor.velocity.x, g_player.actor.velocity.y);
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 24 }, renderer);
 	// state
-	sprintf_s(buffer, 50, g_player.actor.state == GROUND ? "GROUND" : "AIR");
+	switch (g_player.actor.state)
+	{
+	case AIR:
+		sprintf_s(buffer, 50, "AIR");
+		break;
+	case GROUND:
+		sprintf_s(buffer, 50, "GROUND");
+		break;
+	case LADDER:
+		sprintf_s(buffer, 50, "LADDER");
+		break;
+	default:
+		sprintf_s(buffer, 50, "Unknown");
+		break;
+	}
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 36 }, renderer);
 }
 #endif // _DEBUG
@@ -134,12 +155,15 @@ void render_edit(SDL_Renderer *renderer)
 	render_map(renderer, RENDER_ALL);
 	int x = 0, y = 0;
 	SDL_GetMouseState(&x, &y);
+	// cursor
 	hollow_rect(renderer, x-(g_player.actor.skeleton.w)/2, y- (g_player.actor.skeleton.h) / 2, g_player.actor.skeleton.w, g_player.actor.skeleton.h,
 		(SDL_Color) {
 		255, 0, 0, 0
 	});
+	// current sprite
 	SDL_RenderCopy(renderer, g_level->tileset, &(const struct SDL_Rect){ ((curr_sprite_num%16)-1)* g_level->tile_map.tile_width, (curr_sprite_num / 16)*g_level->tile_map.tile_height, g_level->tile_map.tile_width, g_level->tile_map.tile_height },
 		&(const struct SDL_Rect){ x - (g_player.actor.skeleton.w) / 2, y - (g_player.actor.skeleton.h) / 2, g_level->tile_map.tile_width, g_level->tile_map.tile_height });
+	// spawn
 	hollow_rect(renderer, g_player.actor.spawn.x - g_camera.position.x,g_player.actor.spawn.y - g_camera.position.y, g_player.actor.skeleton.w, g_player.actor.skeleton.h,
 		(SDL_Color) {
 		0, 0, 255, 0

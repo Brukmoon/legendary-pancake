@@ -74,7 +74,10 @@ bool process_input_play(struct game* game)
 					player_set_vel_x(&g_player, -g_player.actor.speed);
 					break;
 				case SDLK_s:
-					player_set_vel_x(&g_player, 0);
+					g_player.climb[0] = true;
+					break;
+				case SDLK_w:
+					g_player.climb[1] = true;
 					break;
 				case SDLK_e:
 					game_state_change(game, game_state_edit(NULL));
@@ -93,13 +96,18 @@ bool process_input_play(struct game* game)
 				switch (event.key.keysym.sym) {
 				case SDLK_RIGHT:
 				case SDLK_LEFT:
+				case SDLK_d:
+				case SDLK_a:
 					player_set_vel_x(&g_player, 0);
 					break;
 				case SDLK_q:
-					game_state_reset(game);
-					break;
-				case SDLK_m:
 					game_state_exit(game);
+					break;
+				case SDLK_s:
+					g_player.climb[0]= false;
+					break;
+				case SDLK_w:
+					g_player.climb[1] = false;
 					break;
 				default:
 					break;
@@ -200,8 +208,15 @@ static void set_tile_texture(const vec2 *position, int value)
 }
 static void toggle_map_tile_coll(const vec2 *position)
 {
-	bool t = !g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x];
+	tile t = !g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x];
 	INFO("Writing map tile collision data at position [%d;%d] to %s!", position->x, position->y, t?"TRUE":"FALSE");
+	g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x] = t;
+}
+
+static void toggle_map_ladder(const vec2 *position)
+{
+	tile t = ((g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x]==2)?0:2);
+	INFO("Writing map ladder data at position [%d;%d] to %s!", position->x, position->y, t ? "TRUE" : "FALSE");
 	g_level->tile_map.map[TMAP_COLLISION_LAYER][position->y][position->x] = t;
 }
 
@@ -250,9 +265,16 @@ bool process_input_edit(struct game* game)
 			case SDLK_s:
 				level_save();
 				break;
-				// Set the spawn point for the player.
+			case SDLK_l:
+			{
+				// Toggle ladder collision.
+				vec2 position = calc_mouse_pos_map();
+				toggle_map_ladder(&position);
+			}
+			break;
 			case SDLK_x:
 			{
+				// Set the spawn point for the player.
 				vec2 position = { 0, 0 };
 				SDL_GetMouseState(&position.x, &position.y);
 				position.x = position.x + g_camera.position.x - g_player.actor.skeleton.w/2;
@@ -277,9 +299,6 @@ bool process_input_edit(struct game* game)
 				tile_map_resize(&g_level->tile_map, RESIZE_HEIGHT, -1);
 				break;
 			case SDLK_q:
-				game_state_reset(game);
-				break;
-			case SDLK_m:
 				game_state_exit(game);
 				break;
 			default:
@@ -356,7 +375,14 @@ static void update_player_double_jump(struct player *player)
 
 static void update_player_draw_state(struct player *player)
 {
-	if (player->actor.state != AIR)
+	if (player->actor.state == GROUND)
+	{
+		if (player->actor.draw_state < player->actor.sprite_count - 1)
+			player->actor.draw_state += .2f;
+		else
+			player->actor.draw_state = 0;
+	}
+	else if (player->actor.state == LADDER && player->actor.velocity.y)
 	{
 		if (player->actor.draw_state < player->actor.sprite_count - 1)
 			player->actor.draw_state += .2f;
@@ -379,6 +405,8 @@ void update_play(struct game* game)
 			g_player.actor.velocity.y += (float)GRAVITY;
 		else
 			player_set_vel_y(&g_player, T_VEL);
+		if (player_can_climb(&g_player))
+			player_climb(&g_player);
 		// Move him.
 		player_move(&g_player, (vec2) { (coord)g_player.actor.velocity.x, (coord)g_player.actor.velocity.y });
 		update_player_double_jump(&g_player);

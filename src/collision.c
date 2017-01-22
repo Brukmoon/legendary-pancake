@@ -14,7 +14,7 @@ bool rects_collide(const SDL_Rect* rect1, const SDL_Rect *rect2)
 	return true;
 }
 
-bool tilemap_collision(const struct level *level, const SDL_Rect* rect)
+bool tilemap_collision(const struct level *level, const SDL_Rect* rect, const enum collision_type type)
 {
 	if (rect == NULL || level == NULL)
 	{
@@ -39,7 +39,7 @@ bool tilemap_collision(const struct level *level, const SDL_Rect* rect)
 			 * t can be 0 or 1 [collision false or collision true].
 			 *
 			 */
-			if (t != 0)
+			if (t == type)
 				return true;
 		}
 	return false;
