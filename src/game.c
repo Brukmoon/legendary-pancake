@@ -1,5 +1,4 @@
 #include <SDL_mixer.h>
-#include <stdlib.h>
 
 #include "actor.h"
 #include "text.h"
@@ -11,6 +10,7 @@
 #include "input.h"
 #include "level.h"
 #include "sound.h"
+#include "sprite.h"
 #include "menu.h"
 
 // Outputs SDL version info.
@@ -32,7 +32,9 @@ static bool game_set_pause(struct game *game, bool yesno)
 
 bool game_init(struct game* game, struct game_screen* screen)
 {
-	INFO("Startup: %s\nVersion: %s\nAuthor: Brukmoon\n", GAME_NAME, GAME_VERSION);
+	INFO("Startup: %s", GAME_NAME);
+	INFO("Version: %s", GAME_VERSION);
+	INFO("Author: Brukmoon");
 	INFO("< Game initialization sequence started.");
 	// Logs version info.
 	SDL_version_info();
@@ -46,7 +48,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 			INFO("Window activated.");
 			SDL_DisplayMode mode;
 			SDL_GetWindowDisplayMode(screen->window, &mode);
-			INFO("Display mode: %d %d %d Hz", mode.w, mode.h, mode.refresh_rate);
+			INFO("Display mode: %d px %d px %d Hz", mode.w, mode.h, mode.refresh_rate);
 			// Renderer with HW acceleration enabled.
 			screen->renderer = SDL_CreateRenderer(screen->window, -1, SDL_RENDERER_ACCELERATED);
 			if (screen->renderer)
@@ -58,9 +60,9 @@ bool game_init(struct game* game, struct game_screen* screen)
 					INFO("Sound system activated.");
 					if (fonts_init(FONT_BUFFER_SIZE)) {
 						INFO("Text engine activated.");
+						SDL_ShowCursor(0);
 						INFO("> Game initialization sequence finished.\n");
 						game_state_change(game, game_state_main_menu());
-						SDL_ShowCursor(0);
 						return true;
 					}
 				}
@@ -85,6 +87,8 @@ void game_clean(struct game_screen *screen)
 	fonts_destroy();
 	// destroy sound
 	audio_destroy();
+	// destroy textures and sprites
+	sprites_destroy();
 	// exit subsystems	
 	Mix_CloseAudio();
 	TTF_Quit();
@@ -116,12 +120,18 @@ bool game_state_change(struct game *game, struct game_state *new_state)
 	if (game_running(game))
 		new_state->next = game->run;
 	game->run = new_state;
+
+	// print current state stack
 	struct game_state *iter = game->run;
+	INFO("Current state stack:");
+	INFO("[");
 	while (iter)
 	{
-		INFO("%d -> ", iter->id);
+		INFO("%d", iter->id);
 		iter = iter->next;
 	}
+	INFO("]");
+
 	if (game->run->enter)
 		if (!game->run->enter(game->screen.renderer, game->run->state_param))
 			return false;
@@ -148,8 +158,10 @@ void game_state_exit(struct game *game)
 
 void game_state_reset(struct game *game)
 {
+	INFO("< Exiting all states.");
 	while (game->run->next)
 		game_state_exit(game);
+	INFO("> All states exited.");
 }
 
 bool game_pause(struct game *game) 
@@ -161,7 +173,7 @@ bool game_pause(struct game *game)
 
 static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 {
-	INFO("Game started.\n");
+	INFO("< Start playing.");
 	if (g_level)
 		INFO("There is a level already. Using it.");
 	else
@@ -178,6 +190,7 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 	camera_init(&g_camera, CAMERA_FIXED);
 	player_init(&g_player, renderer);
 	player_spawn(&g_player);
+	INFO("> Play started.");
 	return true;
 }
 
@@ -190,13 +203,14 @@ static void from_play_state(void)
 static bool to_main_menu_state(SDL_Renderer *renderer, char* unused)
 {
 	UNUSED_PARAMETER(unused);
-	INFO("Menu opened.\n");
+	INFO("< Opening main menu.");
 	// set callbacks to menu state callbacks
 	main_menu_load(renderer);
 	music_add("menu", ".ogg");
 	sound_add("accept", ".wav");
 	sound_add("select", ".wav");
 	music_play("menu", 4000);
+	INFO("> Menu opened.");
 	return true;
 }
 
@@ -208,15 +222,16 @@ static void from_main_menu_state(void)
 static bool to_preedit_state(SDL_Renderer *renderer, char* unused)
 {
 	UNUSED_PARAMETER(unused);
-	INFO("Preedit menu opened.\n");
+	INFO("< Opening preedit menu.");
 	// set callbacks to menu state callbacks
 	preedit_menu_load(renderer);
+	INFO("> Preedit menu opened.");
 	return true;
 }
 
 static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 {
-	INFO("Editor opened.\n");
+	INFO("< Opening editor.");
 	if (g_level)
 	{
 		INFO("There is an already opened level (%s). Using it.", g_level->name);
@@ -234,6 +249,7 @@ static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 	camera_init(&g_camera, CAMERA_FREE);
 	player_init(&g_player, renderer);
 	player_spawn(&g_player);
+	INFO("> Editor opened.");
 	return true;
 }
 

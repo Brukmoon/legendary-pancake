@@ -43,6 +43,17 @@ struct menu
 	SDL_Texture *background;
 } *g_menu;
 
+struct menu_level
+{
+	struct menu_level *next;
+	struct menu_level *prev;
+};
+
+struct menu_level_list
+{
+	struct menu_level *head, *tail;
+};
+
 void button_add(SDL_Renderer* renderer, const char* text, const vec2 position);
 void text_box_add(const SDL_Rect skeleton, int max_length);
 void main_menu_load(SDL_Renderer* renderer);

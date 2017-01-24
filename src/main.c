@@ -14,6 +14,8 @@
 #include "config.h"
 #include "game.h"
 
+#include "sprite.h"
+
 #ifndef UNUSED_PARAMETER
  // Suppress warning: unused parameter.
 #define UNUSED_PARAMETER(p) (void)p
@@ -45,6 +47,8 @@ int main(int argc, char* argv[]) {
 
 	if (!game_init(&game, &game.screen))
 		return EXIT_FAILURE;
+	texture_add("spritesheet.png", game.screen.renderer);
+	sprite_add("hey", "spritesheet.png", (SDL_Rect) { 20, 20, 32, 32 });
 	
 	// Overflow @ 2^32-1 is safe. Happens in ~50 days.
 	Uint32 time = SDL_GetTicks();
@@ -61,9 +65,8 @@ int main(int argc, char* argv[]) {
 			SDL_Delay(delay);
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
-
 	game_clean(&game.screen);
-
+	
 #ifdef _MSC_VER
 	/* 
 	 * Memory leak detection --> works only with VS libraries, implicit output to Debug window.

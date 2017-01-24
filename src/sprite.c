@@ -2,28 +2,86 @@
 #include "texture.h"
 #include "common.h"
 #include "hash.h"
+
 // Level sprite manager
-int texture_add(const char* name, SDL_Renderer *renderer)
+const char* texture_add(const char* name, SDL_Renderer *renderer)
 {
-	// Texture ID (unique).
-	static int id = -1;
-	id++;
+	struct texture_bucket* new_bucket = (struct texture_bucket*) malloc(sizeof(struct texture_bucket));
+	if (!new_bucket)
+	{
+		ERROR("Not enough memory!");
+		return NULL;
+	}
 	SDL_Texture *texture = load_texture(renderer, name);
 	if (!texture) // error in texture loading
-		return -1;
-	texture_container[id] = texture;
-	INFO("Added texture %s (ID %d).", name, id);
-	return id;
+		return NULL;
+	new_bucket->texture = texture;
+	size_t name_len = SDL_strlen(name) + 1;
+	new_bucket->key = malloc(name_len);
+	new_bucket->next = NULL;
+	if (!new_bucket->key)
+	{
+		ERROR("Not enough memory.");
+		return NULL;
+	}
+	SDL_strlcpy(new_bucket->key, name, name_len);
+
+	// where to save it in the array
+	int id = hash_s(name) % TEXTURE_ARR_SIZE;
+	struct texture_bucket* iter = textures_container.data[id], *prev = NULL;
+	while (iter)
+	{
+		prev = iter;
+		iter = iter->next;
+	}
+	if (!prev)
+	{
+		textures_container.data[id] = new_bucket;
+	}
+	else
+		prev->next = new_bucket;
+	INFO("Texture %s loaded to index %d.", name, id);
+	return name;
 }
 
-inline SDL_Texture* texture_get(int id) { return texture_container[id]; }
-
-void sprite_add(const char *name, int texture_id, SDL_Rect *target)
-{
-	INFO("Adding sprite %s (#%d) [%d, %d, %d, %d].", name, texture_id, target->x, target->y, target->w, target->h);
-	if (!texture_get(texture_id))
+SDL_Texture* texture_get(const char* name) 
+{ 
+	int id = hash_s(name) % TEXTURE_ARR_SIZE;	
+	struct texture_bucket* iter = textures_container.data[id];
+	while (iter)
 	{
-		ERROR("Texture #%d does not exist in the resource container. Call texture_add first to load the texture before adding a sprite.", texture_id);
+		if (SDL_strcmp(iter->key, name) == 0) // string match
+			return iter->texture;
+		iter = iter->next;
+	}
+	// texture not found
+	return NULL;
+}
+
+void textures_destroy(void)
+{
+	for (int i = 0; i < TEXTURE_ARR_SIZE; ++i)
+	{
+		while (textures_container.data[i])
+		{
+			int ll_position = 0; // position in linked list
+			ll_position++;
+			struct texture_bucket *iter = textures_container.data[i];
+			textures_container.data[i] = iter->next;
+			INFO("Freeing texture %s from index %d (position %d).", iter->key, i, ll_position);
+			free(iter->key);
+			SDL_DestroyTexture(iter->texture);
+			free(iter);
+		}
+	}
+}
+
+void sprite_add(const char *name, const char* texture_name, const SDL_Rect target)
+{
+	INFO("Adding sprite %s (%s) [%d, %d, %d, %d].", name, texture_name, target.x, target.y, target.w, target.h);
+	if (!texture_get(texture_name))
+	{
+		ERROR("Texture %s does not exist in the resource container. Call texture_add first to load the texture before adding a sprite.", texture_name);
 		return;
 	}
 	struct sprite_bucket *new_bucket = (struct sprite_bucket*) malloc(sizeof(struct sprite_bucket));
@@ -32,9 +90,23 @@ void sprite_add(const char *name, int texture_id, SDL_Rect *target)
 		ERROR("Not enough memory.");
 		return;
 	}
-	new_bucket->sprite.target = target;
-	new_bucket->sprite.texture_id = texture_id;
-	SDL_strlcpy(new_bucket->key, name, RESOURCE_LENGTH);
+	new_bucket->sprite.target = malloc(sizeof(SDL_Rect));
+	if (!new_bucket->sprite.target)
+	{
+		ERROR("Not enough memory!");
+		return;
+	}
+	new_bucket->sprite.target->h = target.h;
+	new_bucket->sprite.target->w = target.w;
+	new_bucket->sprite.target->x = target.x;
+	new_bucket->sprite.target->y = target.y;
+
+	size_t name_len = SDL_strlen(texture_name) + 1;
+	new_bucket->sprite.texture = malloc(name_len);
+	SDL_strlcpy(new_bucket->sprite.texture, texture_name, name_len);
+	name_len = SDL_strlen(name) + 1;
+	new_bucket->key = malloc(name_len);
+	SDL_strlcpy(new_bucket->key, name, name_len);
 	new_bucket->next = NULL;
 	int index = hash_s(name) % SPRITE_ARR_SIZE;
 	struct sprite_bucket* iter = sprites_container.data[index], *prev = NULL;
@@ -51,25 +123,24 @@ void sprite_add(const char *name, int texture_id, SDL_Rect *target)
 		prev->next = new_bucket;
 }
 
-void destroy_sprites(void)
+void sprites_destroy(void)
 {
 	for (int i = 0; i < SPRITE_ARR_SIZE; ++i)
 	{
 		while (sprites_container.data[i])
 		{
-#ifdef _DEBUG
 			int ll_position = 0; // position in linked list
 			ll_position++;
-#endif // _DEBUG
 			struct sprite_bucket *iter = sprites_container.data[i];
 			sprites_container.data[i] = iter->next;
-#ifdef _DEBUG
 			INFO("Freeing sprite %s from index %d (position %d).", iter->key, i, ll_position);
-#endif // _DEBUG
+			free(iter->key);
+			free(iter->sprite.texture);
 			free(iter->sprite.target);
 			free(iter);
 		}
 	}
+	textures_destroy();
 }
 
 SDL_Texture *sprite_get(const char* name, SDL_Rect** target)
@@ -81,7 +152,7 @@ SDL_Texture *sprite_get(const char* name, SDL_Rect** target)
 		if (SDL_strcmp(name, iter->key) == 0) // string match
 		{
 			*target = iter->sprite.target;
-			return texture_get(iter->sprite.texture_id);
+			return texture_get(iter->sprite.texture);
 		}
 		iter = iter->next;
 	}
