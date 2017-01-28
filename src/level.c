@@ -129,12 +129,12 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				INFO("tilewidth! %d", level->tile_map.tile_width);
 				INFO("tileheight! %d", level->tile_map.tile_height);
 			}
-			else if (SDL_strcmp(command, "SPAWN") == 0)
+			else if (SDL_strcmp(command, "PLAYER") == 0)
 			{
+				char name[BUFFER_SIZE];
 				vec2 spawn = { 0, 0 };
-				sscanf_s(buffer, "%*s%d%d", &spawn.x, &spawn.y);
-				player_set_spawn(&g_player, spawn);
-				INFO("SPAWN loaded.");
+				sscanf_s(buffer, "%*s%s%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y);
+				player_init(&g_player, spawn, name, renderer);
 			}
 			// Clear.
 			command[0] = '\0';

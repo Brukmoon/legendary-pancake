@@ -131,9 +131,10 @@ static void draw_player_info(const struct player *player, SDL_Renderer *renderer
 	hollow_rect(renderer, SCREEN_WIDTH - 110, 5, 5, 10, (SDL_Color) { 0, 0, 0, 1 });
 	hollow_rect(renderer, SCREEN_WIDTH - 110, 15, 5, 10, (SDL_Color) { 0, 0, 0, 1 });
 
-	SDL_Rect src_rect = (SDL_Rect) { 0, 0, 32, 32 };
+	SDL_Rect *src_rect = NULL;
 	SDL_Rect dest_rect = (SDL_Rect) { SCREEN_WIDTH-135, 5, 20, 20 };
-	SDL_RenderCopy(renderer, player->texture, &src_rect, &dest_rect);
+	SDL_Texture *t = sprite_get(player->actor.anim.curr->curr->sprite_name, &src_rect);
+	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
 }
 
 void render_play(SDL_Renderer *renderer)

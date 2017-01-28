@@ -19,6 +19,7 @@
 #include <SDL.h>
 #include <stdbool.h>
 
+#include "animation.h"
 #include "vector.h"
 
 // Beware: If you change MULTI_JUMP, modify the UI (stamina) aswell.
@@ -40,30 +41,25 @@ struct actor
 	char *name;
 	// Life: max 32,767 HPs.
 	Sint16 hitpoints;
-	// State of the actor.
-	bool is_jumping;
-	// Should be drawn?
-	bool is_visible;
-	/*
-	 * TODO: Move to an animation struct.
-	 */
-	// Current state of the animation.
-	float draw_state;
-	// Number of sprites tied to the actor
-	Uint8 sprite_count, jump_count;
 	// Where should the actor spawn?
 	vec2 spawn;
 	// speed coefficient
 	float speed;
 	// current velocity
 	vec2f velocity;
+
+	struct animation_table anim;
+
+	// State of the actor.
+	bool is_jumping;
+	// Should be drawn?
+	bool is_visible;
+
+	Uint8 jump_count;
 };
 
 // Initialize actor.
-/*
- * TODO: Add initialization options --> make actor truly universal.
- */
-void actor_init(struct actor *actor);
+void actor_init(struct actor *actor, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
 void actor_destroy(struct actor *actor);
 
 // Spawn actor. Call actor_init first.
@@ -83,11 +79,9 @@ struct player // : public actor;
 	struct actor actor;
 	// climb[0] -> down, climb[1] -> up
 	bool climb[2];
-	// Texture is unique.
-	SDL_Texture *texture;
 };
 
-void player_init(struct player *player, SDL_Renderer *renderer);
+void player_init(struct player *player, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
 void player_destroy(struct player *player);
 
 void player_draw(const struct player *player, SDL_Renderer *renderer);

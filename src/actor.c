@@ -14,15 +14,15 @@
 
 struct player g_player;
 
-void actor_init(struct actor *actor)
+void actor_init(struct actor *actor, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
 {
-	// default draw state
-	actor->draw_state = 0;
+	animation_table_load(anim_name, &actor->anim, renderer);
+	animation_table_set(&actor->anim, "move");
 	actor->name = malloc(7);
 	SDL_strlcpy(actor->name, "player", 7);
 	actor->hitpoints = ACTOR_HP;
-	actor->sprite_count = 3;
-	actor->skeleton.x = actor->skeleton.y = 32;
+	actor->skeleton.x = 0;
+	actor->skeleton.y = 0;
 	actor->skeleton.w = actor->skeleton.h = 32;
 	actor->velocity = (vec2f) { 0, 0 };
 	actor->is_visible = false;
@@ -30,11 +30,13 @@ void actor_init(struct actor *actor)
 	actor->state = AIR;
 	actor->speed = ACTOR_STANDARD_SPEED;
 	actor->jump_count = 0;
+	actor->spawn = spawn;
 	camera_set(&g_camera, (vec2) { actor->skeleton.x - CENTER_X, actor->skeleton.y - CENTER_Y });
 }
 
 void actor_destroy(struct actor *actor)
 {
+	animation_table_destroy(&actor->anim);
 	free(actor->name);
 }
 
@@ -141,17 +143,15 @@ void actor_spawn(struct actor *actor)
 	actor->is_visible = true;
 }
 
-void player_init(struct player *player, SDL_Renderer *renderer)
-{ 
-	actor_init(&player->actor); 
+void player_init(struct player *player, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
+{
+	actor_init(&player->actor, spawn, anim_name, renderer); 
 	player->climb[0] = player->climb[1] = false;
-	player->texture = load_texture(renderer, PLAYER_PATH);
 }
 
 void player_destroy(struct player *player)
 {
 	actor_destroy(&player->actor);
-	SDL_DestroyTexture(player->texture);
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)
@@ -162,13 +162,16 @@ void player_draw(const struct player *player, SDL_Renderer *renderer)
 		dest.w = dest.h = 34; // Draw a bit larger.
 		dest.x = player->actor.skeleton.x - g_camera.position.x;
 		dest.y = player->actor.skeleton.y - g_camera.position.y;
-		SDL_Rect src;
-		src.w = src.h = 32;
-		if (player->actor.state == LADDER)
+		SDL_Rect* src = NULL;
+		SDL_Texture* t = NULL;
+		t = sprite_get(player->actor.anim.curr->curr->sprite_name, &src);
+		if (player->actor.velocity.x < 0) // Moving left.
+			SDL_RenderCopyEx(renderer, t, src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
+		else
+			SDL_RenderCopy(renderer, t, src, &dest);
+		/*if (player->actor.state == LADDER)
 		{
-			src.x = ((int)player->actor.draw_state)*player->actor.skeleton.w;
-			src.y = 64;
-			SDL_RenderCopy(renderer, player->texture, &src, &dest);
+			
 		}
 		else if (player->actor.velocity.x == 0) // If standing.
 		{
@@ -184,6 +187,7 @@ void player_draw(const struct player *player, SDL_Renderer *renderer)
 			else
 				SDL_RenderCopy(renderer, player->texture, &src, &dest);
 		}
+		*/
 	}
 }
 
@@ -214,9 +218,18 @@ void player_climb(struct player *player)
 {
 	player->actor.state = LADDER;
 	if (player->climb[0])
+	{
 		player_set_vel_y(player, CLIMB_SPEED);
+		animation_table_set(&player->actor.anim, "ladder");
+	}
 	else if (player->climb[1])
+	{
 		player_set_vel_y(player, -CLIMB_SPEED);
+		animation_table_set(&player->actor.anim, "ladder");
+	}
 	else
+	{
 		player_set_vel_y(player, 0);
+		animation_table_set(&player->actor.anim, "ladder_calm");
+	}
 }

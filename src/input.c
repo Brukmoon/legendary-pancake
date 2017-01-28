@@ -79,9 +79,9 @@ bool process_input_play(struct game* game)
 				case SDLK_w:
 					g_player.climb[1] = true;
 					break;
-				case SDLK_e:
+				/*case SDLK_e:
 					game_state_change(game, game_state_edit(NULL));
-					break;
+					break;*/
 				case SDLK_SPACE:
 					player_jump(&g_player, PLAYER_JUMP_INTENSITY);
 					break;
@@ -375,6 +375,7 @@ static void update_player_double_jump(struct player *player)
 
 static void update_player_draw_state(struct player *player)
 {
+	/*
 	if (player->actor.state == GROUND)
 	{
 		if (player->actor.draw_state < player->actor.sprite_count - 1)
@@ -388,6 +389,14 @@ static void update_player_draw_state(struct player *player)
 			player->actor.draw_state += .2f;
 		else
 			player->actor.draw_state = 0;
+	}
+	*/
+	static Uint32 counter = 0;
+	counter += 1000 / FPS;
+	if (counter > 240)
+	{
+		animation_table_next(&player->actor.anim);
+		counter = 0;
 	}
 }
 
@@ -405,8 +414,14 @@ void update_play(struct game* game)
 			g_player.actor.velocity.y += (float)GRAVITY;
 		else
 			player_set_vel_y(&g_player, T_VEL);
+		if (g_player.actor.velocity.x == 0)
+			animation_table_set(&g_player.actor.anim, "stand");
+		else
+			animation_table_set(&g_player.actor.anim, "move");
 		if (player_can_climb(&g_player))
+		{
 			player_climb(&g_player);
+		}
 		// Move him.
 		player_move(&g_player, (vec2) { (coord)g_player.actor.velocity.x, (coord)g_player.actor.velocity.y });
 		update_player_double_jump(&g_player);

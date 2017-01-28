@@ -15,6 +15,7 @@ struct level;
 enum collision_type
 {
 	TILE_COLLISION = 1,
+	// special type of collision, alters physics
 	LADDER_COLLISION
 };
 

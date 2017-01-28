@@ -1,3 +1,4 @@
+#include "config.h"
 #include "sprite.h"
 #include "texture.h"
 #include "common.h"
@@ -151,7 +152,8 @@ SDL_Texture *sprite_get(const char* name, SDL_Rect** target)
 	{
 		if (SDL_strcmp(name, iter->key) == 0) // string match
 		{
-			*target = iter->sprite.target;
+			if(target)
+				*target = iter->sprite.target;
 			return texture_get(iter->sprite.texture);
 		}
 		iter = iter->next;

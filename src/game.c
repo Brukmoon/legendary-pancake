@@ -15,6 +15,9 @@
 
 // Outputs SDL version info.
 static void SDL_version_info(void);
+// Outputs state stack.
+static void state_stack_print(const struct game *game);
+
 // State transitions.
 static bool to_play_state(SDL_Renderer* game, const char *level_name);
 static void from_play_state(void);
@@ -34,7 +37,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 {
 	INFO("Startup: %s", GAME_NAME);
 	INFO("Version: %s", GAME_VERSION);
-	INFO("Author: Brukmoon");
+	INFO("Author: Brukmoon\n");
 	INFO("< Game initialization sequence started.");
 	// Logs version info.
 	SDL_version_info();
@@ -113,14 +116,8 @@ void SDL_version_info(void)
 		TTF_linked->major, TTF_linked->minor, TTF_linked->patch);
 }
 
-bool game_state_change(struct game *game, struct game_state *new_state)
+static void state_stack_print(const struct game *game)
 {
-	INFO("Changing game state to %d.", new_state->id);
-	// game->run != NULL
-	if (game_running(game))
-		new_state->next = game->run;
-	game->run = new_state;
-
 	// print current state stack
 	struct game_state *iter = game->run;
 	INFO("Current state stack:");
@@ -131,7 +128,16 @@ bool game_state_change(struct game *game, struct game_state *new_state)
 		iter = iter->next;
 	}
 	INFO("]");
+}
 
+bool game_state_change(struct game *game, struct game_state *new_state)
+{
+	INFO("Changing game state to %d.", new_state->id);
+	// game->run != NULL
+	if (game_running(game))
+		new_state->next = game->run;
+	game->run = new_state;
+	state_stack_print(game);
 	if (game->run->enter)
 		if (!game->run->enter(game->screen.renderer, game->run->state_param))
 			return false;
@@ -154,6 +160,7 @@ void game_state_exit(struct game *game)
 	}
 	else
 		ERROR("Can't exit when there is no current state.");
+	state_stack_print(game);
 }
 
 void game_state_reset(struct game *game)
@@ -169,7 +176,6 @@ bool game_pause(struct game *game)
 	INFO("Game paused: %s", game->paused ? "FALSE" : "TRUE");
 	return game_set_pause(game, !game->paused); 
 }
-
 
 static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 {
@@ -188,7 +194,6 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		music_play("music", 6000);
 	}
 	camera_init(&g_camera, CAMERA_FIXED);
-	player_init(&g_player, renderer);
 	player_spawn(&g_player);
 	INFO("> Play started.");
 	return true;
@@ -247,8 +252,8 @@ static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 	SDL_ShowCursor(1);
 	sound_add("click", ".wav");
 	camera_init(&g_camera, CAMERA_FREE);
-	player_init(&g_player, renderer);
-	player_spawn(&g_player);
+//	player_init(&g_player, renderer);
+	//player_spawn(&g_player);
 	INFO("> Editor opened.");
 	return true;
 }

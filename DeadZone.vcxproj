@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="animation.c" />
     <ClCompile Include="src\actor.c" />
     <ClCompile Include="src\button.c" />
     <ClCompile Include="src\camera.c" />
