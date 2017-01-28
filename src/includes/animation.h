@@ -35,7 +35,7 @@ static void frame_add(struct animation* a, const char* sprite_name);
 static void frame_destroy(struct frame** f);
 
 static void animation_create(struct animation** a, const char* name);
-static void animation_destroy(struct animation** a);
+static void animation_destroy(struct animation* a);
 
 // add animation to table
 void animation_table_add(struct animation_table* t, struct animation* a);

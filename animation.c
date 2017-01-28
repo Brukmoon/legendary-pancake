@@ -37,6 +37,7 @@ void frame_add(struct animation* a, const char* sprite)
 
 void frame_destroy(struct frame** f)
 {
+	INFO("Destroying frame %s.", (*f)->sprite_name);
 	free((*f)->sprite_name);
 	free(*f);
 }
@@ -97,6 +98,8 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 	{
 		ERROR("Couldn't open animation file %s.", file_name);
 	}
+	free(file_name);
+	fclose(f);
 }
 
 void animation_create(struct animation** a, const char* name)
@@ -118,19 +121,19 @@ void animation_create(struct animation** a, const char* name)
 	SDL_strlcpy((*a)->name, name, MAX_AN_LENGTH);
 }
 
-void animation_destroy(struct animation** a)
+void animation_destroy(struct animation* a)
 {
-	if (*a == NULL)
+	if (a == NULL)
 		return;
-	struct frame* iter = (*a)->tail;
+	struct frame* iter = a->tail;
 	while (iter)
 	{
 		iter = iter->next;
-		frame_destroy(&(*a)->tail);
-		(*a)->tail = iter;
+		frame_destroy(&a->tail);
+		a->tail = iter;
 	}
-	free((*a)->name);
-	free(*a);
+	free(a->name);
+	free(a);
 }
 
 void animation_table_add(struct animation_table* t, struct animation* a)
@@ -171,7 +174,13 @@ void animation_table_destroy(struct animation_table* t)
 {
 	for (int i = 0; i < ANIMATION_ARR_SIZE; ++i)
 	{
-		animation_destroy(&t->a[i]);
+		struct animation* iter = t->a[i];
+		while (iter)
+		{
+			t->a[i] = iter->next;
+			animation_destroy(iter);
+			iter = t->a[i];
+		}
 		t->a[i] = NULL;
 	}
 }
