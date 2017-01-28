@@ -55,7 +55,10 @@ void actor_move(struct actor *actor, const vec2 delta)
 	if (delta.x != 0) // check x axis collision
 	{
 		if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION)) // No collision, simple case.
+		{
 			actor->skeleton.x += delta.x;
+			animation_table_set(&actor->anim, "move");
+		}
 		else
 		{
 			while (true)
@@ -70,7 +73,15 @@ void actor_move(struct actor *actor, const vec2 delta)
 				if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 					break; // stop stepping
 			}
-			actor->skeleton.x = actor_after.x;
+			if (actor->skeleton.x == actor_after.x)
+			{
+				animation_table_set(&actor->anim, "move_blocked");
+			}
+			else
+			{
+				actor->skeleton.x = actor_after.x;
+				animation_table_set(&actor->anim, "move");
+			}
 		}
 	}
 	actor_after.y += delta.y;
@@ -107,6 +118,8 @@ void actor_move(struct actor *actor, const vec2 delta)
 			actor->skeleton.y = actor_after.y;
 		}
 	}
+	if (actor->velocity.x == 0)
+		animation_table_set(&actor->anim, "stand");
 }
 
 void actor_damage(struct actor *actor, const Sint16 damage)

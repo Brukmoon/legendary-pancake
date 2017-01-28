@@ -414,16 +414,10 @@ void update_play(struct game* game)
 			g_player.actor.velocity.y += (float)GRAVITY;
 		else
 			player_set_vel_y(&g_player, T_VEL);
-		if (g_player.actor.velocity.x == 0)
-			animation_table_set(&g_player.actor.anim, "stand");
-		else
-			animation_table_set(&g_player.actor.anim, "move");
-		if (player_can_climb(&g_player))
-		{
-			player_climb(&g_player);
-		}
 		// Move him.
 		player_move(&g_player, (vec2) { (coord)g_player.actor.velocity.x, (coord)g_player.actor.velocity.y });
+		if (player_can_climb(&g_player))
+			player_climb(&g_player);
 		update_player_double_jump(&g_player);
 		update_player_draw_state(&g_player);
 		// Update camera.

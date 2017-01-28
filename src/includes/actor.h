@@ -10,7 +10,7 @@
 
  // How much does a player jump.
 #define PLAYER_JUMP_INTENSITY 6.f
-#define ACTOR_STANDARD_SPEED 5.f
+#define ACTOR_STANDARD_SPEED 4.f
 #define ACTOR_HP 100
 #define CLIMB_SPEED 5
 #define FALLDAMAGE_TRESHHOLD 10
