@@ -6,6 +6,7 @@
 #include "common.h"
 #include "level.h"
 #include "menu.h"
+#include "object.h"
 #include "sound.h"
 #include "input.h"
 #include "physics.h"
@@ -391,13 +392,13 @@ static void update_player_draw_state(struct player *player)
 			player->actor.draw_state = 0;
 	}
 	*/
-	static Uint32 counter = 0;
-	counter += 1000 / FPS;
-	if (counter > 240)
+	player->actor.anim.curr->delay_counter += 1000/FPS;
+	if (player->actor.anim.curr->delay_counter > player->actor.anim.curr->delay)
 	{
-		animation_table_next(&player->actor.anim);
-		counter = 0;
+		animation_next(&player->actor.anim);
+		player->actor.anim.curr->delay_counter = 0;
 	}
+	object_update();
 }
 
 void update_menu(struct game* game)
@@ -415,7 +416,11 @@ void update_play(struct game* game)
 		else
 			player_set_vel_y(&g_player, T_VEL);
 		// Move him.
-		player_move(&g_player, (vec2) { (coord)g_player.actor.velocity.x, (coord)g_player.actor.velocity.y });
+		vec2 delta = {
+			(coord)g_player.actor.velocity.x,
+			(coord)g_player.actor.velocity.y
+		};
+		player_move(&g_player, &delta);
 		if (player_can_climb(&g_player))
 			player_climb(&g_player);
 		update_player_double_jump(&g_player);

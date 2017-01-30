@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="animation.c" />
     <ClCompile Include="src\actor.c" />
+    <ClCompile Include="src\animation.c" />
     <ClCompile Include="src\button.c" />
     <ClCompile Include="src\camera.c" />
     <ClCompile Include="src\collision.c" />
@@ -28,6 +28,7 @@
     <ClCompile Include="src\graphics.c" />
     <ClCompile Include="src\hash.c" />
     <ClCompile Include="src\includes\map.c" />
+    <ClCompile Include="src\includes\object.c" />
     <ClCompile Include="src\input.c" />
     <ClCompile Include="src\level.c" />
     <ClCompile Include="src\main.c" />
@@ -38,8 +39,8 @@
     <ClCompile Include="src\stack.c" />
     <ClCompile Include="src\text.c" />
     <ClCompile Include="src\texture.c" />
+    <ClCompile Include="src\text_box.c" />
     <ClCompile Include="src\timer.c" />
-    <ClCompile Include="text_box.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\includes\actor.h" />
@@ -56,6 +57,7 @@
     <ClInclude Include="src\includes\level.h" />
     <ClInclude Include="src\includes\map.h" />
     <ClInclude Include="src\includes\menu.h" />
+    <ClInclude Include="src\includes\object.h" />
     <ClInclude Include="src\includes\physics.h" />
     <ClInclude Include="src\includes\render.h" />
     <ClInclude Include="src\includes\sound.h" />
@@ -64,6 +66,8 @@
     <ClInclude Include="src\includes\text.h" />
     <ClInclude Include="src\includes\texture.h" />
     <ClInclude Include="src\includes\text_box.h" />
+    <ClInclude Include="src\includes\timer.h" />
+    <ClInclude Include="src\includes\vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F01DC806-0612-472D-965B-B53E40F4350A}</ProjectGuid>

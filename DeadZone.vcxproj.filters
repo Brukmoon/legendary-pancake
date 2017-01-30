@@ -58,10 +58,13 @@
     <ClCompile Include="src\includes\map.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="text_box.c">
+    <ClCompile Include="src\text_box.c">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="animation.c">
+    <ClCompile Include="src\animation.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\includes\object.c">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -145,6 +148,15 @@
     </ClInclude>
     <ClInclude Include="src\includes\text_box.h">
       <Filter>Menu\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\object.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\vector.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\timer.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

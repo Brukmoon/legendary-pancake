@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "animation.h"
 #include "hash.h"
 #include "common.h"
@@ -8,7 +6,9 @@
 #define BUFFER_SIZE 256
 #define MAX_AN_LENGTH 30
 
-void frame_add(struct animation* a, const char* sprite)
+static void animation_table_init(struct animation_table* t);
+
+void frame_add(struct animation* a, const char* sprite_name)
 {
 	struct frame* f = malloc(sizeof(struct frame));
 	if (!f)
@@ -16,7 +16,7 @@ void frame_add(struct animation* a, const char* sprite)
 		ERROR("Not enough memory!");
 		return;
 	}
-	size_t s = SDL_strlen(sprite) + 1;
+	size_t s = SDL_strlen(sprite_name) + 1;
 	f->sprite_name = malloc(s);
 	if (!f->sprite_name)
 	{
@@ -24,7 +24,8 @@ void frame_add(struct animation* a, const char* sprite)
 		return;
 	}
 	f->next = NULL;
-	SDL_strlcpy(f->sprite_name, sprite, s);
+	SDL_strlcpy(f->sprite_name, sprite_name, s);
+	// add frame to the linked list
 	if (!a->tail)
 	{
 		a->tail = f;
@@ -35,17 +36,29 @@ void frame_add(struct animation* a, const char* sprite)
 	a->head = f;
 }
 
-void frame_destroy(struct frame** f)
+void frame_destroy(struct frame* f)
 {
-	INFO("Destroying frame %s.", (*f)->sprite_name);
-	free((*f)->sprite_name);
-	free(*f);
+	if (!f)
+		return;
+	INFO("Destroying frame %s.", f->sprite_name);
+	free(f->sprite_name);
+	free(f);
+}
+
+static void animation_table_init(struct animation_table* t)
+{
+	// nullify the table
+	for (int i = 0; i < ANIMATION_ARR_SIZE; ++i)
+	{
+		t->a[i] = NULL;
+		t->curr = NULL;
+	}
 }
 
 void animation_table_load(const char* name, struct animation_table* t, SDL_Renderer* renderer)
 {
-	// TODO: Replace +20.
-	size_t s = SDL_strlen(name) + 20;
+	animation_table_init(t);
+	size_t s = SDL_strlen(name) + SDL_strlen(IMG_PATH) + 4;
 	char* file_name = malloc(s);
 	if (!file_name)
 	{
@@ -69,18 +82,20 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 			if (SDL_strcmp(command, "ANIMATION") == 0)
 			{
 				char animation_name[MAX_AN_LENGTH];
-				sscanf_s(buffer, "%*s%s", animation_name, MAX_AN_LENGTH);
-				animation_create(&a, animation_name);
-				INFO("Loading animation %s", animation_name);
+				int delay = 0;
+				sscanf_s(buffer, "%*s%s%d", animation_name, MAX_AN_LENGTH, &delay);
+				animation_create(&a, animation_name, &delay);
+				INFO("< Loading animation %s", animation_name);
 			}
 			else if (SDL_strcmp(command, "ANIMATION_END") == 0)
 			{
 				animation_table_add(t, a);
 				a = NULL;
+				INFO("> Animation loaded.");
 			}
 			else if (SDL_strcmp(command, "FRAME") == 0)
 			{
-				SDL_Rect r;
+				SDL_Rect r = { 0, 0, 0, 0 };
 				char sprite_name[MAX_AN_LENGTH];
 				sscanf_s(buffer, "%*s%s%d%d%d%d", sprite_name, MAX_AN_LENGTH, &r.x, &r.y, &r.w, &r.h);
 				INFO("Loading frame %s [%d;%d]", sprite_name, r.x, r.y);
@@ -102,7 +117,7 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 	fclose(f);
 }
 
-void animation_create(struct animation** a, const char* name)
+void animation_create(struct animation** a, const char* name, const int* delay)
 {
 	(*a) = malloc(sizeof(struct animation));
 	if (!(*a))
@@ -112,6 +127,8 @@ void animation_create(struct animation** a, const char* name)
 	}
 	(*a)->curr = (*a)->head = (*a)->tail = NULL;
 	(*a)->next = NULL;
+	(*a)->delay = *delay;
+	(*a)->delay_counter = 0;
 	(*a)->name = malloc(MAX_AN_LENGTH);
 	if (!(*a)->name)
 	{
@@ -129,7 +146,7 @@ void animation_destroy(struct animation* a)
 	while (iter)
 	{
 		iter = iter->next;
-		frame_destroy(&a->tail);
+		frame_destroy(a->tail);
 		a->tail = iter;
 	}
 	free(a->name);
@@ -154,7 +171,7 @@ void animation_table_add(struct animation_table* t, struct animation* a)
 	INFO("Animation %s loaded to index %d.", a->name, index);
 }
 
-void animation_table_set(struct animation_table* t, const char *name)
+void animation_set(const char *name, struct animation_table* t)
 {
 	size_t index = hash_s(name) % ANIMATION_ARR_SIZE;
 	struct animation* iter = t->a[index];
@@ -170,6 +187,13 @@ void animation_table_set(struct animation_table* t, const char *name)
 	ERROR("Animation %s not found.", name);
 }
 
+void animation_next(struct animation_table* t)
+{
+	t->curr->curr = t->curr->curr->next;
+	if (!t->curr->curr)
+		t->curr->curr = t->curr->tail;
+}
+
 void animation_table_destroy(struct animation_table* t)
 {
 	for (int i = 0; i < ANIMATION_ARR_SIZE; ++i)
@@ -178,16 +202,10 @@ void animation_table_destroy(struct animation_table* t)
 		while (iter)
 		{
 			t->a[i] = iter->next;
+			INFO("K");
 			animation_destroy(iter);
 			iter = t->a[i];
 		}
 		t->a[i] = NULL;
 	}
-}
-
-void animation_table_next(struct animation_table* t)
-{
-	t->curr->curr = t->curr->curr->next;
-	if (!t->curr->curr)
-		t->curr->curr = t->curr->tail;
 }

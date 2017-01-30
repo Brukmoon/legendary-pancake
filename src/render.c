@@ -6,6 +6,7 @@
 #include "game.h"
 #include "level.h"
 #include "menu.h"
+#include "object.h"
 #include "render.h"
 #if SHOW_CONSOLE
 #include "text.h"
@@ -94,6 +95,9 @@ static void render_debug_console(SDL_Renderer* const renderer)
 	// speed
 	sprintf_s(buffer, 50, "Player speed: [%f;%f]", g_player.actor.velocity.x, g_player.actor.velocity.y);
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 24 }, renderer);
+	// player animation
+	sprintf_s(buffer, 50, "Player animation state: %s", g_player.actor.anim.curr->name);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 36 }, renderer);
 	// state
 	switch (g_player.actor.state)
 	{
@@ -110,7 +114,8 @@ static void render_debug_console(SDL_Renderer* const renderer)
 		sprintf_s(buffer, 50, "Unknown");
 		break;
 	}
-	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 36 }, renderer);
+	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 48 }, renderer);
+
 }
 #endif // _DEBUG
 
@@ -135,6 +140,13 @@ static void draw_player_info(const struct player *player, SDL_Renderer *renderer
 	SDL_Rect dest_rect = (SDL_Rect) { SCREEN_WIDTH-135, 5, 20, 20 };
 	SDL_Texture *t = sprite_get(player->actor.anim.curr->curr->sprite_name, &src_rect);
 	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
+	t = sprite_get("bamboo", &src_rect);
+	dest_rect = (SDL_Rect) { SCREEN_WIDTH - 30, 30, 32, 32 };
+	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
+	// load texture
+	char buffer[5];
+	SDL_itoa(player->collect, buffer, 10);
+	draw_text(buffer, 20, (SDL_Color) { 255, 255, 255, 1 }, (vec2) {SCREEN_WIDTH - 30, 30}, renderer);
 }
 
 void render_play(SDL_Renderer *renderer)
@@ -149,6 +161,7 @@ void render_play(SDL_Renderer *renderer)
 #if SHOW_CONSOLE
 	render_debug_console(renderer);
 #endif // SHOW_CONSOLE
+	object_draw(renderer);
 	player_draw(&g_player, renderer);
 	draw_player_info(&g_player, renderer);
 	SDL_RenderPresent(renderer);

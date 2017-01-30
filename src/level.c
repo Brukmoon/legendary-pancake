@@ -7,6 +7,7 @@
 #include "hash.h"
 #include "game.h"
 #include "level.h"
+#include "object.h"
 #include "texture.h"
 
 #define BUFFER_SIZE 256
@@ -134,7 +135,14 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				char name[BUFFER_SIZE];
 				vec2 spawn = { 0, 0 };
 				sscanf_s(buffer, "%*s%s%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y);
-				player_init(&g_player, spawn, name, renderer);
+				player_init(&g_player, "player", spawn, name, renderer);
+			}
+			else if (SDL_strcmp(command, "OBJECT") == 0)
+			{
+				char name[BUFFER_SIZE];
+				vec2 spawn = { 0, 0 };
+				sscanf_s(buffer, "%*s%s%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y);
+				object_add(name, spawn, renderer);
 			}
 			// Clear.
 			command[0] = '\0';
@@ -183,6 +191,8 @@ void level_clean(void)
 		level_free_grid(g_level);
 		level_destroy_textures(g_level);
 	}
+	object_destroy();
+	sprites_destroy();
 	free(g_level);
 	g_level = NULL;
 	INFO("Level structure freed.");

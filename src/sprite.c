@@ -85,6 +85,11 @@ void sprite_add(const char *name, const char* texture_name, const SDL_Rect targe
 		ERROR("Texture %s does not exist in the resource container. Call texture_add first to load the texture before adding a sprite.", texture_name);
 		return;
 	}
+	if (sprite_get(name, NULL))
+	{
+		INFO("Sprite %s already added. Skipping.", name);
+		return;
+	}
 	struct sprite_bucket *new_bucket = (struct sprite_bucket*) malloc(sizeof(struct sprite_bucket));
 	if (!new_bucket)
 	{
@@ -158,6 +163,5 @@ SDL_Texture *sprite_get(const char* name, SDL_Rect** target)
 		}
 		iter = iter->next;
 	}
-	ERROR("Texture %s not found. Use function sprite_add first to load the sprite into the resource manager.", name);
 	return NULL;
 }

@@ -10,9 +10,11 @@
 
  // How much does a player jump.
 #define PLAYER_JUMP_INTENSITY 6.f
+#define PLAYER_CLIMB_SPEED 5
+
 #define ACTOR_STANDARD_SPEED 4.f
 #define ACTOR_HP 100
-#define CLIMB_SPEED 5
+
 #define FALLDAMAGE_TRESHHOLD 10
 #define DAMAGE_RATE 20
 
@@ -36,17 +38,15 @@ struct actor
 		AIR,
 		LADDER
 	} state;
+
+	// where?
 	SDL_Rect skeleton;
 	// Name of the actor.
 	char *name;
-	// Life: max 32,767 HPs.
-	Sint16 hitpoints;
 	// Where should the actor spawn?
 	vec2 spawn;
 	// speed coefficient
 	float speed;
-	// current velocity
-	vec2f velocity;
 
 	struct animation_table anim;
 
@@ -54,20 +54,21 @@ struct actor
 	bool is_jumping;
 	// Should be drawn?
 	bool is_visible;
-
 	Uint8 jump_count;
+	// current velocity
+	vec2f velocity;
+	// Life: max 32,767 HPs.
+	Sint16 hitpoints;
 };
 
 // Initialize actor.
-void actor_init(struct actor *actor, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
+void actor_init(struct actor *actor, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
 void actor_destroy(struct actor *actor);
 
 // Spawn actor. Call actor_init first.
 void actor_spawn(struct actor *actor);
 // Move actor by delta.
-void actor_move(struct actor *actor, const vec2 delta);
-// Perform jump.
-bool actor_jump(struct actor *actor, float speed);
+void actor_move(struct actor *actor, const vec2* delta);
 // Subtract damage points from actor's HPs.
 void actor_damage(struct actor *actor, const Sint16 damage);
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
@@ -79,15 +80,18 @@ struct player // : public actor;
 	struct actor actor;
 	// climb[0] -> down, climb[1] -> up
 	bool climb[2];
+	int collect;
 };
 
-void player_init(struct player *player, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
+void player_init(struct player *player, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
 void player_destroy(struct player *player);
 
 void player_draw(const struct player *player, SDL_Renderer *renderer);
-void player_move(struct player *player, const vec2 delta);
+void player_move(struct player *player, const vec2* delta);
 void player_jump(struct player *player, float speed);
+// place the player at spawn position and spawn him
 void player_spawn(struct player *player);
+// is the player currently on ladder?
 bool player_can_climb(struct player *player);
 void player_climb(struct player *player);
 
