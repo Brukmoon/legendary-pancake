@@ -93,6 +93,7 @@ void player_jump(struct player *player, float speed);
 void player_spawn(struct player *player);
 // is the player currently on ladder?
 bool player_can_climb(struct player *player);
+bool player_can_shoot(struct player* player);
 void player_climb(struct player *player);
 
 // Cause damage to the player.
@@ -103,7 +104,6 @@ inline void player_set_spawn(struct player *player, const vec2 spawn) { player->
 inline void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }
 inline void player_set_vel_y(struct player *player, float vel) { player->actor.velocity.y = vel; }
 
-// TODO: Move to player struct.
 extern struct player g_player;
 
 #endif // ACTOR_H

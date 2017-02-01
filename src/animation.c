@@ -202,7 +202,6 @@ void animation_table_destroy(struct animation_table* t)
 		while (iter)
 		{
 			t->a[i] = iter->next;
-			INFO("K");
 			animation_destroy(iter);
 			iter = t->a[i];
 		}

@@ -16,12 +16,6 @@ enum render_map_flags
 	RENDER_ALL = RENDER_GRID | RENDER_COLL,
 };
 
-// Draws the curr_map map to the screen.
-void render_map(SDL_Renderer* const renderer, const enum render_map_flags f);
-
-// Draws the main menu.
-void render_menu_interface(SDL_Renderer* const renderer);
-
 // State callbacks. %callback_%statename
 void render_menu(SDL_Renderer *renderer);
 void render_play(SDL_Renderer *renderer);

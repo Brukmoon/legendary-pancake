@@ -114,6 +114,20 @@ bool process_input_play(struct game* game)
 					break;
 				}
 				break;
+			case SDL_MOUSEBUTTONDOWN:
+				switch (event.button.button)
+				{
+				case SDL_BUTTON_LEFT:
+				{
+					// mouse pos
+					vec2 m_pos = { 0,0 };
+					SDL_GetMouseState(&m_pos.x, &m_pos.y);
+					float vel = m_pos.x > (g_player.actor.skeleton.x-g_camera.position.x) ? 7.f : -7.f;
+					missile_fire(&g_player.actor.skeleton, &vel, game->screen.renderer);
+					break;
+				}
+				}
+				break;
 			case SDL_QUIT:
 				game_state_reset(game);
 				game_state_exit(game);

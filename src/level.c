@@ -140,9 +140,9 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			else if (SDL_strcmp(command, "OBJECT") == 0)
 			{
 				char name[BUFFER_SIZE];
-				vec2 spawn = { 0, 0 };
-				sscanf_s(buffer, "%*s%s%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y);
-				object_add(name, spawn, renderer);
+				SDL_Rect skeleton = { 0, 0 };
+				sscanf_s(buffer, "%*s%s%d%d%d%d", name, BUFFER_SIZE, &skeleton.x, &skeleton.y, &skeleton.w, &skeleton.h);
+				object_add(name, skeleton, renderer);
 			}
 			// Clear.
 			command[0] = '\0';

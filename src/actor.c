@@ -113,6 +113,9 @@ void actor_move(struct actor *actor, const vec2* delta)
 			actor->skeleton.y = actor_after.y;
 		}
 	}
+	// Don't move legs when in air.
+	if(actor->state == AIR)
+		animation_set("move_blocked", &actor->anim);
 	if (actor->velocity.x == 0)
 		animation_set("stand", &actor->anim);
 }
@@ -132,8 +135,8 @@ void actor_spawn(struct actor *actor)
 {
 	actor->skeleton.x = actor->spawn.x;
 	actor->skeleton.y = actor->spawn.y;
-	INFO("Actor %s spawned at [%d;%d].", actor->name, actor->spawn.x, actor->spawn.y);
 	actor->is_visible = true;
+	INFO("Actor %s spawned at [%d;%d].", actor->name, actor->spawn.x, actor->spawn.y);
 }
 
 void player_init(struct player *player, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
@@ -216,6 +219,13 @@ void player_spawn(struct player *player)
 bool player_can_climb(struct player *player)
 {
 	return tilemap_collision(g_level, &player->actor.skeleton, LADDER_COLLISION);
+}
+
+bool player_can_shoot(struct player* player)
+{
+	if (player->collect > 0 && player->actor.state != LADDER)
+		return true;
+	return false;
 }
 
 void player_climb(struct player *player)

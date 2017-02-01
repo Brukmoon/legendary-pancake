@@ -191,7 +191,11 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		sound_add("jump", ".wav");
 		sound_add("death", ".wav");
 		sound_add("fall", ".wav");
+		sound_add("shoot", ".wav");
+		sound_add("pick", ".wav");
 		music_play("music", 6000);
+		texture_add("assets/gfx/arrow.png", renderer);
+		sprite_add("arrow", "assets/gfx/arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
 	}
 	camera_init(&g_camera, CAMERA_FIXED);
 	player_spawn(&g_player);
@@ -252,8 +256,6 @@ static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 	SDL_ShowCursor(1);
 	sound_add("click", ".wav");
 	camera_init(&g_camera, CAMERA_FREE);
-//	player_init(&g_player, renderer);
-	//player_spawn(&g_player);
 	INFO("> Editor opened.");
 	return true;
 }

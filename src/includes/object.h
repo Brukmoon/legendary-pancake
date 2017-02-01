@@ -12,17 +12,36 @@ struct object
 	struct object* next;
 
 	char* name;
-	vec2 spawn;
+	SDL_Rect skeleton;
+
+	bool is_active;
 	struct animation_table t;
 };
 
 static struct object *g_object_head, *g_object_root;
 
-void object_add(const char* name, vec2 spawn, SDL_Renderer* renderer);
+void object_add(const char* name, SDL_Rect spawn, SDL_Renderer* renderer);
 void object_destroy(void);
 // animation
 void object_update(void);
 void object_draw(SDL_Renderer* renderer);
 
+struct missile
+{
+	struct missile* next, *prev;
+
+	int degrees;
+	SDL_Rect skeleton;
+	float velocity;
+	struct animation_table t;
+};
+
+static struct missile *g_missile_head, *g_missile_root;
+
+void missile_fire(SDL_Rect* skeleton, const float* velocity, SDL_Renderer *renderer);
+void missile_draw(SDL_Renderer* renderer);
+static void missile_destroy(void);
+static void missile_remove(struct missile* m);
+static void missile_update(void);
 
 #endif // OBJECT_H
