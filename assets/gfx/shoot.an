@@ -1,0 +1,4 @@
+TEXTURE assets/gfx/shoot.png
+ANIMATION shoot 120
+FRAME shoot1 0 0 32 32
+ANIMATION_END

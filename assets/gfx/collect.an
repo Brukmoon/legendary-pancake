@@ -1,0 +1,15 @@
+TEXTURE assets/gfx/bamboo.png
+ANIMATION rotate 120
+FRAME bamboo 0 0 32 32
+FRAME rotate2 32 0 32 32
+FRAME rotate3 64 0 32 32
+FRAME rotate4 0 32 32 32
+FRAME rotate5 32 32 32 32
+FRAME rotate6 64 32 32 32
+FRAME rotate7 0 64 32 32
+FRAME rotate6 64 32 32 32
+FRAME rotate5 32 32 32 32
+FRAME rotate4 0 32 32 32
+FRAME rotate3 64 0 32 32
+FRAME rotate2 32 0 32 32
+ANIMATION_END
