@@ -28,6 +28,12 @@ void actor_init(struct actor *actor, const char* name, const vec2 spawn, const c
 	animation_set("stand", &actor->anim);
 }
 
+// NYI
+bool actor_can_shoot(const struct actor* actor)
+{
+	return true;
+}
+
 void actor_destroy(struct actor *actor)
 {
 	free(actor->name);
@@ -144,6 +150,7 @@ void player_init(struct player *player, const char* name, const vec2 spawn, cons
 	actor_init(&player->actor, name, spawn, anim_name, renderer); 
 	player->climb[0] = player->climb[1] = false;
 	player->collect = 0;
+	player->path = NULL;
 }
 
 void player_destroy(struct player *player)
@@ -216,12 +223,12 @@ void player_spawn(struct player *player)
 	actor_spawn(&player->actor);
 }
 
-bool player_can_climb(struct player *player)
+bool player_can_climb(const struct player *player)
 {
 	return tilemap_collision(g_level, &player->actor.skeleton, LADDER_COLLISION);
 }
 
-bool player_can_shoot(struct player* player)
+bool player_can_shoot(const struct player* player)
 {
 	if (player->collect > 0 && player->actor.state != LADDER)
 		return true;

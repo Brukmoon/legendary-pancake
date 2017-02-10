@@ -7,6 +7,8 @@
 #include "animation.h"
 #include "vector.h"
 
+struct actor;
+
 struct object
 {
 	struct object* next;
@@ -38,7 +40,7 @@ struct missile
 
 static struct missile *g_missile_head, *g_missile_root;
 
-void missile_fire(SDL_Rect* skeleton, const float* velocity, SDL_Renderer *renderer);
+void missile_fire(struct player *source, const float* velocity, SDL_Renderer *renderer);
 void missile_draw(SDL_Renderer* renderer);
 static void missile_destroy(void);
 static void missile_remove(struct missile* m);

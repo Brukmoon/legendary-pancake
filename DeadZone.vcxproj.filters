@@ -67,6 +67,9 @@
     <ClCompile Include="src\includes\object.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\includes\path.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -156,6 +159,9 @@
       <Filter>Core\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\timer.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\path.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

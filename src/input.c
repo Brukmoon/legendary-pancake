@@ -13,6 +13,9 @@
 
 int curr_sprite_num = 1;
 
+
+#include "path.h"
+
 bool process_input_menu(struct game* game)
 {
 	SDL_Event event;
@@ -89,6 +92,13 @@ bool process_input_play(struct game* game)
 				case SDLK_RETURN:
 					game_pause(game);
 					break;
+				case SDLK_j:
+				{
+					path_destroy(&g_player.path);
+					path_find((vec2) { 2, 2 }, (vec2) { (int)g_player.actor.skeleton.x/g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height}, &g_player.path);
+					
+				}
+					break;
 				default:
 					break;
 				}
@@ -123,7 +133,7 @@ bool process_input_play(struct game* game)
 					vec2 m_pos = { 0,0 };
 					SDL_GetMouseState(&m_pos.x, &m_pos.y);
 					float vel = m_pos.x > (g_player.actor.skeleton.x-g_camera.position.x) ? 7.f : -7.f;
-					missile_fire(&g_player.actor.skeleton, &vel, game->screen.renderer);
+					missile_fire(&g_player, &vel, game->screen.renderer);
 					break;
 				}
 				}

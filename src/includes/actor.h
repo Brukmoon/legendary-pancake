@@ -23,6 +23,7 @@
 
 #include "animation.h"
 #include "vector.h"
+#include "path.h"
 
 // Beware: If you change MULTI_JUMP, modify the UI (stamina) aswell.
 enum 
@@ -32,6 +33,7 @@ enum
 
 struct actor
 {
+	char *name;
 	enum
 	{
 		GROUND,
@@ -39,10 +41,8 @@ struct actor
 		LADDER
 	} state;
 
-	// where?
+	// sizes and position
 	SDL_Rect skeleton;
-	// Name of the actor.
-	char *name;
 	// Where should the actor spawn?
 	vec2 spawn;
 	// speed coefficient
@@ -50,18 +50,17 @@ struct actor
 
 	struct animation_table anim;
 
-	// State of the actor.
 	bool is_jumping;
-	// Should be drawn?
+	// should the actor be drawn?
 	bool is_visible;
+	// jump count since last reset
 	Uint8 jump_count;
-	// current velocity
+	// current velocity (horizontal and vertical)
 	vec2f velocity;
-	// Life: max 32,767 HPs.
+	// life; max 32,767 HPs.
 	Sint16 hitpoints;
 };
 
-// Initialize actor.
 void actor_init(struct actor *actor, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
 void actor_destroy(struct actor *actor);
 
@@ -72,17 +71,22 @@ void actor_move(struct actor *actor, const vec2* delta);
 // Subtract damage points from actor's HPs.
 void actor_damage(struct actor *actor, const Sint16 damage);
 void actor_draw(const struct actor *actor, SDL_Renderer *renderer);
+bool actor_can_shoot(const struct actor* actor);
 
-// Player is a special case of an actor.
+// special case of an actor.
 struct player // : public actor;
 {
-	// A player is an actor.
 	struct actor actor;
 	// climb[0] -> down, climb[1] -> up
 	bool climb[2];
-	int collect;
+	// how many collectables has he collected?
+	// TODO: Move into backpack struct.
+	Uint8 collect;
+
+	struct position* path;
 };
 
+// @anim_name: which animation table file to load?
 void player_init(struct player *player, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer);
 void player_destroy(struct player *player);
 
@@ -92,10 +96,9 @@ void player_jump(struct player *player, float speed);
 // place the player at spawn position and spawn him
 void player_spawn(struct player *player);
 // is the player currently on ladder?
-bool player_can_climb(struct player *player);
-bool player_can_shoot(struct player* player);
+bool player_can_climb(const struct player *player);
+bool player_can_shoot(const struct player* player);
 void player_climb(struct player *player);
-
 // Cause damage to the player.
 inline void player_damage(struct player *player, const Sint16 damage) { actor_damage(&player->actor, damage); }
 

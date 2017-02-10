@@ -29,6 +29,7 @@
     <ClCompile Include="src\hash.c" />
     <ClCompile Include="src\includes\map.c" />
     <ClCompile Include="src\includes\object.c" />
+    <ClCompile Include="src\includes\path.c" />
     <ClCompile Include="src\input.c" />
     <ClCompile Include="src\level.c" />
     <ClCompile Include="src\main.c" />
@@ -45,6 +46,7 @@
   <ItemGroup>
     <ClInclude Include="src\includes\actor.h" />
     <ClInclude Include="src\includes\animation.h" />
+    <ClInclude Include="src\includes\path.h" />
     <ClInclude Include="src\includes\button.h" />
     <ClInclude Include="src\includes\camera.h" />
     <ClInclude Include="src\includes\collision.h" />

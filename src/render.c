@@ -33,6 +33,8 @@ static void draw_menu_interface(SDL_Renderer* const renderer);
 static void draw_dyn_map_background(SDL_Renderer* const renderer);
 // Draws the curr_map map to the screen.
 static void draw_map(SDL_Renderer* const renderer, const enum render_map_flags f);
+// draw actor paths
+static void draw_path(SDL_Renderer* const renderer);
 
 static void draw_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 {
@@ -177,6 +179,7 @@ void render_play(SDL_Renderer *renderer)
 	// draw cursor if you can shoot
 	if(player_can_shoot(&g_player))
 		draw_cursor("arrow", renderer);
+	draw_path(renderer);
 
 	SDL_RenderPresent(renderer);
 }
@@ -255,4 +258,43 @@ static void draw_dyn_map_background(SDL_Renderer* const renderer)
 	SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
 	dst_rect.x = (int)scrollingOffset + w;
 	SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
+}
+
+static void draw_path(SDL_Renderer* const renderer)
+{
+	struct position* current = g_player.path;
+	while (current)
+	{
+		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
+		if (current->next && current->pos.x == current->next->pos.x)
+		{
+			if (current->pos.y > current->next->pos.y)
+				SDL_RenderDrawLine(renderer,
+					current->pos.x*g_level->tile_map.tile_width + g_level->tile_map.tile_width / 2 - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height - g_level->tile_map.tile_height / 2 - g_camera.position.y,
+					current->pos.x*g_level->tile_map.tile_width + g_level->tile_map.tile_width / 2 - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height - g_level->tile_map.tile_height / 2 + g_level->tile_map.tile_height - g_camera.position.y);
+			else
+			{
+				SDL_RenderDrawLine(renderer,
+					current->pos.x*g_level->tile_map.tile_width + g_level->tile_map.tile_width / 2 - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height + g_level->tile_map.tile_height / 2 - g_camera.position.y,
+					current->pos.x*g_level->tile_map.tile_width + g_level->tile_map.tile_width / 2 - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height + g_level->tile_map.tile_height / 2 + g_level->tile_map.tile_height - g_camera.position.y);
+			}
+		}
+		else if(current->next)
+		{
+			if (current->pos.x > current->next->pos.x)
+			{
+				SDL_RenderDrawLine(renderer,
+					current->pos.x*g_level->tile_map.tile_width - g_level->tile_map.tile_width / 2 - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height + g_level->tile_map.tile_height / 2 - g_camera.position.y,
+					current->pos.x*g_level->tile_map.tile_width - g_level->tile_map.tile_width / 2 + g_level->tile_map.tile_width - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height + g_level->tile_map.tile_height / 2 - g_camera.position.y);
+			}
+			else if(current->pos.x < current->next->pos.x)
+			{
+				SDL_RenderDrawLine(renderer,
+					current->pos.x*g_level->tile_map.tile_width + g_level->tile_map.tile_width / 2 - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height + g_level->tile_map.tile_height / 2 - g_camera.position.y,
+					current->pos.x*g_level->tile_map.tile_width + g_level->tile_map.tile_width / 2 + g_level->tile_map.tile_width - g_camera.position.x, current->pos.y*g_level->tile_map.tile_height + g_level->tile_map.tile_height / 2 - g_camera.position.y);
+			}
+		}
+		//hollow_rect(renderer, current->pos.x*32 - g_camera.position.x, current->pos.y*32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
+		current = current->next;
+	}
 }

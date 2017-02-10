@@ -127,9 +127,9 @@ static void	object_collision(struct object* obj)
 	}
 }
 
-void missile_fire(SDL_Rect* skeleton, const float* velocity, SDL_Renderer *renderer)
+void missile_fire(struct player *source, const float* velocity, SDL_Renderer *renderer)
 {
-	if (player_can_shoot(&g_player))
+	if (player_can_shoot(source))
 	{
 		struct missile* m = malloc(sizeof(struct missile));
 		if (m)
@@ -147,13 +147,13 @@ void missile_fire(SDL_Rect* skeleton, const float* velocity, SDL_Renderer *rende
 				g_missile_head->next = m;
 				g_missile_head = m;
 			}
-			m->skeleton = *skeleton;
+			m->skeleton = source->actor.skeleton;
 			m->velocity = *velocity;
 			m->degrees = 0;
 			animation_table_load("shoot", &m->t, renderer);
 			animation_set("shoot", &m->t);
 			sound_play("shoot");
-			g_player.collect--;
+			source->collect--;
 			INFO("Missile fired!.");
 		}
 		else
