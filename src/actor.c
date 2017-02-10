@@ -156,6 +156,7 @@ void player_init(struct player *player, const char* name, const vec2 spawn, cons
 void player_destroy(struct player *player)
 {
 	actor_destroy(&player->actor);
+	path_destroy(&player->path);
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)

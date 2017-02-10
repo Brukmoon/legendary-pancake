@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>
@@ -82,7 +83,7 @@ static void heapify(struct open_set *h, int i, struct pf_node const **node_grid)
 		smallest = RIGHT_ELEMENT(i);
 	// has the smallest element changed?
 	if (smallest != i) {
-	    node_swap(&(h->e[i]), &(h->e[smallest]));
+		node_swap(&(h->e[i]), &(h->e[smallest]));
 		heapify(h, smallest, node_grid);
 	}
 }
@@ -124,7 +125,7 @@ void path_find(vec2 start, vec2 goal, struct position** path)
 	struct open_set* open_set = NULL;
 	open_set_init(&open_set);
 	open_set_push(open_set, start, node_grid);
-	node_grid[start.y][start.x].parent = (node){ -1, -1 };
+	node_grid[start.y][start.x].parent = (node) { -1, -1 };
 	node_grid[start.y][start.x].discovered = true;
 	node_grid[start.y][start.x].g_score = 0;
 	node_grid[start.y][start.x].f_score = estimate_distance(&start, &goal);
@@ -143,14 +144,14 @@ void path_find(vec2 start, vec2 goal, struct position** path)
 		// handle neighbors
 		for (int i = 0; i < 8; i += 2)
 		{
-			const node neighbor = { current.x + p_mod[i],current.y + p_mod[i+1] };
+			const node neighbor = { current.x + p_mod[i],current.y + p_mod[i + 1] };
 			if (neighbor.x >= 0 && neighbor.x < g_level->tile_map.width && neighbor.y >= 0 && neighbor.y < g_level->tile_map.height)
 			{
 				// neighbor already processed
 				if (node_grid[neighbor.y][neighbor.x].discovered)
 					continue;
 				open_set_push(open_set, neighbor, node_grid);
-				int tentative_gscore = node_grid[neighbor.y][neighbor.x].g_score + (p_mod[i+1]==1?2:1);
+				int tentative_gscore = node_grid[neighbor.y][neighbor.x].g_score + (p_mod[i + 1] == 1 ? 2 : 1);
 				if (tentative_gscore >= node_grid[neighbor.y][neighbor.x].g_score)
 					continue;
 				node_grid[neighbor.y][neighbor.x].parent = current;
