@@ -151,7 +151,7 @@ void path_find(vec2 start, vec2 goal, struct position** path)
 				if (node_grid[neighbor.y][neighbor.x].discovered)
 					continue;
 				open_set_push(open_set, neighbor, node_grid);
-				int tentative_gscore = node_grid[neighbor.y][neighbor.x].g_score + (p_mod[i + 1] == 1 ? 2 : 1);
+				int tentative_gscore = node_grid[current.y][current.x].g_score + (p_mod[i + 1] == 1 ? 2 : 1);
 				if (tentative_gscore >= node_grid[neighbor.y][neighbor.x].g_score)
 					continue;
 				node_grid[neighbor.y][neighbor.x].parent = current;
