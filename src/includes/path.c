@@ -56,7 +56,6 @@ static void open_set_init(struct open_set** h)
 
 static void open_set_push(struct open_set* h, node const data, struct pf_node **node_grid)
 {
-	INFO("Pushing %d;%d", data.x, data.y);
 	if (h->size)
 		h->e = realloc(h->e, (h->size + 1)*sizeof(node));
 	// first push
@@ -107,6 +106,7 @@ node open_set_pop(struct open_set *h, struct pf_node **node_grid) {
 // heuristic distance between two nodes
 static int estimate_distance(node const* start, node const* goal);
 static void reconstruct_path(const node* current, struct pf_node const** node_grid, struct position** path);
+static bool open_set_contains(struct open_set* h, node const* current);
 
 void path_find(vec2 start, vec2 goal, struct position** path)
 {
@@ -139,6 +139,7 @@ void path_find(vec2 start, vec2 goal, struct position** path)
 			break;
 		}
 		node_grid[current.y][current.x].discovered = true;
+		// non-passable
 		if (g_level->tile_map.map[TMAP_COLLISION_LAYER][current.y][current.x] == 1)
 			continue;
 		// handle neighbors
@@ -150,10 +151,12 @@ void path_find(vec2 start, vec2 goal, struct position** path)
 				// neighbor already processed
 				if (node_grid[neighbor.y][neighbor.x].discovered)
 					continue;
-				open_set_push(open_set, neighbor, node_grid);
 				int tentative_gscore = node_grid[current.y][current.x].g_score + (p_mod[i + 1] == 1 ? 2 : 1);
-				if (tentative_gscore >= node_grid[neighbor.y][neighbor.x].g_score)
+				if(!open_set_contains(open_set, &neighbor))
+					open_set_push(open_set, neighbor, node_grid);
+				else if (tentative_gscore >= node_grid[neighbor.y][neighbor.x].g_score)
 					continue;
+				// best path until now
 				node_grid[neighbor.y][neighbor.x].parent = current;
 				node_grid[neighbor.y][neighbor.x].g_score = tentative_gscore;
 				node_grid[neighbor.y][neighbor.x].f_score = tentative_gscore + estimate_distance(&neighbor, &goal);
@@ -209,4 +212,12 @@ void path_destroy(struct position** path)
 		free(temp);
 	}
 	*path = NULL;
+}
+
+static bool open_set_contains(struct open_set* h, node const* current)
+{
+	for (int i = 0; i < h->size; ++i)
+		if (current->x == h->e[i].x && current->y == h->e[i].y)
+			return true;
+	return false;
 }
