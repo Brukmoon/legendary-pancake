@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
 		},
 		NULL
 	};
-
 	if (!game_init(&game, &game.screen))
 		return EXIT_FAILURE;
 	
@@ -62,7 +61,6 @@ int main(int argc, char* argv[]) {
 		time += 1000 / FPS; // frames per 1000 MS (1s) --> FPS
 	}
 	game_clean(&game.screen);
-	
 #ifdef _MSC_VER
 	/* 
 	 * Memory leak detection --> works only with VS libraries, implicit output to Debug window.

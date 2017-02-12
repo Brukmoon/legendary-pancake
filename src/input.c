@@ -95,7 +95,7 @@ bool process_input_play(struct game* game)
 				case SDLK_j:
 				{
 					path_destroy(&g_player.path);
-					path_find((vec2) { 2, 2 }, (vec2) { (int)g_player.actor.skeleton.x/g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height}, &g_player.path);
+					path_find((vec2) { 25, 0 }, (vec2) { (int)g_player.actor.skeleton.x / g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height }, &g_player.path);
 					
 				}
 					break;
@@ -434,6 +434,8 @@ void update_play(struct game* game)
 {
 	if (!game->paused)
 	{
+		path_destroy(&g_player.path);
+		path_find((vec2) { 25, 0 }, (vec2) { (int)g_player.actor.skeleton.x / g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height }, &g_player.path);
 		// Update player.
 		if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
 			g_player.actor.velocity.y += (float)GRAVITY;
