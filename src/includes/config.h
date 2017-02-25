@@ -6,7 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define GAME_VERSION "0.0.2 [dev]"
+#define GAME_VERSION "0.0.3 [dev]"
 #define GAME_NAME "Dead Zone"
 // Title of the game window. (GAME_NAME GAME_VERSION)
 #define WINDOW_TITLE GAME_NAME " " GAME_VERSION

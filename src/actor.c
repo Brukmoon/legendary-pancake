@@ -420,7 +420,7 @@ void enemy_update_all(void)
 		}
 		if (jump)
 			actor_jump(&iter->actor, PLAYER_JUMP_INTENSITY);
-		vec2 move_delta = { iter->actor.velocity.x, iter->actor.velocity.y };
+		vec2 move_delta = { (coord) iter->actor.velocity.x, (coord) iter->actor.velocity.y };
 		actor_move(&iter->actor, &move_delta);
 		if (tilemap_collision(g_level, &iter->actor.skeleton, LADDER_COLLISION))
 		{
