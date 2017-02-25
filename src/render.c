@@ -270,7 +270,9 @@ static void draw_path(SDL_Renderer* const renderer)
 		while (current)
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
-			hollow_rect(renderer, current->pos.x * 32 - g_camera.position.x, current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
+			vec2 waypoint_pos = { current->pos.x * 32, current->pos.y * 32 };
+			if(is_visible(&g_camera, &waypoint_pos, g_level->tile_map.tile_width, g_level->tile_map.tile_height))
+				hollow_rect(renderer, waypoint_pos.x - g_camera.position.x, waypoint_pos.y - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
 			current = current->next;
 		}
 		hollow_rect(renderer, enemy_current->current->pos.x * 32 - g_camera.position.x, enemy_current->current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 0, 0, 0 });

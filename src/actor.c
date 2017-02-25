@@ -328,20 +328,24 @@ void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 
 void enemy_draw_all(SDL_Renderer* renderer)
 {
 	struct enemy* iter = g_enemies;
-	SDL_Rect dest;
+	SDL_Rect dest = { 0, 0 };
 	while (iter)
 	{
-		dest.w = iter->actor.skeleton.w;
-		dest.h = iter->actor.skeleton.h;
-		dest.x = iter->actor.skeleton.x - g_camera.position.x;
-		dest.y = iter->actor.skeleton.y - g_camera.position.y;
-		SDL_Rect* src = NULL;
-		SDL_Texture* t = NULL;
-		t = sprite_get(iter->actor.anim.curr->curr->sprite_name, &src);
-		if (iter->actor.velocity.x < 0) // Moving left.
-			SDL_RenderCopyEx(renderer, t, src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
-		else
-			SDL_RenderCopy(renderer, t, src, &dest);
+		vec2 enemy_pos = { iter->actor.skeleton.x, iter->actor.skeleton.y };
+		if (is_visible(&g_camera, &enemy_pos, iter->actor.skeleton.w, iter->actor.skeleton.h));
+		{
+			dest.w = iter->actor.skeleton.w;
+			dest.h = iter->actor.skeleton.h;
+			dest.x = iter->actor.skeleton.x - g_camera.position.x;
+			dest.y = iter->actor.skeleton.y - g_camera.position.y;
+			SDL_Rect* src = NULL;
+			SDL_Texture* t = NULL;
+			t = sprite_get(iter->actor.anim.curr->curr->sprite_name, &src);
+			if (iter->actor.velocity.x < 0) // Moving left.
+				SDL_RenderCopyEx(renderer, t, src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
+			else
+				SDL_RenderCopy(renderer, t, src, &dest);
+		}
 		iter = iter->next;
 	}
 }

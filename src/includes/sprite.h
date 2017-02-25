@@ -1,7 +1,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#define SPRITE_ARR_SIZE 20
+#define SPRITE_ARR_SIZE 19
 #define TEXTURE_ARR_SIZE 5
 
 #include <SDL.h>
