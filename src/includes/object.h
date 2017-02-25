@@ -21,12 +21,13 @@ struct object
 };
 
 static struct object *g_object_head, *g_object_root;
-
 void object_add(const char* name, SDL_Rect spawn, SDL_Renderer* renderer);
 void object_destroy(void);
+
 // animation
-void object_update(void);
+void object_update_all(void);
 void object_draw(SDL_Renderer* renderer);
+void object_write_to_file(FILE* f);
 
 struct missile
 {

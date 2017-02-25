@@ -400,29 +400,12 @@ static void update_player_double_jump(struct player *player)
 
 static void update_player_draw_state(struct player *player)
 {
-	/*
-	if (player->actor.state == GROUND)
-	{
-		if (player->actor.draw_state < player->actor.sprite_count - 1)
-			player->actor.draw_state += .2f;
-		else
-			player->actor.draw_state = 0;
-	}
-	else if (player->actor.state == LADDER && player->actor.velocity.y)
-	{
-		if (player->actor.draw_state < player->actor.sprite_count - 1)
-			player->actor.draw_state += .2f;
-		else
-			player->actor.draw_state = 0;
-	}
-	*/
 	player->actor.anim.curr->delay_counter += 1000/FPS;
 	if (player->actor.anim.curr->delay_counter > player->actor.anim.curr->delay)
 	{
 		animation_next(&player->actor.anim);
 		player->actor.anim.curr->delay_counter = 0;
 	}
-	object_update();
 }
 
 void update_menu(struct game* game)
@@ -435,7 +418,7 @@ void update_play(struct game* game)
 	if (!game->paused)
 	{
 		path_destroy(&g_player.path);
-		path_find((vec2) { 25, 0 }, (vec2) { (int)g_player.actor.skeleton.x / g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height }, &g_player.path);
+		path_find(calc_mouse_pos_map(), (vec2) { (int)g_player.actor.skeleton.x / g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height }, &g_player.path);
 		// Update player.
 		if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
 			g_player.actor.velocity.y += (float)GRAVITY;
@@ -451,6 +434,8 @@ void update_play(struct game* game)
 			player_climb(&g_player);
 		update_player_double_jump(&g_player);
 		update_player_draw_state(&g_player);
+		object_update_all();
+		enemy_update_all();
 		// Update camera.
 		camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
 		if (g_player.actor.hitpoints == 0)

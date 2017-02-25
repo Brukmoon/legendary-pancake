@@ -42,6 +42,7 @@
     <ClCompile Include="src\texture.c" />
     <ClCompile Include="src\text_box.c" />
     <ClCompile Include="src\timer.c" />
+    <ClCompile Include="vector.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\includes\actor.h" />

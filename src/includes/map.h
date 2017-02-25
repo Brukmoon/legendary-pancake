@@ -13,6 +13,13 @@
  */
 typedef int tile;
 
+enum tile_type
+{
+	T_PASSABLE = 0,
+	T_IMPASSABLE = 1,
+	T_LADDER = 2
+};
+
 // Resize mode.
 enum resize_type
 {

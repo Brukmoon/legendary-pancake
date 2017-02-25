@@ -94,7 +94,7 @@ void object_destroy(void)
 	missile_destroy();
 }
 
-void object_update(void)
+void object_update_all(void)
 {
 	struct object* iter = g_object_root;
 	while (iter)
@@ -248,6 +248,16 @@ void missile_draw(SDL_Renderer* renderer)
 			SDL_RenderCopyEx(renderer, t, src, &dest, 0,NULL,SDL_FLIP_HORIZONTAL);*/
 		iter->degrees += 20;
 		SDL_RenderCopyEx(renderer, t, src, &dest, iter->degrees, NULL, SDL_FLIP_NONE);
+		iter = iter->next;
+	}
+}
+
+void object_write_to_file(FILE* f)
+{
+	struct object* iter = g_object_root;
+	while(iter)
+	{
+		fprintf(f, "OBJECT %s %d %d %d %d\n", iter->name, iter->skeleton.x, iter->skeleton.y, iter->skeleton.w, iter->skeleton.h);
 		iter = iter->next;
 	}
 }

@@ -3,6 +3,7 @@
 
 #include "sprite.h"
 
+// Average number of animations per table
 #define ANIMATION_ARR_SIZE 5
 
 // Animation frame.

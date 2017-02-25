@@ -144,6 +144,15 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				sscanf_s(buffer, "%*s%s%d%d%d%d", name, BUFFER_SIZE, &skeleton.x, &skeleton.y, &skeleton.w, &skeleton.h);
 				object_add(name, skeleton, renderer);
 			}
+			else if (SDL_strcmp(command, "ENEMY") == 0)
+			{
+				char name[BUFFER_SIZE];
+				vec2 spawn = { 0, 0 };
+				vec2 goal = { 0, 0 };
+				sscanf_s(buffer, "%*s%s%d%d%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y, &goal.x, &goal.y);
+				enemy_load(name, name, spawn, goal, renderer);
+			}
+
 			// Clear.
 			command[0] = '\0';
 		}
@@ -193,6 +202,8 @@ void level_clean(void)
 	}
 	object_destroy();
 	sprites_destroy();
+	enemy_destroy_all();
+
 	free(g_level);
 	g_level = NULL;
 	INFO("Level structure freed.");
@@ -277,7 +288,7 @@ bool level_save()
 	fprintf(f, "%s\n", "BACKGROUND assets/gfx/level1_background.png");
 	fprintf(f, "%s\n", "D_BACKGROUND assets/gfx/clouds.png");
 	fprintf(f, "%s %s %d %d\n", "PLAYER", g_player.actor.name, g_player.actor.spawn.x, g_player.actor.spawn.y);
-	// TODO: Write objects.
+	object_write_to_file(f);
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);
 	return true;

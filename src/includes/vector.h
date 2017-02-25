@@ -1,5 +1,7 @@
-#ifndef POSITION_H
-#define POSITION_H
+#ifndef VECTOR_H
+#define VECTOR_H
+
+#include <stdbool.h>
 
 typedef int coord;
 typedef struct
@@ -7,9 +9,17 @@ typedef struct
 	coord x, y;
 } vec2;
 
+bool vec2_equal(vec2 const* one, vec2 const* two);
+void vec2_swap(vec2* one, vec2* two);
+
 typedef struct
 {
 	float x, y;
 } vec2f;
 
-#endif // POSITION_H
+typedef struct
+{
+	coord x, y, z;
+} vec3;
+
+#endif // VECTOR_H

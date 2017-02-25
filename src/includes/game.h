@@ -32,6 +32,7 @@ struct game
 	struct game_screen screen;
 	struct game_state *run;
 };
+
 // Initialize. Must be called exactly once, after declaration of game state machine.
 bool game_init(struct game* game, struct game_screen* screen);
 // Clean the resources. After calling this function, calling any engine function will probably result in an error. 

@@ -70,6 +70,9 @@
     <ClCompile Include="src\includes\path.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="vector.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">

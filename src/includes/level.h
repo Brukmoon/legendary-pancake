@@ -4,6 +4,7 @@
 #include <SDL.h>
 
 #include "map.h"
+#include "vector.h"
 
 // Max length of level name.
 #define LEVEL_NAME_LENGTH 30
@@ -31,5 +32,10 @@ extern struct level
 	// Dynamic background /*optional*/
 	SDL_Texture* d_background;
 } *g_level;
+
+inline vec2 real_to_map(coord x, coord y)
+{
+	return (vec2) { (int)x / g_level->tile_map.tile_width, (int)y / g_level->tile_map.tile_height };
+}
 
 #endif // LEVEL_H
