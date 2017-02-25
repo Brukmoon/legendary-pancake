@@ -263,12 +263,17 @@ static void draw_dyn_map_background(SDL_Renderer* const renderer)
 
 static void draw_path(SDL_Renderer* const renderer)
 {
-	struct position* current = g_enemies->path;
-	while (current)
+	struct enemy* enemy_current = g_enemies;
+	while (enemy_current)
 	{
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
-		hollow_rect(renderer, current->pos.x*32 - g_camera.position.x, current->pos.y*32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
-		current = current->next;
+		struct position* current = enemy_current->path;
+		while (current)
+		{
+			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
+			hollow_rect(renderer, current->pos.x * 32 - g_camera.position.x, current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
+			current = current->next;
+		}
+		hollow_rect(renderer, enemy_current->current->pos.x * 32 - g_camera.position.x, enemy_current->current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 0, 0, 0 });
+		enemy_current = enemy_current->next;
 	}
-	fill_rect(renderer, g_enemies->current->pos.x * 32 - g_camera.position.x, g_enemies->current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 0, 0, 0 });
 }

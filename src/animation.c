@@ -4,7 +4,10 @@
 #include "config.h"
 
 #define BUFFER_SIZE 256
+// max animation name length
 #define MAX_AN_LENGTH 30
+// max command length
+#define MAX_COMM_LENGTH 21
 
 static void animation_table_init(struct animation_table* t);
 
@@ -58,6 +61,7 @@ static void animation_table_init(struct animation_table* t)
 void animation_table_load(const char* name, struct animation_table* t, SDL_Renderer* renderer)
 {
 	animation_table_init(t);
+	// 4 is reserved space for file extension
 	size_t s = SDL_strlen(name) + SDL_strlen(IMG_PATH) + 4;
 	char* file_name = malloc(s);
 	if (!file_name)
@@ -72,8 +76,9 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 	fopen_s(&f, file_name, "r");
 	if (f != NULL)
 	{
-		char buffer[BUFFER_SIZE], command[21], texture_name[MAX_AN_LENGTH];
+		char buffer[BUFFER_SIZE], command[MAX_COMM_LENGTH], texture_name[MAX_AN_LENGTH];
 		struct animation* a = NULL;
+		// until you get to the end of file
 		while (!feof(f)) 
 		{
 			fgets(buffer, BUFFER_SIZE, f);
@@ -82,7 +87,7 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 			if (SDL_strcmp(command, "ANIMATION") == 0)
 			{
 				char animation_name[MAX_AN_LENGTH];
-				int delay = 0;
+				unsigned delay = 0;
 				sscanf_s(buffer, "%*s%s%d", animation_name, MAX_AN_LENGTH, &delay);
 				animation_create(&a, animation_name, &delay);
 				INFO("< Loading animation %s", animation_name);
@@ -98,7 +103,7 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 				SDL_Rect r = { 0, 0, 0, 0 };
 				char sprite_name[MAX_AN_LENGTH];
 				sscanf_s(buffer, "%*s%s%d%d%d%d", sprite_name, MAX_AN_LENGTH, &r.x, &r.y, &r.w, &r.h);
-				INFO("Loading frame %s [%d;%d]", sprite_name, r.x, r.y);
+				// INFO("Loading frame %s [%d;%d]", sprite_name, r.x, r.y);
 				sprite_add(sprite_name, texture_name, r);
 				frame_add(a, sprite_name);
 			}
@@ -117,7 +122,7 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 	fclose(f);
 }
 
-void animation_create(struct animation** a, const char* name, const int* delay)
+void animation_create(struct animation** a, char const* name,  unsigned const* delay)
 {
 	(*a) = malloc(sizeof(struct animation));
 	if (!(*a))
@@ -140,7 +145,7 @@ void animation_create(struct animation** a, const char* name, const int* delay)
 
 void animation_destroy(struct animation* a)
 {
-	if (a == NULL)
+	if (!a)
 		return;
 	struct frame* iter = a->tail;
 	while (iter)
@@ -155,17 +160,18 @@ void animation_destroy(struct animation* a)
 
 void animation_table_add(struct animation_table* t, struct animation* a)
 {
+	// find where to put it
 	size_t index = hash_s(a->name) % ANIMATION_ARR_SIZE;
+	// get to the end of the linked list at index
 	struct animation* iter = t->a[index], *prev = NULL;
 	while (iter)
 	{
 		prev = iter;
 		iter = iter->next;
 	}
-	if (!prev)
-	{
+	// push it
+	if (!prev) // ll empty
 		t->a[index] = a;
-	}
 	else
 		prev->next = a;
 	INFO("Animation %s loaded to index %d.", a->name, index);
@@ -190,13 +196,14 @@ void animation_set(const char *name, struct animation_table* t)
 void animation_next(struct animation_table* t)
 {
 	t->curr->curr = t->curr->curr->next;
-	if (!t->curr->curr)
+	if (!t->curr->curr) 
+		// start over again
 		t->curr->curr = t->curr->tail;
 }
 
 void animation_table_destroy(struct animation_table* t)
 {
-	for (int i = 0; i < ANIMATION_ARR_SIZE; ++i)
+	for (size_t i = 0; i < ANIMATION_ARR_SIZE; ++i)
 	{
 		struct animation* iter = t->a[i];
 		while (iter)

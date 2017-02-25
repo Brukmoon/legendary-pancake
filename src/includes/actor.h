@@ -15,6 +15,7 @@
 
 #define ACTOR_STANDARD_SPEED 4.f
 #define ACTOR_HP 100
+#define ACTOR_NAME_LENGTH 10
 
 #define FALLDAMAGE_TRESHHOLD 10
 #define DAMAGE_RATE 20
@@ -108,6 +109,8 @@ struct enemy
 
 void enemy_init(struct enemy* enemy, char const* name, vec2 const spawn, char const* anim_name, SDL_Renderer* renderer);
 static void enemy_destroy(struct enemy* enemy);
+
+// destroy all enemies (@ level cleanup)
 void enemy_destroy_all(void);
 void enemy_draw_all(SDL_Renderer* renderer);
 void enemy_update_all(void);

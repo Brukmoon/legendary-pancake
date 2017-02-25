@@ -26,12 +26,13 @@ static void actor_move(struct actor* actor, vec2 const* delta);
 static void actor_draw(struct actor const* actor, int draw_size_delta, SDL_Renderer* renderer);
 static bool actor_can_shoot(const struct actor* actor);
 static void actor_damage(struct actor* actor, Uint16 const damage);
+static void actor_jump(struct actor* actor, float speed);
 
 
 void actor_init(struct actor *actor, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
 {
-	actor->name = malloc(7);
-	SDL_strlcpy(actor->name, name, 7);
+	actor->name = malloc(ACTOR_NAME_LENGTH);
+	SDL_strlcpy(actor->name, name, ACTOR_NAME_LENGTH);
 	actor->hitpoints = ACTOR_HP;
 	actor->skeleton.x = actor->skeleton.y = 0;
 	actor->skeleton.w = actor->skeleton.h = 32;
@@ -171,6 +172,18 @@ void actor_spawn(struct actor *actor)
 	INFO("Actor %s spawned at [%d;%d].", actor->name, actor->spawn.x, actor->spawn.y);
 }
 
+static void actor_jump(struct actor* actor, float speed)
+{
+	if (actor->state != LADDER)
+	{
+		// He is jumping until he hits the ground.
+		actor->is_jumping = true;
+		actor->jump_count++;
+		// Go against gravity.
+		actor->velocity.y = -speed;
+	}
+}
+
 void player_init(struct player *player, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
 {
 	actor_init(&player->actor, name, spawn, anim_name, renderer); 
@@ -201,17 +214,14 @@ void player_move(struct player *player, const vec2 *delta)
 void player_jump(struct player *player, float speed) 
 { 
 	// jump requirements
+	// TODO: ladder is checked twice
 	if ((!player->actor.is_jumping && 
 		player->actor.state == GROUND) 
 		|| (player->actor.is_jumping && 
 			player->actor.jump_count < MULTI_JUMP &&
 			player->actor.state != LADDER))
 	{
-		// He is jumping until he hits the ground.
-		player->actor.is_jumping = true;
-		player->actor.jump_count++;
-		// Go against gravity.
-		player->actor.velocity.y = -speed;
+		actor_jump(&player->actor, speed);
 		sound_play("jump");
 	}
 }
@@ -284,7 +294,7 @@ void enemy_draw(struct player const* enemy, SDL_Renderer* renderer)
 
 void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 const goal, SDL_Renderer *renderer)
 {
-	INFO("ENEMY LOAD %d %d GOAL: %d %d", spawn.x, spawn.y, goal.x, goal.y);
+	INFO("Enemy load %s, SPAWN: [%d; %d] GOAL: [%d; %d]", name ,spawn.x, spawn.y, goal.x, goal.y);
 	struct enemy* enemy = malloc(sizeof(struct enemy));
 	if (!enemy)
 	{
@@ -311,7 +321,7 @@ void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 
 		{
 			iter = iter->next;
 		}
-		iter->next = iter;
+		iter->next = enemy;
 	}
 }
 
@@ -354,43 +364,66 @@ void enemy_update_all(void)
 	struct enemy* iter = g_enemies;
 	while (iter)
 	{
+		// handle gravity
 		if ((iter->actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
 			iter->actor.velocity.y += (float)GRAVITY;
 		else
 			iter->actor.velocity.y = T_VEL;
-		vec2 enemy_pos = { 0, 0 };
-
+		vec2 enemy_pos = { 0, 0 }, enemy_pos_real = { 0, 0 };
+		bool jump = false;
 		if (iter->current) // there is a path
 		{
+			enemy_pos_real.x = iter->actor.skeleton.x;
+			enemy_pos_real.y = iter->actor.skeleton.y;
 			enemy_pos = real_to_map(iter->actor.skeleton.x, iter->actor.skeleton.y);
+			// there was a previous waypoint and it was to the right
 			if (iter->current->prev && iter->current->prev->pos.x > iter->current->pos.x)
 				enemy_pos.x++;
 			if (iter->current->prev && iter->current->prev->pos.y > iter->current->pos.y)
 				enemy_pos.y++;
-			if (vec2_equal(&enemy_pos, &iter->start))
+			vec2 start_real = vec2_scale(&iter->start, g_level->tile_map.tile_width);
+			// we found the end point
+			if (vec2_similar(&enemy_pos_real, &start_real, 2))
 			{
 				vec2_swap(&iter->start, &iter->goal);
 				path_destroy(&iter->path);
 				path_find(iter->start, iter->goal, &iter->path);
 				iter->current = iter->path;
 			}
-			// reached current waypoint
-			if (vec2_equal(&iter->current->pos, &enemy_pos))
-				iter->current = iter->current->next; // set next
-			// must go up
-			if (iter->current->pos.y < enemy_pos.y)
-				iter->actor.velocity.y = -2;
-			else if (iter->current->pos.y > enemy_pos.y)
-				iter->actor.velocity.y = 2;
-			if (iter->current->pos.x < enemy_pos.x)
-				iter->actor.velocity.x = -2;
-			else if (iter->current->pos.x > enemy_pos.x)
-				iter->actor.velocity.x = 2;
-			else
-				iter->actor.velocity.x = 0;
+			vec2 waypoint_real = vec2_scale(&iter->current->pos, g_level->tile_map.tile_width);
+			if (vec2_similar(&waypoint_real, &enemy_pos_real, 3))
+			{
+				if(iter->current->next)
+					iter->current = iter->current->next; // set next
+			}
+			if (iter->current)
+			{
+				// must go up
+				if (iter->current->pos.y < enemy_pos.y)
+				{
+					iter->actor.velocity.y = -2;
+					jump = true;
+				}
+				else if (iter->current->pos.y > enemy_pos.y)
+					iter->actor.velocity.y = 2;
+				if (iter->current->pos.x < enemy_pos.x)
+					iter->actor.velocity.x = -2;
+				else if (iter->current->pos.x > enemy_pos.x)
+					iter->actor.velocity.x = 2;
+				else
+					iter->actor.velocity.x = 0;
+			}
 		}
-		vec2 move_speed = { iter->actor.velocity.x, iter->actor.velocity.y };
-		actor_move(&iter->actor, &move_speed);
+		if (jump)
+			actor_jump(&iter->actor, PLAYER_JUMP_INTENSITY);
+		vec2 move_delta = { iter->actor.velocity.x, iter->actor.velocity.y };
+		actor_move(&iter->actor, &move_delta);
+		if (tilemap_collision(g_level, &iter->actor.skeleton, LADDER_COLLISION))
+		{
+			iter->actor.state = LADDER;
+			animation_set("ladder", &iter->actor.anim);
+		}
+		
 		iter->actor.anim.curr->delay_counter += 1000 / FPS;
 		if (iter->actor.anim.curr->delay_counter > iter->actor.anim.curr->delay)
 		{

@@ -3,6 +3,11 @@
 #include "camera.h"
 #include "level.h"
 
+// Camera limit
+// Camera shouldn't show the outside of map.
+#define MAX_CAMERA_X g_level->tile_map.width*g_level->tile_map.tile_width-SCREEN_WIDTH
+#define MAX_CAMERA_Y g_level->tile_map.height*g_level->tile_map.tile_height-SCREEN_HEIGHT
+
 struct camera g_camera = { CAMERA_FREE, { INITIAL_CAMERA_X, INITIAL_CAMERA_Y } };
 
 void camera_init(struct camera *camera, const enum camera_type t)
@@ -16,13 +21,7 @@ void camera_init(struct camera *camera, const enum camera_type t)
 	// Camera defaults to the center of the screen.
 	camera_set(camera, (vec2) { INITIAL_CAMERA_X, INITIAL_CAMERA_Y });
 	INFO("Camera offsets set to (%d, %d).", camera->position.x, camera->position.y);
-	// TODO: Limit scrolling.
 }
-
-// Camera limit
-// Camera shouldn't show the outside of map.
-#define MAX_CAMERA_X g_level->tile_map.width*g_level->tile_map.tile_width-SCREEN_WIDTH
-#define MAX_CAMERA_Y g_level->tile_map.height*g_level->tile_map.tile_height-SCREEN_HEIGHT
 
 void camera_set(struct camera *camera, vec2 position)
 {
@@ -48,9 +47,6 @@ void camera_set(struct camera *camera, vec2 position)
 #endif // NO_CAMERA_LIMIT
 	camera->position = position;
 }
-
-#undef MAX_CAMERA_X
-#undef MAX_CAMERA_Y
 
 void camera_scroll(struct camera *camera, const vec2 delta)
 {
