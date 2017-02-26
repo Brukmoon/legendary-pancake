@@ -67,6 +67,16 @@ void preedit_menu_load(SDL_Renderer* renderer)
 	g_menu->background = load_texture(renderer, IMG_PATH"background1.png");
 }
 
+void preplay_menu_load(SDL_Renderer* renderer)
+{
+	menu_create(&g_menu, MENU_BUTTON);
+	button_add(renderer, E_MENU_OK, (const vec2) { CENTER_X - 58, CENTER_Y + BUTTON_FONT_SIZE + 15 });
+	button_add(renderer, E_MENU_CANCEL, (const vec2) { CENTER_X, CENTER_Y + BUTTON_FONT_SIZE + 15 });
+	g_menu->button_list->current = g_menu->button_list->root;
+	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
+	g_menu->background = load_texture(renderer, IMG_PATH"background1.png");
+}
+
 void menu_destroy(void)
 {
 	if (!g_menu)

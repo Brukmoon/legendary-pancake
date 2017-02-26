@@ -179,7 +179,11 @@ void sound_add(const char* name, const char* type)
 void music_play(const char *name, int fadein_ms)
 {
 #if MUSIC_ON
-
+	static int curr_hash = -1;
+	int new_hash = hash_s(name);
+	if (new_hash != curr_hash)
+	{
+		curr_hash = new_hash;
 		//Play the music
 		Mix_Music* m = music_get(name);
 		if (m == NULL)
@@ -192,6 +196,7 @@ void music_play(const char *name, int fadein_ms)
 		{
 			ERROR("Couldn't play music %s.", name);
 		}
+	}
 #else
 	UNUSED_PARAMETER(name);
 	UNUSED_PARAMETER(fadein_ms);

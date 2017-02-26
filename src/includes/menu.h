@@ -58,6 +58,7 @@ void button_add(SDL_Renderer* renderer, const char* text, const vec2 position);
 void text_box_add(const SDL_Rect skeleton, int max_length);
 void main_menu_load(SDL_Renderer* renderer);
 void preedit_menu_load(SDL_Renderer* renderer);
+void preplay_menu_load(SDL_Renderer* renderer);
 
 void menu_create(struct menu **menu, const enum menu_flags flags);
 void menu_draw(struct menu *menu, SDL_Renderer* renderer);

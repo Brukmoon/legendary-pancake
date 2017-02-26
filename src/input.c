@@ -36,7 +36,7 @@ bool process_input_menu(struct game* game)
 				// TODO: Redesign - send accept message to menu.
 				sound_play("accept");
 				if (SDL_strcmp(M_MENU_PLAY, g_menu->button_list->current->text) == 0)
-					game_state_change(game, game_state_play("level1"));
+					game_state_change(game, game_state_preplay());
 				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list->current->text) == 0)
 					game_state_change(game, game_state_preedit());
 				else if (SDL_strcmp(M_MENU_QUIT, g_menu->button_list->current->text) == 0)
@@ -220,6 +220,49 @@ bool process_input_preedit(struct game* game)
 			{	
 				//Append character
 				SDL_strlcat(g_menu->text_box_list->current->text, e.text.text, g_menu->text_box_list->current->max_length);
+			}
+		}
+	}
+	return true;
+}
+
+bool process_input_preplay(struct game* game)
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e) != 0)
+	{
+		if (e.type == SDL_QUIT)
+		{
+			game_state_reset(game);
+			game_state_exit(game);
+			return false;
+		}
+		//Special key input
+		else if (e.type == SDL_KEYDOWN)
+		{
+			if (e.key.keysym.sym == SDLK_UP || e.key.keysym.sym == SDLK_LEFT)
+			{
+				menu_prev_button(g_menu);
+			}
+			else if (e.key.keysym.sym == SDLK_DOWN || e.key.keysym.sym == SDLK_RIGHT)
+			{
+				menu_next_button(g_menu);
+			}
+			else if (e.key.keysym.sym == SDLK_RETURN)
+			{
+				INFO("Clicked button %s.", g_menu->button_list->current->text);
+				sound_play("accept");
+				if (SDL_strcmp(E_MENU_OK, g_menu->button_list->current->text) == 0)
+				{
+					// BEWARE: Possible error here. Can text get freed before the state exits?
+					if (!game_state_change(game, game_state_play("level1")))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+				}
+				else if (SDL_strcmp(E_MENU_CANCEL, g_menu->button_list->current->text) == 0)
+					game_state_exit(game);
 			}
 		}
 	}

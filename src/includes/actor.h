@@ -8,18 +8,6 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-// How much does a player jump.
-#define PLAYER_JUMP_INTENSITY 6.f
-// How fast does a player climb a ladder.
-#define PLAYER_CLIMB_SPEED 5
-
-#define ACTOR_STANDARD_SPEED 4.f
-#define ACTOR_HP 100
-#define ACTOR_NAME_LENGTH 10
-
-#define FALLDAMAGE_TRESHHOLD 10
-#define DAMAGE_RATE 20
-
 #include <SDL.h>
 #include <stdbool.h>
 
@@ -31,6 +19,9 @@ enum
 { 
 	MULTI_JUMP = 2 
 };
+
+// How much does a player jump.
+#define PLAYER_JUMP_INTENSITY 6.f  
 
 struct actor
 {

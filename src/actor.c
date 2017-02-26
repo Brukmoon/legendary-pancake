@@ -7,9 +7,17 @@
 #include "sound.h"
 #include "physics.h"
 #include "texture.h"
-#include "vector.h"
 
 #define PLAYER_PATH IMG_PATH"player.png"
+// How fast does a player climb a ladder.
+#define PLAYER_CLIMB_SPEED 5
+#define ACTOR_STANDARD_SPEED 4.f
+#define ACTOR_DEFAULT_HP 100
+#define ACTOR_DEFAULT_X 0
+#define ACTOR_DEFAULT_Y 0
+//#define ACTOR_NAME_LENGTH 10
+#define FALLDAMAGE_TRESHHOLD 10
+#define DAMAGE_RATE 20
 
 struct player g_player;
 struct enemy* g_enemies = NULL;
@@ -24,18 +32,22 @@ static void actor_spawn(struct actor* actor);
 static void actor_move(struct actor* actor, vec2 const* delta);
 // Subtract damage points from actor's HPs.
 static void actor_draw(struct actor const* actor, int draw_size_delta, SDL_Renderer* renderer);
-static bool actor_can_shoot(const struct actor* actor);
+static bool actor_can_shoot(struct actor const* actor);
 static void actor_damage(struct actor* actor, Uint16 const damage);
 static void actor_jump(struct actor* actor, float speed);
 
 
-void actor_init(struct actor *actor, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
+void actor_init(struct actor *actor, char const* name, vec2 const spawn, char const* anim_name, SDL_Renderer *renderer)
 {
-	actor->name = malloc(ACTOR_NAME_LENGTH);
-	SDL_strlcpy(actor->name, name, ACTOR_NAME_LENGTH);
-	actor->hitpoints = ACTOR_HP;
-	actor->skeleton.x = actor->skeleton.y = 0;
-	actor->skeleton.w = actor->skeleton.h = 32;
+	size_t name_str_len = SDL_strlen(name) + 1;
+	actor->name = malloc(name_str_len);
+	SDL_strlcpy(actor->name, name, name_str_len);
+	actor->hitpoints = ACTOR_DEFAULT_HP;
+	actor->skeleton.x = ACTOR_DEFAULT_X;
+	actor->skeleton.y = ACTOR_DEFAULT_Y;
+	// size of character is tile size by default
+	actor->skeleton.w = g_level->tile_map.tile_width;
+	actor->skeleton.h = g_level->tile_map.tile_height;
 	actor->velocity = (vec2f) { 0, 0 };
 	actor->is_visible = actor->is_jumping = false;
 	actor->state = AIR;

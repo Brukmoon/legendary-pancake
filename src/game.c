@@ -234,6 +234,18 @@ static bool to_preedit_state(SDL_Renderer *renderer, char* unused)
 	INFO("< Opening preedit menu.");
 	// set callbacks to menu state callbacks
 	preedit_menu_load(renderer);
+	music_play("menu", 4000);
+	INFO("> Preedit menu opened.");
+	return true;
+}
+
+static bool to_preplay_state(SDL_Renderer *renderer, char* unused)
+{
+	UNUSED_PARAMETER(unused);
+	INFO("< Opening preedit menu.");
+	// set callbacks to menu state callbacks
+	preplay_menu_load(renderer);
+	music_play("menu", 4000);
 	INFO("> Preedit menu opened.");
 	return true;
 }
@@ -254,7 +266,9 @@ static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
     player_set_vel_x(&g_player, 0);
 	player_set_vel_y(&g_player, 0);
 	SDL_ShowCursor(1);
+	music_add("menux", ".ogg");
 	sound_add("click", ".wav");
+	music_play("menux", 6000);
 	camera_init(&g_camera, CAMERA_FREE);
 	INFO("> Editor opened.");
 	return true;
@@ -319,6 +333,25 @@ struct game_state *game_state_preedit(void)
 	preedit->next = NULL;
 
 	return preedit;
+}
+
+struct game_state *game_state_preplay(void)
+{
+	struct game_state *preplay = malloc(sizeof(struct game_state));
+
+	preplay->id = GAME_STATE_PREPLAY;
+	preplay->state_param = NULL;
+
+	preplay->enter = to_preplay_state;
+	preplay->exit = from_main_menu_state;
+
+	preplay->draw = render_menu;
+	preplay->process_input = process_input_preplay;
+	preplay->update = update_menu;
+
+	preplay->next = NULL;
+
+	return preplay;
 }
 
 struct game_state *game_state_edit(char *level_name)

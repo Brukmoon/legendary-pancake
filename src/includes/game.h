@@ -47,6 +47,7 @@ enum game_state_id
 	GAME_STATE_MAIN_MENU,
 	GAME_STATE_PLAY,
 	GAME_STATE_PREEDIT,
+	GAME_STATE_PREPLAY,
 	GAME_STATE_EDIT,
 	GAME_STATE_COUNT
 };
@@ -72,6 +73,7 @@ struct game_state *game_state_main_menu(void);
 struct game_state *game_state_play(char* level_name);
 struct game_state *game_state_edit(char* level_name);
 struct game_state *game_state_preedit(void);
+struct game_state *game_state_preplay(void);
 
 bool game_state_change(struct game *game, struct game_state *new_state);
 void game_state_exit(struct game *game);
