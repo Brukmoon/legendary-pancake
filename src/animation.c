@@ -9,6 +9,7 @@
 // max command length
 #define MAX_COMM_LENGTH 21
 
+// initialize an animation_table
 static void animation_table_init(struct animation_table* t);
 
 void frame_add(struct animation* a, const char* sprite_name)

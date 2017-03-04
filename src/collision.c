@@ -26,14 +26,16 @@ bool tilemap_collision(const struct level *level, const SDL_Rect* rect, const en
 		right = ((rect->x + rect->w - 1) / level->tile_map.tile_width) > level->tile_map.width?level->tile_map.width - 1: (rect->x + rect->w - 1) / level->tile_map.tile_width,
 		top = ((rect->y) / level->tile_map.tile_height) < 0?0: (rect->y) / level->tile_map.tile_height,
 		bottom = (rect->y + rect->h - 1) / level->tile_map.tile_height > level->tile_map.height?level->tile_map.height - 1: (rect->y + rect->h - 1) / level->tile_map.tile_height;
-
 	for (int i = left; i <= right; i++)
 		for (int j = top; j <= bottom; j++)
-		{			
-			tile t = level->tile_map.map[TMAP_COLLISION_LAYER][j][i];
-			// t can be either 0 (no collision) or any COLLISION_TYPE.
-			if (t == type)
-				return true;
+		{
+			if (i >= 0 && i < level->tile_map.width && j >= 0 && j < level->tile_map.height)
+			{
+				tile t = level->tile_map.map[TMAP_COLLISION_LAYER][j][i];
+				// t can be either 0 (no collision) or any COLLISION_TYPE.
+				if (t == type)
+					return true;
+			}
 		}
 	return false;
 }

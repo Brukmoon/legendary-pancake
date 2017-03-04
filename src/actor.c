@@ -17,7 +17,6 @@
 #define ACTOR_DEFAULT_Y 0
 //#define ACTOR_NAME_LENGTH 10
 #define FALLDAMAGE_TRESHHOLD 10
-#define DAMAGE_RATE 20
 
 struct player g_player;
 struct enemy* g_enemies = NULL;
@@ -33,9 +32,12 @@ static void actor_move(struct actor* actor, vec2 const* delta);
 // Subtract damage points from actor's HPs.
 static void actor_draw(struct actor const* actor, int draw_size_delta, SDL_Renderer* renderer);
 static bool actor_can_shoot(struct actor const* actor);
+static bool actor_can_climb(struct actor const* actor);
+// subtract damage points from actor hitpoints
 static void actor_damage(struct actor* actor, Uint16 const damage);
+static void actor_gravity(struct actor* actor);
+// put speed force on actor
 static void actor_jump(struct actor* actor, float speed);
-
 
 void actor_init(struct actor *actor, char const* name, vec2 const spawn, char const* anim_name, SDL_Renderer *renderer)
 {
@@ -62,6 +64,11 @@ void actor_init(struct actor *actor, char const* name, vec2 const spawn, char co
 bool actor_can_shoot(const struct actor* actor)
 {
 	return true;
+}
+
+static bool actor_can_climb(struct actor const* actor)
+{
+	return tilemap_collision(g_level, &actor->skeleton, LADDER_COLLISION);
 }
 
 void actor_destroy(struct actor *actor)
@@ -150,10 +157,15 @@ void actor_move(struct actor *actor, const vec2* delta)
 				if (actor->state == AIR)
 				{
 					if (actor->velocity.y > FALLDAMAGE_TRESHHOLD)
+					{
+						// TODO: Move out.
+						sound_play("fall");
 						actor_damage(actor, ((int)actor->velocity.y % 8)*DAMAGE_RATE);
+					}
 				}
 			}
-			actor->state = GROUND;
+			if(delta->y > 0)
+				actor->state = GROUND;
 			actor->velocity.y = 0;
 			actor->skeleton.y = actor_after.y;
 		}
@@ -167,7 +179,6 @@ void actor_move(struct actor *actor, const vec2* delta)
 
 void actor_damage(struct actor *actor, Uint16 const damage)
 {
-	sound_play("fall");
 #if DAMAGE_ON
 	if (actor->hitpoints - damage > 0) // Hitpoints can't be less than 0.
 		actor->hitpoints -= damage;
@@ -196,18 +207,24 @@ static void actor_jump(struct actor* actor, float speed)
 	}
 }
 
+static void actor_gravity(struct actor* actor)
+{
+	if ((actor->velocity.y + (float)GRAVITY) <= T_VEL)
+		actor->velocity.y += (float)GRAVITY;
+	else
+		actor->velocity.y = T_VEL;
+}
+
 void player_init(struct player *player, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
 {
 	actor_init(&player->actor, name, spawn, anim_name, renderer); 
 	player->climb[0] = player->climb[1] = false;
 	player->collect = 0;
-	player->path = NULL;
 }
 
 void player_destroy(struct player *player)
 {
 	actor_destroy(&player->actor);
-	path_destroy(&player->path);
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)
@@ -227,11 +244,11 @@ void player_jump(struct player *player, float speed)
 { 
 	// jump requirements
 	// TODO: ladder is checked twice
-	if ((!player->actor.is_jumping && 
-		player->actor.state == GROUND) 
-		|| (player->actor.is_jumping && 
-			player->actor.jump_count < MULTI_JUMP &&
-			player->actor.state != LADDER))
+	if (
+		(!player->actor.is_jumping && player->actor.state == GROUND) 
+		|| 
+		(player->actor.is_jumping && player->actor.jump_count < MULTI_JUMP && player->actor.state != LADDER)
+		)
 	{
 		actor_jump(&player->actor, speed);
 		sound_play("jump");
@@ -243,9 +260,22 @@ void player_spawn(struct player *player)
 	actor_spawn(&player->actor);
 }
 
+void player_update(struct player* player)
+{
+	actor_gravity(&player->actor);
+	// Move him.
+	vec2 delta = {
+		(coord)g_player.actor.velocity.x,
+		(coord)g_player.actor.velocity.y
+	};
+	player_move(player, &delta);
+	if (player_can_climb(player))
+		player_climb(player);
+}
+
 bool player_can_climb(const struct player *player)
 {
-	return tilemap_collision(g_level, &player->actor.skeleton, LADDER_COLLISION);
+	return actor_can_climb(&player->actor);
 }
 
 bool player_can_shoot(const struct player* player)
@@ -344,7 +374,7 @@ void enemy_draw_all(SDL_Renderer* renderer)
 	while (iter)
 	{
 		vec2 enemy_pos = { iter->actor.skeleton.x, iter->actor.skeleton.y };
-		if (is_visible(&g_camera, &enemy_pos, iter->actor.skeleton.w, iter->actor.skeleton.h));
+		if (iter->is_spawned && is_visible(&g_camera, &enemy_pos, iter->actor.skeleton.w, iter->actor.skeleton.h))
 		{
 			dest.w = iter->actor.skeleton.w;
 			dest.h = iter->actor.skeleton.h;
@@ -380,12 +410,28 @@ void enemy_update_all(void)
 	struct enemy* iter = g_enemies;
 	while (iter)
 	{
+		// not spawned
+		if (!iter->is_spawned) // go to next
+		{
+			iter = iter->next;
+			continue;
+		}
+		// check if dead
+		// TODO: Add dead texture -> should be an object.
+		if (iter->actor.hitpoints <= 0)
+			iter->is_spawned = false; // despawn
+		// check collision with player
+		if (rects_collide(&g_player.actor.skeleton, &iter->actor.skeleton))
+		{
+			player_damage(&g_player, 2);
+			// skip move
+			iter = iter->next;
+			continue;
+		}
 		// handle gravity
-		if ((iter->actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
-			iter->actor.velocity.y += (float)GRAVITY;
-		else
-			iter->actor.velocity.y = T_VEL;
+		actor_gravity(&iter->actor);
 		vec2 enemy_pos = { 0, 0 }, enemy_pos_real = { 0, 0 };
+		// should jump
 		bool jump = false;
 		if (iter->current) // there is a path
 		{
@@ -412,6 +458,7 @@ void enemy_update_all(void)
 				if(iter->current->next)
 					iter->current = iter->current->next; // set next
 			}
+			// is there a path?
 			if (iter->current)
 			{
 				// must go up
@@ -421,7 +468,10 @@ void enemy_update_all(void)
 					jump = true;
 				}
 				else if (iter->current->pos.y > enemy_pos.y)
-					iter->actor.velocity.y = 2;
+				{
+					if (actor_can_climb(&iter->actor))
+						iter->actor.velocity.y = 2;
+				}
 				if (iter->current->pos.x < enemy_pos.x)
 					iter->actor.velocity.x = -2;
 				else if (iter->current->pos.x > enemy_pos.x)
@@ -431,7 +481,7 @@ void enemy_update_all(void)
 			}
 		}
 		if (jump)
-			actor_jump(&iter->actor, PLAYER_JUMP_INTENSITY);
+			actor_jump(&iter->actor, 4.5f);
 		vec2 move_delta = { (coord) iter->actor.velocity.x, (coord) iter->actor.velocity.y };
 		actor_move(&iter->actor, &move_delta);
 		if (tilemap_collision(g_level, &iter->actor.skeleton, LADDER_COLLISION))
@@ -439,7 +489,7 @@ void enemy_update_all(void)
 			iter->actor.state = LADDER;
 			animation_set("ladder", &iter->actor.anim);
 		}
-		
+		// animation
 		iter->actor.anim.curr->delay_counter += 1000 / FPS;
 		if (iter->actor.anim.curr->delay_counter > iter->actor.anim.curr->delay)
 		{

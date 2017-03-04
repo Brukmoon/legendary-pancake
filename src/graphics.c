@@ -32,7 +32,6 @@ void fill_rect(SDL_Renderer *renderer,
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-
 void hollow_rect(SDL_Renderer *renderer,
 	const int x, const int y,
 	const int width, const int height,

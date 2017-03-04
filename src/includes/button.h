@@ -3,10 +3,10 @@
 
 #include <stdbool.h>
 
-#define BUTTON_FONT_SIZE 25
-
 #include "texture.h"
 #include "vector.h"
+
+#define BUTTON_FONT_SIZE 35
 
 // Texture types.
 enum button_sprite
@@ -29,7 +29,8 @@ struct button
 	struct button* prev;
 };
 
-struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position);
+// create and return a button
+struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, size_t const font_size, const vec2 position);
 void button_destroy(struct button *button);
 // Set button as active.
 void set_button_active(struct button *button, bool yesno);

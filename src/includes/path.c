@@ -60,7 +60,7 @@ static void bubble_up(struct open_set* h, int position, struct pf_node_l const *
 // heuristic distance between two nodes
 static int estimate_distance(vec2 const* start, vec2 const* goal);
 // reconstruct the path
-static void reconstruct_path(node const* current, struct pf_node_l const** node_grid, struct position** path);
+static void reconstruct_path(node const* current, struct pf_node_l const** node_grid, struct waypoint** path);
 
 static void node_swap(node* const one, node* const two)
 {
@@ -362,11 +362,11 @@ static int estimate_distance(vec2 const* start, vec2 const* goal)
 	return abs(start->x - goal->x) + abs(start->y - goal->y);
 }
 
-static void reconstruct_path(const node* current, struct pf_node_l const** node_grid, struct position** path)
+static void reconstruct_path(const node* current, struct pf_node_l const** node_grid, struct waypoint** path)
 {
 	//INFO("cost: %d", node_grid[current->y][current->x].z[current->z].g_score);
 	// root
-	(*path) = malloc(sizeof(struct position));
+	(*path) = malloc(sizeof(struct waypoint));
 	(*path)->next = NULL;
 	(*path)->prev = NULL;
 	(*path)->pos.x = current->x;
@@ -376,7 +376,7 @@ static void reconstruct_path(const node* current, struct pf_node_l const** node_
 	if (current->x == -1 && current->y == -1 && current->z == -1)
 		return;
 	node *next = &node_grid[current->y][current->x].z[current->z].parent;
-	struct position* iter = *path;
+	struct waypoint* iter = *path;
 	while (current->x != -1 && current->y != -1)
 	{
 		next = &node_grid[current->y][current->x].z[current->z].parent;
@@ -396,7 +396,7 @@ static void reconstruct_path(const node* current, struct pf_node_l const** node_
 				&& current->y != iter->pos.y && current->x != iter->pos.x)
 			)
 		{
-			iter->next = malloc(sizeof(struct position));
+			iter->next = malloc(sizeof(struct waypoint));
 			iter->next->prev = iter;
 			iter = iter->next;
 			iter->pos.x = current->x;
@@ -408,9 +408,9 @@ static void reconstruct_path(const node* current, struct pf_node_l const** node_
 	iter->next = NULL;
 }
 
-void path_destroy(struct position** path)
+void path_destroy(struct waypoint** path)
 {
-	struct position* temp = NULL;
+	struct waypoint* temp = NULL;
 	while (*path)
 	{
 		temp = *path;

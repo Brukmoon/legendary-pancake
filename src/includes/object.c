@@ -94,7 +94,7 @@ void object_destroy(void)
 	missile_destroy();
 }
 
-void object_update_all(void)
+void object_update_all(SDL_Renderer* renderer)
 {
 	struct object* iter = g_object_root;
 	while (iter)
@@ -111,7 +111,7 @@ void object_update_all(void)
 		}
 		iter = iter->next;
 	}
-	missile_update();
+	missile_update(renderer);
 }
 
 static void	object_collision(struct object* obj)
@@ -205,11 +205,27 @@ static void missile_remove(struct missile* m)
 	free(m);
 }
 
-static void missile_update(void)
+static void missile_update(SDL_Renderer* renderer)
 {
 	struct missile* iter = g_missile_root;
 	while (iter)
 	{
+		// check collision with enemies
+		struct enemy* enemy = g_enemies;
+		while (enemy)
+		{
+			if (enemy->is_spawned && rects_collide(&iter->skeleton, &enemy->actor.skeleton))
+			{
+				INFO("HIT! %d", enemy->is_spawned);
+				missile_remove(iter);
+				object_add("collect", enemy->actor.skeleton, renderer);
+				enemy->actor.hitpoints -= SHOOT_DAMAGE_RATE;
+				missile_update(renderer);
+				return;
+			}
+			enemy = enemy->next;
+		}
+		// update animation
 		iter->skeleton.x += (int)iter->velocity;
 		iter->t.curr->delay_counter += 1000 / FPS;
 		if (iter->t.curr->delay_counter > iter->t.curr->delay)
@@ -221,7 +237,7 @@ static void missile_update(void)
 		{
 			missile_remove(iter);
 			// redo updating
-			missile_update();
+			missile_update(renderer);
 			return;
 		}
 		iter = iter->next;

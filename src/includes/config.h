@@ -22,12 +22,14 @@
 #define DATA_PATH "./assets/"
 #define IMG_PATH DATA_PATH##"gfx/"
 #define SOUND_PATH DATA_PATH##"sfx/"
-#define SOUND_PATH DATA_PATH##"sfx/"
 #define LEVEL_PATH DATA_PATH##"level/"
 
 // good monospace font
-#define FONT_TYPE "Consolas.ttf"
+#define FONT_TYPE "OpenSans-Regular.ttf"
 #define FONT_FILE DATA_PATH FONT_TYPE
+
+#define DAMAGE_RATE 20
+#define SHOOT_DAMAGE_RATE 100
 
 // Code configuration.
 #define CAMERA_LIMIT 1

@@ -62,13 +62,13 @@ struct player // : public actor;
 	// how many collectables has he collected?
 	// TODO: Move into backpack struct.
 	Uint8 collect;
-	struct position* path;
 };
 
 // @anim_name: which animation table file to load?
 void player_init(struct player* player, char const* name, vec2 const spawn, char const* anim_name, SDL_Renderer* renderer);
 void player_destroy(struct player* player);
 
+void player_update(struct player* player);
 void player_draw(const struct player* player, SDL_Renderer* renderer);
 void player_move(struct player* player, const vec2* delta);
 void player_jump(struct player* player, float speed);
@@ -92,7 +92,7 @@ struct enemy
 {
 	struct actor actor;
 	vec2 start, goal;
-	struct position* path, *current;
+	struct waypoint* path, *current;
 	bool is_spawned;
 
 	struct enemy* next;

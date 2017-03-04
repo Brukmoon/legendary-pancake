@@ -174,8 +174,8 @@ void render_play(SDL_Renderer *renderer)
 #endif // SHOW_CONSOLE
 	// draw all objects, e.g. missiles, static objects etc.
 	object_draw(renderer);
-	enemy_draw_all(renderer);
 	player_draw(&g_player, renderer);
+	enemy_draw_all(renderer);
 	draw_player_info(&g_player, renderer);
 	// draw cursor if you can shoot
 	if(player_can_shoot(&g_player))
@@ -266,7 +266,7 @@ static void draw_path(SDL_Renderer* const renderer)
 	struct enemy* enemy_current = g_enemies;
 	while (enemy_current)
 	{
-		struct position* current = enemy_current->path;
+		struct waypoint* current = enemy_current->path;
 		while (current)
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);

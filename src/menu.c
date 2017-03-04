@@ -43,11 +43,9 @@ void menu_create(struct menu **menu, const enum menu_flags flags)
 void main_menu_load(SDL_Renderer* renderer)
 {
 	menu_create(&g_menu, MENU_BUTTON);
-	
-	INFO("Menu memory allocated.");
-	button_add(renderer, M_MENU_PLAY, (const vec2) { CENTER_X-20, CENTER_Y });
-	button_add(renderer, M_MENU_EDIT, (const vec2) { CENTER_X-30, CENTER_Y+BUTTON_FONT_SIZE});
-	button_add(renderer, M_MENU_QUIT, (const vec2) { CENTER_X-20, CENTER_Y+2*BUTTON_FONT_SIZE});
+	button_add(renderer, M_MENU_PLAY, BUTTON_FONT_SIZE, (const vec2) { CENTER_X-20, CENTER_Y });
+	button_add(renderer, M_MENU_EDIT, BUTTON_FONT_SIZE, (const vec2) { CENTER_X-37, CENTER_Y+BUTTON_FONT_SIZE});
+	button_add(renderer, M_MENU_QUIT, BUTTON_FONT_SIZE, (const vec2) { CENTER_X-20, CENTER_Y+2*BUTTON_FONT_SIZE});
 	g_menu->button_list->current = g_menu->button_list->root;
 	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
 	g_menu->background = load_texture(renderer, IMG_PATH"background1.png");
@@ -56,11 +54,9 @@ void main_menu_load(SDL_Renderer* renderer)
 void preedit_menu_load(SDL_Renderer* renderer)
 {
 	menu_create(&g_menu, MENU_ALL);
-
-	INFO("Menu memory allocated.");
 	text_box_add((const SDL_Rect) { CENTER_X - 65, CENTER_Y, 130, BUTTON_FONT_SIZE + 10}, 10);
-	button_add(renderer, E_MENU_OK, (const vec2) { CENTER_X - 58, CENTER_Y + BUTTON_FONT_SIZE + 15 });
-	button_add(renderer, E_MENU_CANCEL, (const vec2) { CENTER_X, CENTER_Y + BUTTON_FONT_SIZE + 15 });
+	button_add(renderer, E_MENU_OK, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 2*BUTTON_FONT_SIZE - 10, CENTER_Y + BUTTON_FONT_SIZE + 10 });
+	button_add(renderer, E_MENU_CANCEL, BUTTON_FONT_SIZE,(const vec2) { CENTER_X, CENTER_Y + BUTTON_FONT_SIZE + 10 });
 	g_menu->button_list->current = g_menu->button_list->root;
 	g_menu->text_box_list->current = g_menu->text_box_list->root;
 	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
@@ -70,8 +66,9 @@ void preedit_menu_load(SDL_Renderer* renderer)
 void preplay_menu_load(SDL_Renderer* renderer)
 {
 	menu_create(&g_menu, MENU_BUTTON);
-	button_add(renderer, E_MENU_OK, (const vec2) { CENTER_X - 58, CENTER_Y + BUTTON_FONT_SIZE + 15 });
-	button_add(renderer, E_MENU_CANCEL, (const vec2) { CENTER_X, CENTER_Y + BUTTON_FONT_SIZE + 15 });
+	button_add(renderer, P_MENU_LEVEL1, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 10, CENTER_Y });
+	button_add(renderer, P_MENU_LEVEL2, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 10, CENTER_Y + BUTTON_FONT_SIZE});
+	button_add(renderer, E_MENU_CANCEL, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 8, CENTER_Y + 2*BUTTON_FONT_SIZE });
 	g_menu->button_list->current = g_menu->button_list->root;
 	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
 	g_menu->background = load_texture(renderer, IMG_PATH"background1.png");
@@ -113,7 +110,7 @@ void menu_destroy(void)
 	INFO("Menu destroyed.");
 }
 
-void button_add(SDL_Renderer* renderer, const char* text, const vec2 position)
+void button_add(SDL_Renderer* renderer, const char* text, size_t const font_size, const vec2 position)
 {
 	if (!g_menu)
 	{
@@ -130,7 +127,7 @@ void button_add(SDL_Renderer* renderer, const char* text, const vec2 position)
 			return;
 		}
 	}
-	struct button *new_button = button_create(renderer, g_menu->button_list->head, text, position);
+	struct button *new_button = button_create(renderer, g_menu->button_list->head, text, font_size, position);
 	g_menu->button_list->head = new_button;
 	if (!g_menu->button_list->root)
 		g_menu->button_list->root = new_button;
@@ -186,7 +183,7 @@ void menu_draw(struct menu *menu, SDL_Renderer* renderer)
 		{
 			hollow_rect(renderer, iterator->r.x, iterator->r.y, iterator->r.w, iterator->r.h, (SDL_Color){ 0, 0, 0, 1 });
 			if(SDL_strlen(iterator->text) > 0)
-				draw_text(iterator->text, 25, (SDL_Color) { 0, 0, 0, 1 }, (vec2) { iterator->r.x, iterator->r.y+8 }, renderer);
+				draw_text(iterator->text, BUTTON_FONT_SIZE, (SDL_Color) { 0, 0, 0, 1 }, (vec2) { iterator->r.x, iterator->r.y }, renderer);
 			iterator = iterator->next;
 		}
 	}

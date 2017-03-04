@@ -92,13 +92,6 @@ bool process_input_play(struct game* game)
 				case SDLK_RETURN:
 					game_pause(game);
 					break;
-				case SDLK_j:
-				{
-					path_destroy(&g_player.path);
-					path_find((vec2) { 25, 0 }, (vec2) { (int)g_player.actor.skeleton.x / g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height }, &g_player.path);
-					
-				}
-					break;
 				default:
 					break;
 				}
@@ -252,10 +245,19 @@ bool process_input_preplay(struct game* game)
 			{
 				INFO("Clicked button %s.", g_menu->button_list->current->text);
 				sound_play("accept");
-				if (SDL_strcmp(E_MENU_OK, g_menu->button_list->current->text) == 0)
+				if (SDL_strcmp(P_MENU_LEVEL1, g_menu->button_list->current->text) == 0)
 				{
 					// BEWARE: Possible error here. Can text get freed before the state exits?
-					if (!game_state_change(game, game_state_play("level1")))
+					if (!game_state_change(game, game_state_play(P_MENU_LEVEL1)))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+				}
+				else if (SDL_strcmp(P_MENU_LEVEL2, g_menu->button_list->current->text) == 0)
+				{
+					// BEWARE: Possible error here. Can text get freed before the state exits?
+					if (!game_state_change(game, game_state_play(P_MENU_LEVEL2)))
 					{
 						INFO("Not loaded!");
 						game_state_exit(game);
@@ -460,24 +462,10 @@ void update_play(struct game* game)
 {
 	if (!game->paused)
 	{
-		path_destroy(&g_player.path);
-		path_find(calc_mouse_pos_map(), (vec2) { (int)g_player.actor.skeleton.x / g_level->tile_map.tile_width, (int)g_player.actor.skeleton.y / g_level->tile_map.tile_height }, &g_player.path);
-		// Update player.
-		if ((g_player.actor.velocity.y + (float)GRAVITY) <= T_VEL) // Player can't exceed terminal velocity.
-			g_player.actor.velocity.y += (float)GRAVITY;
-		else
-			player_set_vel_y(&g_player, T_VEL);
-		// Move him.
-		vec2 delta = {
-			(coord)g_player.actor.velocity.x,
-			(coord)g_player.actor.velocity.y
-		};
-		player_move(&g_player, &delta);
-		if (player_can_climb(&g_player))
-			player_climb(&g_player);
+		player_update(&g_player);
 		update_player_double_jump(&g_player);
 		update_player_draw_state(&g_player);
-		object_update_all();
+		object_update_all(game->screen.renderer);
 		enemy_update_all();
 		// Update camera.
 		camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });

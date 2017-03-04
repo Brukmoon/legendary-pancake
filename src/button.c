@@ -2,7 +2,7 @@
 #include "button.h"
 #include "text.h"
 
-struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, const vec2 position)
+struct button* button_create(SDL_Renderer* renderer, struct button* parent, const char* text, size_t const font_size, const vec2 position)
 {
 	struct button* butt = malloc(sizeof(struct button));
 	if (!butt)
@@ -16,9 +16,8 @@ struct button* button_create(SDL_Renderer* renderer, struct button* parent, cons
 		ERROR("Not enough memory!");
 		return NULL;
 	}
-
-	butt->texture[BUTTON_SPRITE_INACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 0, 0, 0 });
-	butt->texture[BUTTON_SPRITE_ACTIVE] = create_text_texture(renderer, text, 25, (SDL_Color) { 255, 0, 0 });
+	butt->texture[BUTTON_SPRITE_INACTIVE] = create_text_texture(renderer, text, font_size, (SDL_Color) { 25, 25, 25 });
+	butt->texture[BUTTON_SPRITE_ACTIVE] = create_text_texture(renderer, text, font_size, (SDL_Color) { 255, 0, 0 });
 	butt->position = position;
 	size_t str_len = SDL_strlen(text) + 1;
 	butt->text = malloc(str_len);

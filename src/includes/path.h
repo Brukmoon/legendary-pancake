@@ -4,15 +4,15 @@
 #include "vector.h"
 
 // path ll
-struct position
+struct waypoint
 {
-	struct position* next;
-	struct position* prev;
+	struct waypoint* next;
+	struct waypoint* prev;
 	vec2 pos;
 };
 
-void path_find(vec2 start, vec2 goal, struct position** path);
+void path_find(vec2 start, vec2 goal, struct waypoint** path);
 // mem cleanup
-void path_destroy(struct position** path);
+void path_destroy(struct waypoint** path);
 
 #endif // PATH_H

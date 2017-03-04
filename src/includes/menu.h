@@ -13,6 +13,9 @@
 #define E_MENU_OK "OK"
 #define E_MENU_CANCEL "BACK"
 
+#define P_MENU_LEVEL1 "level1"
+#define P_MENU_LEVEL2 "demo"
+
 struct button_list
 {
 	struct button *root;
@@ -54,7 +57,7 @@ struct menu_level_list
 	struct menu_level *head, *tail;
 };
 
-void button_add(SDL_Renderer* renderer, const char* text, const vec2 position);
+void button_add(SDL_Renderer* renderer, const char* text, size_t const font_size, const vec2 position);
 void text_box_add(const SDL_Rect skeleton, int max_length);
 void main_menu_load(SDL_Renderer* renderer);
 void preedit_menu_load(SDL_Renderer* renderer);
