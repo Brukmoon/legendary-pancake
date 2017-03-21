@@ -75,8 +75,11 @@ struct game_state *game_state_edit(char* level_name);
 struct game_state *game_state_preedit(void);
 struct game_state *game_state_preplay(void);
 
+// add a new state to the stack and set it as current
 bool game_state_change(struct game *game, struct game_state *new_state);
+// exit current state
 void game_state_exit(struct game *game);
+// empty the state stack
 void game_state_reset(struct game *game);
 
 // Texture type currently selected. Needed by both the event handler and renderer.

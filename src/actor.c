@@ -10,7 +10,7 @@
 
 #define PLAYER_PATH IMG_PATH"player.png"
 // How fast does a player climb a ladder.
-#define PLAYER_CLIMB_SPEED 5
+#define PLAYER_CLIMB_SPEED 6
 #define ACTOR_STANDARD_SPEED 4.f
 #define ACTOR_DEFAULT_HP 100
 #define ACTOR_DEFAULT_X 0
@@ -19,6 +19,7 @@
 #define FALLDAMAGE_TRESHHOLD 10
 
 struct player g_player;
+// enemy linked list
 struct enemy* g_enemies = NULL;
 
 // Initialize the actor object.
@@ -32,6 +33,7 @@ static void actor_move(struct actor* actor, vec2 const* delta);
 // Subtract damage points from actor's HPs.
 static void actor_draw(struct actor const* actor, int draw_size_delta, SDL_Renderer* renderer);
 static bool actor_can_shoot(struct actor const* actor);
+// is on ladder tile?
 static bool actor_can_climb(struct actor const* actor);
 // subtract damage points from actor hitpoints
 static void actor_damage(struct actor* actor, Uint16 const damage);
@@ -77,20 +79,22 @@ void actor_destroy(struct actor *actor)
 	animation_table_destroy(&actor->anim);
 }
 
-// NYI
 void actor_draw(const struct actor *actor, int draw_size_delta, SDL_Renderer *renderer)
 {
-	SDL_Rect dest;
-	dest.w = dest.h = 32 + draw_size_delta; // Draw a bit larger.
-	dest.x = actor->skeleton.x - g_camera.position.x;
-	dest.y = actor->skeleton.y - g_camera.position.y;
-	SDL_Rect* src = NULL;
-	SDL_Texture* t = NULL;
-	t = sprite_get(actor->anim.curr->curr->sprite_name, &src);
-	if (actor->velocity.x < 0) // Moving left.
-		SDL_RenderCopyEx(renderer, t, src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
-	else
-		SDL_RenderCopy(renderer, t, src, &dest);
+	if (actor->is_visible)
+	{
+		SDL_Rect dest;
+		dest.w = dest.h = 32 + draw_size_delta; // Draw a bit larger.
+		dest.x = actor->skeleton.x - g_camera.position.x;
+		dest.y = actor->skeleton.y - g_camera.position.y;
+		SDL_Rect* src = NULL;
+		SDL_Texture* t = NULL;
+		t = sprite_get(actor->anim.curr->curr->sprite_name, &src);
+		if (actor->velocity.x < 0) // Moving left.
+			SDL_RenderCopyEx(renderer, t, src, &dest, 0, 0, SDL_FLIP_HORIZONTAL);
+		else
+			SDL_RenderCopy(renderer, t, src, &dest);
+	}
 }
 
 void actor_move(struct actor *actor, const vec2* delta)
@@ -101,6 +105,7 @@ void actor_move(struct actor *actor, const vec2* delta)
 	// Handle each axis collision separately.
 	if (delta->x != 0) // check x axis collision
 	{
+		// no collision, move normally
 		if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION)) // No collision, simple case.
 		{
 			actor->skeleton.x += delta->x;
@@ -120,10 +125,9 @@ void actor_move(struct actor *actor, const vec2* delta)
 				if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 					break; // stop stepping
 			}
+			// collision, but no change
 			if (actor->skeleton.x == actor_after.x)
-			{
 				animation_set("move_blocked", &actor->anim);
-			}
 			else
 			{
 				actor->skeleton.x = actor_after.x;
@@ -207,7 +211,7 @@ static void actor_jump(struct actor* actor, float speed)
 	}
 }
 
-static void actor_gravity(struct actor* actor)
+void actor_gravity(struct actor* actor)
 {
 	if ((actor->velocity.y + (float)GRAVITY) <= T_VEL)
 		actor->velocity.y += (float)GRAVITY;
@@ -229,10 +233,12 @@ void player_destroy(struct player *player)
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)
 {
-	if (player->actor.is_visible)
-	{
-		actor_draw(&player->actor, 2, renderer);
-	}
+	actor_draw(&player->actor, 2, renderer);
+}
+
+void player_gravity(struct player* player)
+{
+	actor_gravity(&player->actor);
 }
 
 void player_move(struct player *player, const vec2 *delta)
@@ -258,19 +264,6 @@ void player_jump(struct player *player, float speed)
 void player_spawn(struct player *player)
 {
 	actor_spawn(&player->actor);
-}
-
-void player_update(struct player* player)
-{
-	actor_gravity(&player->actor);
-	// Move him.
-	vec2 delta = {
-		(coord)g_player.actor.velocity.x,
-		(coord)g_player.actor.velocity.y
-	};
-	player_move(player, &delta);
-	if (player_can_climb(player))
-		player_climb(player);
 }
 
 bool player_can_climb(const struct player *player)
@@ -419,7 +412,11 @@ void enemy_update_all(void)
 		// check if dead
 		// TODO: Add dead texture -> should be an object.
 		if (iter->actor.hitpoints <= 0)
+		{
 			iter->is_spawned = false; // despawn
+			iter = iter->next;
+			continue;
+		}
 		// check collision with player
 		if (rects_collide(&g_player.actor.skeleton, &iter->actor.skeleton))
 		{
@@ -433,24 +430,31 @@ void enemy_update_all(void)
 		vec2 enemy_pos = { 0, 0 }, enemy_pos_real = { 0, 0 };
 		// should jump
 		bool jump = false;
-		if (iter->current) // there is a path
-		{
-			enemy_pos_real.x = iter->actor.skeleton.x;
-			enemy_pos_real.y = iter->actor.skeleton.y;
-			enemy_pos = real_to_map(iter->actor.skeleton.x, iter->actor.skeleton.y);
+		enemy_pos_real.x = iter->actor.skeleton.x;
+		enemy_pos_real.y = iter->actor.skeleton.y;
+		enemy_pos = real_to_map(iter->actor.skeleton.x, iter->actor.skeleton.y);
+		if (iter->path) // there is a path
+		{	
 			// there was a previous waypoint and it was to the right
 			if (iter->current->prev && iter->current->prev->pos.x > iter->current->pos.x)
 				enemy_pos.x++;
 			if (iter->current->prev && iter->current->prev->pos.y > iter->current->pos.y)
 				enemy_pos.y++;
 			vec2 start_real = vec2_scale(&iter->start, g_level->tile_map.tile_width);
-			// we found the end point
+			// we reached the end point
 			if (vec2_similar(&enemy_pos_real, &start_real, 2))
 			{
 				vec2_swap(&iter->start, &iter->goal);
 				path_destroy(&iter->path);
+				iter->current = NULL;
+				// attempt to find a path
 				path_find(iter->start, iter->goal, &iter->path);
 				iter->current = iter->path;
+				if (!iter->current)
+				{
+					INFO("Path not found.");
+					break;
+				}
 			}
 			vec2 waypoint_real = vec2_scale(&iter->current->pos, g_level->tile_map.tile_width);
 			if (vec2_similar(&waypoint_real, &enemy_pos_real, 3))
@@ -479,6 +483,13 @@ void enemy_update_all(void)
 				else
 					iter->actor.velocity.x = 0;
 			}
+		}
+		else
+		{
+			// blocking path, swap and find way back
+			vec2_swap(&iter->start, &iter->goal);
+			path_find(enemy_pos, iter->goal, &iter->path);
+			iter->current = iter->path;
 		}
 		if (jump)
 			actor_jump(&iter->actor, 4.5f);

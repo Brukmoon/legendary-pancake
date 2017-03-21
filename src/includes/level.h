@@ -24,6 +24,9 @@ extern struct level
 	unsigned id;
 	// Name of the level.
 	char name[LEVEL_NAME_LENGTH];
+	char next[LEVEL_NAME_LENGTH];
+	// goal position
+	vec2 goal;
 	struct tile_map tile_map;
 	// Map tileset.
 	SDL_Texture *tileset;

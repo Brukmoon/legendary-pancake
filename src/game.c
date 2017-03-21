@@ -11,6 +11,7 @@
 #include "level.h"
 #include "sound.h"
 #include "sprite.h"
+#include "timer.h"
 #include "menu.h"
 
 // Outputs SDL version info.
@@ -66,6 +67,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 						SDL_ShowCursor(0);
 						INFO("> Game initialization sequence finished.\n");
 						game_state_change(game, game_state_main_menu());
+						timer_reset(&g_timer);
 						return true;
 					}
 				}
@@ -186,17 +188,24 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 	{
 		if (!level_load(level_name, renderer))
 			return false;
+		size_t music_name_length = SDL_strlen(level_name) + SDL_strlen("_music") + 1;
+		char *music_name = malloc(music_name_length);
+		SDL_strlcpy(music_name, g_level->name, music_name_length);
+		SDL_strlcat(music_name, "_music", music_name_length);
 		// set callbacks to play state callbacks
-		music_add("music", ".ogg");
+		music_add(music_name, ".ogg");
+		music_play(music_name, 6000);
+		free(music_name);
 		sound_add("jump", ".wav");
+		sound_add("win", ".wav");
 		sound_add("death", ".wav");
 		sound_add("fall", ".wav");
 		sound_add("shoot", ".wav");
 		sound_add("pick", ".wav");
-		music_play("music", 6000);
 		texture_add("assets/gfx/arrow.png", renderer);
 		sprite_add("arrow", "assets/gfx/arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
 	}
+	SDL_ShowCursor(false);
 	camera_init(&g_camera, CAMERA_FIXED);
 	player_spawn(&g_player);
 	INFO("> Play started.");

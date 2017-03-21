@@ -5,13 +5,13 @@
 void timer_reset(struct timer *t)
 {
 	t->paused = false;
-	t->start_ticks = SDL_GetTicks();
-	t->ticks = 0;
+	t->last_tick_time = SDL_GetTicks();
+	t->delta = 0;
 }
 
 int timer_ticks(struct timer *t)
 {
 	if (!t->paused)
-		t->ticks = SDL_GetTicks() - t->start_ticks;
-	return t->ticks;
+		t->delta = SDL_GetTicks() - t->last_tick_time;
+	return t->delta;
 }

@@ -33,7 +33,7 @@ void fonts_destroy(void);
  * BEWARE: There is no GC mechanism included. Remember to SDL_DestroyTexture!
  */
 SDL_Texture* create_text_texture(SDL_Renderer* renderer, const char* text, int size, SDL_Color color);
-// Draws text, then deletes the texture. Very heavy, use with caution (in Debug only).
+// Draws text, then deletes the texture.
 void draw_text(const char *text, int font_size, const SDL_Color color, vec2 destination, SDL_Renderer *renderer);
 
 #endif // TEXT_H

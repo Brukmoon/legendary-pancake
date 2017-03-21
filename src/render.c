@@ -216,6 +216,11 @@ void render_edit(SDL_Renderer *renderer)
 		(SDL_Color) {
 		0, 0, 255, 0
 	});
+	// goal
+	hollow_rect(renderer, g_level->goal.x - g_camera.position.x, g_level->goal.y - g_camera.position.y, g_player.actor.skeleton.w, g_player.actor.skeleton.h,
+		(SDL_Color) {
+		255, 255, 0, 0
+	});
 
 	SDL_RenderPresent(renderer);
 }
@@ -263,19 +268,25 @@ static void draw_dyn_map_background(SDL_Renderer* const renderer)
 
 static void draw_path(SDL_Renderer* const renderer)
 {
+#ifdef _DEBUG
 	struct enemy* enemy_current = g_enemies;
 	while (enemy_current)
 	{
 		struct waypoint* current = enemy_current->path;
-		while (current)
+		// is there a path?
+		if (enemy_current->current)
 		{
-			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
-			vec2 waypoint_pos = { current->pos.x * 32, current->pos.y * 32 };
-			if(is_visible(&g_camera, &waypoint_pos, g_level->tile_map.tile_width, g_level->tile_map.tile_height))
-				hollow_rect(renderer, waypoint_pos.x - g_camera.position.x, waypoint_pos.y - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
-			current = current->next;
+			while (current)
+			{
+				SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
+				vec2 waypoint_pos = { current->pos.x * 32, current->pos.y * 32 };
+				if (is_visible(&g_camera, &waypoint_pos, g_level->tile_map.tile_width, g_level->tile_map.tile_height))
+					hollow_rect(renderer, waypoint_pos.x - g_camera.position.x, waypoint_pos.y - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
+				current = current->next;
+			}
+			hollow_rect(renderer, enemy_current->current->pos.x * 32 - g_camera.position.x, enemy_current->current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 0, 0, 0 });
 		}
-		hollow_rect(renderer, enemy_current->current->pos.x * 32 - g_camera.position.x, enemy_current->current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 0, 0, 0 });
 		enemy_current = enemy_current->next;
 	}
+#endif // _DEBUG
 }

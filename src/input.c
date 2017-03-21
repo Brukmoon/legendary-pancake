@@ -83,6 +83,20 @@ bool process_input_play(struct game* game)
 				case SDLK_w:
 					g_player.climb[1] = true;
 					break;
+					// DEBUG - next level
+				case SDLK_n:
+				{
+					char* name = malloc(SDL_strlen(g_level->next) + 1);
+					SDL_strlcpy(name, g_level->next, SDL_strlen(g_level->next) + 1);
+					game_state_exit(game);
+					if (!game_state_change(game, game_state_play(name)))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+					free(name);
+				}
+					break;
 				/*case SDLK_e:
 					game_state_change(game, game_state_edit(NULL));
 					break;*/
@@ -330,7 +344,7 @@ bool process_input_edit(struct game* game)
 				player_set_vel_y(&g_player, 1);
 				break;
 			case SDLK_p:
-				game_state_change(game, game_state_play("level0"));
+				game_state_change(game, game_state_play(g_level->name));
 				break;
 			case SDLK_s:
 				level_save();
@@ -352,6 +366,15 @@ bool process_input_edit(struct game* game)
 				player_set_spawn(&g_player, position);
 			}
 				break;
+			case SDLK_c:
+			{
+				// Set the destination point
+				vec2 position = { 0, 0 };
+				SDL_GetMouseState(&position.x, &position.y);
+				g_level->goal.x = position.x + g_camera.position.x - g_player.actor.skeleton.w / 2;
+				g_level->goal.y = position.y + g_camera.position.y - g_player.actor.skeleton.h / 2;
+			}
+			break;
 			case SDLK_2:
 			case SDLK_KP_2:
 				tile_map_resize(&g_level->tile_map, RESIZE_HEIGHT, 1);
@@ -430,6 +453,25 @@ bool process_input_edit(struct game* game)
 	return true;
 }
 
+static void update_player(struct player* player, struct game* game)
+{
+	player_gravity(player);
+	// Move him.
+	vec2 delta = {
+		(coord)g_player.actor.velocity.x,
+		(coord)g_player.actor.velocity.y
+	};
+	player_move(player, &delta);
+	if (player_can_climb(player))
+		player_climb(player);
+	if (g_player.actor.hitpoints <= 0)
+	{
+		INFO("YOU DIED!");
+		sound_play("death");
+		game_state_exit(game);
+	}
+}
+
 static void update_player_double_jump(struct player *player)
 {
 	/*
@@ -453,6 +495,25 @@ static void update_player_draw_state(struct player *player)
 	}
 }
 
+// check if the goal has been reached by the player, if so, next level
+static void goal_update(struct game* game)
+{
+	vec2 player_pos = real_to_map(g_player.actor.skeleton.x, g_player.actor.skeleton.y), goal_pos = real_to_map(g_level->goal.x, g_level->goal.y);
+	if (vec2_equal(&player_pos, &goal_pos))
+	{
+		sound_play("win");
+		char* name = malloc(SDL_strlen(g_level->next) + 1);
+		SDL_strlcpy(name, g_level->next, SDL_strlen(g_level->next) + 1);
+		game_state_exit(game);
+		if (!game_state_change(game, game_state_play(name)))
+		{
+			INFO("Not loaded!");
+			game_state_exit(game);
+		}
+		free(name);
+	}
+}
+
 void update_menu(struct game* game)
 {
 	UNUSED_PARAMETER(game);
@@ -462,19 +523,14 @@ void update_play(struct game* game)
 {
 	if (!game->paused)
 	{
-		player_update(&g_player);
-		update_player_double_jump(&g_player);
-		update_player_draw_state(&g_player);
-		object_update_all(game->screen.renderer);
-		enemy_update_all();
 		// Update camera.
 		camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
-		if (g_player.actor.hitpoints == 0)
-		{
-			INFO("YOU DIED!");
-			sound_play("death");
-			game_state_exit(game);
-		}
+		object_update_all(game->screen.renderer);
+		enemy_update_all();
+		goal_update(game);
+		update_player_draw_state(&g_player);
+		update_player(&g_player, game);
+		update_player_double_jump(&g_player);
 	}
 }
 

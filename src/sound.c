@@ -83,11 +83,12 @@ void music_add(const char *name, const char* type)
 	// Copy name to the new bucket.
 	strcpy_s(new_bucket->key, str_len, name);
 	// Create buffer, put path to data folder inside.
-	char name_buffer[MUSIC_FILE_NAME_LENGTH];
-	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, SOUND_PATH);
+	size_t name_buffer_length = SDL_strlen(SOUND_PATH) + SDL_strlen(name) + SDL_strlen(type) + 1;
+	char *name_buffer = malloc(name_buffer_length);
+	strcpy_s(name_buffer, name_buffer_length, SOUND_PATH);
 	// Append file name and type.
-	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, name);
-	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, type);
+	strcat_s(name_buffer, name_buffer_length, name);
+	strcat_s(name_buffer, name_buffer_length, type);
 	// Load music.
 	new_bucket->music = Mix_LoadMUS(name_buffer);
 	struct music_bucket* iter = music_container.music[index], *prev = NULL;
@@ -103,6 +104,7 @@ void music_add(const char *name, const char* type)
 	else
 		prev->next = new_bucket;
 	INFO("Music %s (%s) loaded to index %d.", name, name_buffer, index);
+	free(name_buffer);
 #else
 	UNUSED_PARAMETER(type);
 	UNUSED_PARAMETER(name);
@@ -144,11 +146,12 @@ void sound_add(const char* name, const char* type)
 	// Copy name to the new bucket.
 	strcpy_s(new_bucket->key, str_len, name);
 	// Create buffer, put name inside.
-	char name_buffer[MUSIC_FILE_NAME_LENGTH];
-	strcpy_s(name_buffer, MUSIC_FILE_NAME_LENGTH, SOUND_PATH);
-	// Append file name and file type.
-	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, name);
-	strcat_s(name_buffer, MUSIC_FILE_NAME_LENGTH, type);
+	size_t name_buffer_length = SDL_strlen(SOUND_PATH) + SDL_strlen(name) + SDL_strlen(type) + 1;
+	char *name_buffer = malloc(name_buffer_length);
+	strcpy_s(name_buffer, name_buffer_length, SOUND_PATH);
+	// Append file name and type.
+	strcat_s(name_buffer, name_buffer_length, name);
+	strcat_s(name_buffer, name_buffer_length, type);
 	// Load music.
 	new_bucket->sound = Mix_LoadWAV(name_buffer);
 	if (!new_bucket->sound)
@@ -170,6 +173,7 @@ void sound_add(const char* name, const char* type)
 	else
 		prev->next = new_bucket;
 	INFO("Sound %s (%s) loaded to index %d.", name, name_buffer, index);
+	free(name_buffer);
 #else
 	UNUSED_PARAMETER(name);
 	UNUSED_PARAMETER(type);
@@ -179,8 +183,10 @@ void sound_add(const char* name, const char* type)
 void music_play(const char *name, int fadein_ms)
 {
 #if MUSIC_ON
-	static int curr_hash = -1;
-	int new_hash = hash_s(name);
+	// which music is currently playing?
+	static unsigned long curr_hash = -1; // -1, make it overflow
+	unsigned long new_hash = hash_s(name);
+	// not already playing?
 	if (new_hash != curr_hash)
 	{
 		curr_hash = new_hash;

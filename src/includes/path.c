@@ -60,7 +60,7 @@ static void bubble_up(struct open_set* h, int position, struct pf_node_l const *
 // heuristic distance between two nodes
 static int estimate_distance(vec2 const* start, vec2 const* goal);
 // reconstruct the path
-static void reconstruct_path(node const* current, struct pf_node_l const** node_grid, struct waypoint** path);
+static void reconstruct_path(node* current, struct pf_node_l const** node_grid, struct waypoint** path);
 
 static void node_swap(node* const one, node* const two)
 {
@@ -167,7 +167,7 @@ static node open_set_pop(struct open_set *h, struct pf_node_l **node_grid)
 	return ret;
 }
 
-void path_find(vec2 start, vec2 goal, struct position** path)
+void path_find(vec2 start, vec2 goal, struct waypoint** path)
 {
 	// TODO: Perhaps move the grid to global scope and perform a heap cleanup via a stack.
 	// allocate array of pointers
@@ -362,7 +362,7 @@ static int estimate_distance(vec2 const* start, vec2 const* goal)
 	return abs(start->x - goal->x) + abs(start->y - goal->y);
 }
 
-static void reconstruct_path(const node* current, struct pf_node_l const** node_grid, struct waypoint** path)
+static void reconstruct_path(node* current, struct pf_node_l const** node_grid, struct waypoint** path)
 {
 	//INFO("cost: %d", node_grid[current->y][current->x].z[current->z].g_score);
 	// root

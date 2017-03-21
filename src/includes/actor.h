@@ -68,8 +68,8 @@ struct player // : public actor;
 void player_init(struct player* player, char const* name, vec2 const spawn, char const* anim_name, SDL_Renderer* renderer);
 void player_destroy(struct player* player);
 
-void player_update(struct player* player);
 void player_draw(const struct player* player, SDL_Renderer* renderer);
+void player_gravity(struct player* player);
 void player_move(struct player* player, const vec2* delta);
 void player_jump(struct player* player, float speed);
 // place the player at spawn position and spawn him

@@ -5,10 +5,10 @@
 
 struct timer
 {
-	int start_ticks;
-	int ticks;
+	int last_tick_time;
+	int delta;
 	bool paused;
-};
+} g_timer;
 
 inline void timer_pause(struct timer *t) { t->paused = !t->paused; }
 void timer_reset(struct timer *t);

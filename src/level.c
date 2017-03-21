@@ -71,6 +71,12 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				sscanf_s(buffer, "%*s%s", level->name, LEVEL_NAME_LENGTH);
 				INFO("name! %s", level->name);
 			}
+			else if (SDL_strcmp(command, "GOAL") == 0)
+			{
+				// Name of the level.
+				sscanf_s(buffer, "%*s%d%d%s", &level->goal.x, &level->goal.y, level->next, LEVEL_NAME_LENGTH);
+				INFO("next! %s", level->next);
+			}
 			else if (SDL_strcmp(command, "MAP") == 0)
 			{
 				// Level width and height.
@@ -182,6 +188,7 @@ void level_init(struct level **level)
 		return;
 	}
 	(*level)->background = NULL;
+	(*level)->goal = (vec2){ 0, 0 };
 	(*level)->tileset = NULL;
 	for (int i = 0; i < TMAP_LAYER_COUNT; ++i)
 		(*level)->tile_map.map[i] = NULL;
@@ -277,6 +284,7 @@ bool level_save()
 	}
 	fprintf(f, "NAME %s\n", g_level->name);
 	fprintf(f, "TILE %d\n", g_level->tile_map.tile_width);
+	fprintf(f, "GOAL %d %d %s\n", g_level->goal.x, g_level->goal.y, g_level->next);
 	fprintf(f, "MAP %d %d\n", g_level->tile_map.width, g_level->tile_map.height);
 	for (int y = 0; y < g_level->tile_map.height; ++y)
 	{
@@ -288,7 +296,7 @@ bool level_save()
 	fprintf(f, "%s\n", "BACKGROUND assets/gfx/level1_background.png");
 	fprintf(f, "%s\n", "D_BACKGROUND assets/gfx/clouds.png");
 	fprintf(f, "%s %s %d %d\n", "PLAYER", g_player.actor.name, g_player.actor.spawn.x, g_player.actor.spawn.y);
-	object_write_to_file(f);
+	//object_write_to_file(f);
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);
 	return true;
