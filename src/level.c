@@ -122,7 +122,6 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				if (!g_level->d_background)
 				{
 					INFO("Dynamic background couldn't be loaded.");
-					g_level->d_background = NULL;
 					fclose(f);
 					return false;
 				}
@@ -188,7 +187,9 @@ void level_init(struct level **level)
 		return;
 	}
 	(*level)->background = NULL;
-	(*level)->goal = (vec2){ 0, 0 };
+	(*level)->d_background = NULL;
+	(*level)->goal = (vec2) { 0, 0 };
+	SDL_strlcpy((*level)->next, "", LEVEL_NAME_LENGTH);
 	(*level)->tileset = NULL;
 	for (int i = 0; i < TMAP_LAYER_COUNT; ++i)
 		(*level)->tile_map.map[i] = NULL;

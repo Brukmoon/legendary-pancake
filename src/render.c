@@ -251,19 +251,22 @@ static void draw_cursor(const char* name, SDL_Renderer *renderer)
 
 static void draw_dyn_map_background(SDL_Renderer* const renderer)
 {
-	// TODO: move static variable to level struct so it won't be alive the entire time
-	static float scrollingOffset = 0;
-	scrollingOffset -= 0.5f;
-	int w = 0, h = 0;
-	SDL_QueryTexture(g_level->d_background, NULL, NULL, &w, &h);
-	if ((int)scrollingOffset < -w)
+	if (g_level->d_background)
 	{
-		scrollingOffset = 0;
+		// TODO: move static variable to level struct so it won't be alive the entire time
+		static float scrollingOffset = 0;
+		scrollingOffset -= 0.5f;
+		int w = 0, h = 0;
+		SDL_QueryTexture(g_level->d_background, NULL, NULL, &w, &h);
+		if ((int)scrollingOffset < -w)
+		{
+			scrollingOffset = 0;
+		}
+		SDL_Rect dst_rect = { (int)scrollingOffset, 0, w, h };
+		SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
+		dst_rect.x = (int)scrollingOffset + w;
+		SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
 	}
-	SDL_Rect dst_rect = { (int)scrollingOffset, 0, w, h };
-	SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
-	dst_rect.x = (int)scrollingOffset + w;
-	SDL_RenderCopy(renderer, g_level->d_background, NULL, &dst_rect);
 }
 
 static void draw_path(SDL_Renderer* const renderer)

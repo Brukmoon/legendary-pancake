@@ -135,9 +135,9 @@ void actor_move(struct actor *actor, const vec2* delta)
 			}
 		}
 	}
-	actor_after.y += delta->y;
 	if (delta->y != 0) // check y axis collision
 	{
+		actor_after.y += delta->y;
 		if (!tilemap_collision(g_level, &actor_after, TILE_COLLISION))
 		{
 			// if not collide with ladder
@@ -174,11 +174,11 @@ void actor_move(struct actor *actor, const vec2* delta)
 			actor->skeleton.y = actor_after.y;
 		}
 	}
-	// Don't move legs when in air.
-	if(actor->state == AIR)
-		animation_set("move_blocked", &actor->anim);
 	if (delta->x == 0)
 		animation_set("stand", &actor->anim);
+	// Don't move legs when in air.
+	else if(actor->state == AIR)
+		animation_set("move_blocked", &actor->anim);
 }
 
 void actor_damage(struct actor *actor, Uint16 const damage)
@@ -320,7 +320,6 @@ void enemy_destroy(struct enemy* enemy)
 
 void enemy_draw(struct player const* enemy, SDL_Renderer* renderer)
 {
-	// TODO: Move into actor_draw.
 	if (enemy->actor.is_visible)
 	{
 		actor_draw(&enemy->actor, 0, renderer);
@@ -404,8 +403,9 @@ void enemy_update_all(void)
 	while (iter)
 	{
 		// not spawned
-		if (!iter->is_spawned) // go to next
+		if (!iter->is_spawned)
 		{
+			// process the next one
 			iter = iter->next;
 			continue;
 		}
@@ -420,7 +420,7 @@ void enemy_update_all(void)
 		// check collision with player
 		if (rects_collide(&g_player.actor.skeleton, &iter->actor.skeleton))
 		{
-			player_damage(&g_player, 2);
+			player_damage(&g_player, (const Uint16)(DAMAGE_RATE*0.1));
 			// skip move
 			iter = iter->next;
 			continue;
@@ -453,7 +453,8 @@ void enemy_update_all(void)
 				if (!iter->current)
 				{
 					INFO("Path not found.");
-					break;
+					iter = iter->next;
+					continue;
 				}
 			}
 			vec2 waypoint_real = vec2_scale(&iter->current->pos, g_level->tile_map.tile_width);
@@ -486,11 +487,14 @@ void enemy_update_all(void)
 		}
 		else
 		{
+			//iter->start = enemy_pos;
 			// blocking path, swap and find way back
 			vec2_swap(&iter->start, &iter->goal);
+			//path_find(iter->start, iter->goal, &iter->path);
 			path_find(enemy_pos, iter->goal, &iter->path);
 			iter->current = iter->path;
 		}
+	
 		if (jump)
 			actor_jump(&iter->actor, 4.5f);
 		vec2 move_delta = { (coord) iter->actor.velocity.x, (coord) iter->actor.velocity.y };
@@ -514,6 +518,11 @@ void enemy_update_all(void)
 void enemy_spawn(struct enemy* enemy)
 {
 	path_find(enemy->start, enemy->goal, &enemy->path);
+	if (!enemy->path)
+	{
+		INFO("Path not found! Retrying.");
+		path_find(enemy->start, enemy->goal, &enemy->path);
+	}
 	enemy->current = enemy->path;
 	enemy->is_spawned = true;
 }

@@ -3,6 +3,7 @@
 #include "actor.h"
 #include "game.h"
 #include "camera.h"
+#include "collision.h"
 #include "common.h"
 #include "level.h"
 #include "menu.h"
@@ -498,19 +499,31 @@ static void update_player_draw_state(struct player *player)
 // check if the goal has been reached by the player, if so, next level
 static void goal_update(struct game* game)
 {
-	vec2 player_pos = real_to_map(g_player.actor.skeleton.x, g_player.actor.skeleton.y), goal_pos = real_to_map(g_level->goal.x, g_level->goal.y);
-	if (vec2_equal(&player_pos, &goal_pos))
+	if (g_level)
 	{
-		sound_play("win");
-		char* name = malloc(SDL_strlen(g_level->next) + 1);
-		SDL_strlcpy(name, g_level->next, SDL_strlen(g_level->next) + 1);
-		game_state_exit(game);
-		if (!game_state_change(game, game_state_play(name)))
+		SDL_Rect goal_skeleton = { g_level->goal.x, g_level->goal.y, g_level->tile_map.tile_width, g_level->tile_map.tile_height };
+		if (rects_collide(&g_player.actor.skeleton, &goal_skeleton))
 		{
-			INFO("Not loaded!");
-			game_state_exit(game);
+			ERROR("NEXT: %s", g_level->next);
+			sound_play("win");
+			// there is a next lvel
+			if (g_level->next[0] != '\0')
+			{
+				char* name = malloc(SDL_strlen(g_level->next) + 1);
+				SDL_strlcpy(name, g_level->next, SDL_strlen(g_level->next) + 1);
+				game_state_exit(game);
+				if (!game_state_change(game, game_state_play(name)))
+				{
+					INFO("Not loaded!");
+					game_state_exit(game);
+				}
+				free(name);
+			}
+			else
+			{
+				game_state_exit(game);
+			}
 		}
-		free(name);
 	}
 }
 
@@ -527,10 +540,10 @@ void update_play(struct game* game)
 		camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
 		object_update_all(game->screen.renderer);
 		enemy_update_all();
-		goal_update(game);
 		update_player_draw_state(&g_player);
 		update_player(&g_player, game);
 		update_player_double_jump(&g_player);
+		goal_update(game);
 	}
 }
 

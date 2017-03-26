@@ -192,7 +192,6 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		char *music_name = malloc(music_name_length);
 		SDL_strlcpy(music_name, g_level->name, music_name_length);
 		SDL_strlcat(music_name, "_music", music_name_length);
-		// set callbacks to play state callbacks
 		music_add(music_name, ".ogg");
 		music_play(music_name, 6000);
 		free(music_name);
@@ -202,8 +201,8 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		sound_add("fall", ".wav");
 		sound_add("shoot", ".wav");
 		sound_add("pick", ".wav");
-		texture_add("assets/gfx/arrow.png", renderer);
-		sprite_add("arrow", "assets/gfx/arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
+		texture_add(IMG_PATH"arrow.png", renderer);
+		sprite_add("arrow", IMG_PATH"arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
 	}
 	SDL_ShowCursor(false);
 	camera_init(&g_camera, CAMERA_FIXED);

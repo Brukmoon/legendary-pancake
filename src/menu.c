@@ -161,10 +161,10 @@ void text_box_add(const SDL_Rect skeleton, int max_length)
 
 void menu_draw(struct menu *menu, SDL_Renderer* renderer)
 {
-	if(menu->background)
+	if(menu->background) // there is a background
 		SDL_RenderCopy(renderer, menu->background, NULL, NULL);
 	SDL_Rect dest = { 0, 0, 0, 0 };
-	if (menu->button_list)
+	if (menu->button_list) // there are buttons
 	{
 		struct button* iterator = menu->button_list->root;
 		while (iterator)
@@ -176,7 +176,7 @@ void menu_draw(struct menu *menu, SDL_Renderer* renderer)
 			iterator = iterator->next;
 		}
 	}
-	if (menu->text_box_list)
+	if (menu->text_box_list) // there are text boxes
 	{
 		struct text_box *iterator = menu->text_box_list->root;
 		while (iterator)
@@ -209,6 +209,7 @@ void menu_prev_button(struct menu *menu)
 void menu_next_button(struct menu *menu)
 {
 	sound_play("select");
+	// is there next button on the list?
 	if (menu->button_list->current->next)
 	{
 		set_button_active(menu->button_list->current->next, true);
@@ -217,6 +218,7 @@ void menu_next_button(struct menu *menu)
 	}
 	else
 	{
+		// start from beginning
 		set_button_active(menu->button_list->root, true);
 		set_button_active(menu->button_list->current, false);
 		menu->button_list->current = menu->button_list->root;

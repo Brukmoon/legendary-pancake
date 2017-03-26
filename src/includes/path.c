@@ -417,7 +417,6 @@ void path_destroy(struct waypoint** path)
 		*path = (*path)->next;
 		free(temp);
 	}
-	*path = NULL;
 }
 
 // linear search through the heap
