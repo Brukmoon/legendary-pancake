@@ -84,20 +84,6 @@ bool process_input_play(struct game* game)
 				case SDLK_w:
 					g_player.climb[1] = true;
 					break;
-					// DEBUG - next level
-				case SDLK_n:
-				{
-					char* name = malloc(SDL_strlen(g_level->next) + 1);
-					SDL_strlcpy(name, g_level->next, SDL_strlen(g_level->next) + 1);
-					game_state_exit(game);
-					if (!game_state_change(game, game_state_play(name)))
-					{
-						INFO("Not loaded!");
-						game_state_exit(game);
-					}
-					free(name);
-				}
-					break;
 				/*case SDLK_e:
 					game_state_change(game, game_state_edit(NULL));
 					break;*/

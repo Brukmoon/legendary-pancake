@@ -137,8 +137,10 @@ void draw_menu_interface(SDL_Renderer* const renderer)
 
 static void draw_player_info(const struct player *player, SDL_Renderer *renderer)
 {
+	// draw hp
 	fill_rect(renderer, SCREEN_WIDTH - 105, 9, player->actor.hitpoints, 11, (SDL_Color) { 255, 0, 0, 1 });
 	hollow_rect(renderer, SCREEN_WIDTH - 105, 9, 100, 11, (SDL_Color) { 0, 0, 0, 1 });
+	// stamina
 	if (player->actor.jump_count < 2)
 		fill_rect(renderer, SCREEN_WIDTH - 110, 5, 5, 10, (SDL_Color) { 255, 255, 0, 1 });
 	if (player->actor.jump_count < 1)
@@ -148,10 +150,11 @@ static void draw_player_info(const struct player *player, SDL_Renderer *renderer
 
 	SDL_Rect *src_rect = NULL;
 	SDL_Rect dest_rect = (SDL_Rect) { SCREEN_WIDTH-135, 5, 20, 20 };
+	// avatar
 	SDL_Texture *t = sprite_get(player->actor.anim.curr->curr->sprite_name, &src_rect);
 	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
 	t = sprite_get("bamboo", &src_rect);
-	dest_rect = (SDL_Rect) { SCREEN_WIDTH - 30, 30, 32, 32 };
+	dest_rect = (SDL_Rect) { SCREEN_WIDTH - 30, 35, 32, 32 };
 	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
 	// load texture
 	char buffer[5];

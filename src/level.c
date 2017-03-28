@@ -151,11 +151,18 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			}
 			else if (SDL_strcmp(command, "ENEMY") == 0)
 			{
-				char name[BUFFER_SIZE];
+				char name[BUFFER_SIZE], type[BUFFER_SIZE];
 				vec2 spawn = { 0, 0 };
 				vec2 goal = { 0, 0 };
-				sscanf_s(buffer, "%*s%s%d%d%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y, &goal.x, &goal.y);
-				enemy_load(name, name, spawn, goal, renderer);
+				sscanf_s(buffer, "%*s%s%s%d%d%d%d", name, BUFFER_SIZE, type, BUFFER_SIZE, &spawn.x, &spawn.y, &goal.x, &goal.y);
+				if(SDL_strcmp(type, "patrol") == 0)
+					enemy_load(name, name, spawn, goal, PATROL, renderer);
+				else if (SDL_strcmp(type, "raider") == 0)
+				{
+					goal.x = g_player.actor.skeleton.x;
+					goal.y = g_player.actor.skeleton.y;
+					enemy_load(name, name, spawn, goal, RAIDER, renderer);
+				}
 			}
 
 			// Clear.
@@ -297,7 +304,8 @@ bool level_save()
 	fprintf(f, "%s\n", "BACKGROUND assets/gfx/level1_background.png");
 	fprintf(f, "%s\n", "D_BACKGROUND assets/gfx/clouds.png");
 	fprintf(f, "%s %s %d %d\n", "PLAYER", g_player.actor.name, g_player.actor.spawn.x, g_player.actor.spawn.y);
-	//object_write_to_file(f);
+	object_write_to_file(f);
+	enemy_write_to_file(f);
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);
 	return true;

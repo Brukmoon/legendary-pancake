@@ -171,8 +171,8 @@ void path_find(vec2 start, vec2 goal, struct waypoint** path)
 {
 	// TODO: Perhaps move the grid to global scope and perform a heap cleanup via a stack.
 	// allocate array of pointers
-	struct pf_node_l **node_grid = malloc(sizeof(struct pf_node_l*)*g_level->tile_map.height);
-	if (!*node_grid)
+	struct pf_node_l **node_grid = NULL;
+	if( (node_grid = (struct pf_node_l**)malloc((sizeof(struct pf_node_l*))*g_level->tile_map.height)) == NULL)
 	{
 		ERROR("Not enough memory!");
 		return;
@@ -299,11 +299,13 @@ void path_find(vec2 start, vec2 goal, struct waypoint** path)
 				{
 					int lowest_jump = INT_MAX;
 					bool can_move_side = false;
+					// check third dimension
 					for (size_t j = 0; j < node_grid[neighbor.y][neighbor.x].z_count; ++j)
 					{
+						// current lowest is not the lowest
 						if (node_grid[neighbor.y][neighbor.x].z[j].jump < lowest_jump)
 							lowest_jump = node_grid[neighbor.y][neighbor.x].z[j].jump;
-
+						// even = can move to side
 						if (node_grid[neighbor.y][neighbor.x].z[j].jump % 2 == 0 && node_grid[neighbor.y][neighbor.x].z[j].jump < (MAX_JUMP * 2 + 6))
 							can_move_side = true;
 					}
@@ -344,7 +346,9 @@ void path_find(vec2 start, vec2 goal, struct waypoint** path)
 		}
 	}
 	if (success)
+	{
 		reconstruct_path(&goal_node, node_grid, path);
+	}
 	else
 		*path = NULL;
 	open_set_destroy(open_set);
@@ -367,6 +371,11 @@ static void reconstruct_path(node* current, struct pf_node_l const** node_grid, 
 	//INFO("cost: %d", node_grid[current->y][current->x].z[current->z].g_score);
 	// root
 	(*path) = malloc(sizeof(struct waypoint));
+	if (!(*path))
+	{
+		ERROR("Not enough memory!");
+		return;
+	}
 	(*path)->next = NULL;
 	(*path)->prev = NULL;
 	(*path)->pos.x = current->x;

@@ -14,7 +14,7 @@
 #define E_MENU_CANCEL "BACK"
 
 #define P_MENU_LEVEL1 "level1"
-#define P_MENU_LEVEL2 "demo"
+#define P_MENU_LEVEL2 "level3"
 
 struct button_list
 {

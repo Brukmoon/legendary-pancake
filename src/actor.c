@@ -326,7 +326,7 @@ void enemy_draw(struct player const* enemy, SDL_Renderer* renderer)
 	}
 }
 
-void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 const goal, SDL_Renderer *renderer)
+void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 const goal, enum enemy_type t, SDL_Renderer *renderer)
 {
 	INFO("Enemy load %s, SPAWN: [%d; %d] GOAL: [%d; %d]", name ,spawn.x, spawn.y, goal.x, goal.y);
 	struct enemy* enemy = malloc(sizeof(struct enemy));
@@ -340,6 +340,7 @@ void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 
 	enemy->actor.skeleton.y = enemy->actor.spawn.y;
 	enemy->start = real_to_map(spawn.x, spawn.y);
 	enemy->goal = real_to_map(goal.x, goal.y);
+	enemy->type = t;
 	enemy_spawn(enemy);
 
 	// empty list
@@ -485,16 +486,6 @@ void enemy_update_all(void)
 					iter->actor.velocity.x = 0;
 			}
 		}
-		else
-		{
-			//iter->start = enemy_pos;
-			// blocking path, swap and find way back
-			vec2_swap(&iter->start, &iter->goal);
-			//path_find(iter->start, iter->goal, &iter->path);
-			path_find(enemy_pos, iter->goal, &iter->path);
-			iter->current = iter->path;
-		}
-	
 		if (jump)
 			actor_jump(&iter->actor, 4.5f);
 		vec2 move_delta = { (coord) iter->actor.velocity.x, (coord) iter->actor.velocity.y };
@@ -515,13 +506,25 @@ void enemy_update_all(void)
 	}
 }
 
+void enemy_write_to_file(FILE* f)
+{
+	struct enemy* iter = g_enemies;
+	unsigned k = g_level->tile_map.tile_width;
+	while (iter)
+	{
+		fprintf(f, "ENEMY enemy patrol %d %d %d %d\n", k*iter->start.x, k*iter->start.y, k*iter->goal.x, k*iter->goal.y);
+		iter = iter->next;
+	}
+}
+
 void enemy_spawn(struct enemy* enemy)
 {
 	path_find(enemy->start, enemy->goal, &enemy->path);
+	if (enemy->actor.skeleton.y == 627)
+		INFO("%d %d", enemy->path->pos.y, enemy->path->pos.x);
 	if (!enemy->path)
 	{
-		INFO("Path not found! Retrying.");
-		path_find(enemy->start, enemy->goal, &enemy->path);
+		INFO("Path not found.");
 	}
 	enemy->current = enemy->path;
 	enemy->is_spawned = true;

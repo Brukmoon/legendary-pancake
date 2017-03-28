@@ -9,6 +9,7 @@
 #define ACTOR_H
 
 #include <SDL.h>
+#include <stdio.h>
 #include <stdbool.h>
 
 #include "animation.h"
@@ -88,9 +89,17 @@ inline void player_set_vel_y(struct player *player, float vel) { player->actor.v
 
 extern struct player g_player;
 
+enum enemy_type
+{
+	PATROL,
+	RAIDER
+};
+
 struct enemy
 {
 	struct actor actor;
+	enum enemy_type type;
+
 	vec2 start, goal;
 	struct waypoint* path, *current;
 	bool is_spawned;
@@ -107,8 +116,11 @@ void enemy_draw_all(SDL_Renderer* renderer);
 void enemy_update_all(void);
 
 void enemy_draw(struct player const* enemy, SDL_Renderer* renderer);
-void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 const goal, SDL_Renderer *renderer);
+void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 const goal, enum enemy_type t, SDL_Renderer *renderer);
 void enemy_spawn(struct enemy* enemy);
+
+// write to level file
+void enemy_write_to_file(FILE* f);
 
 extern struct enemy* g_enemies;
 
