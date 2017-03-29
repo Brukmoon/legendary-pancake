@@ -415,6 +415,20 @@ static void reconstruct_path(node* current, struct pf_node_l const** node_grid, 
 		current = &node_grid[current->y][current->x].z[current->z].parent;
 	}
 	iter->next = NULL;
+	// reverse ll
+	/*
+	struct waypoint* p = NULL;
+	struct waypoint* c = *path;
+	struct waypoint* n;
+	while (c != NULL)
+	{
+		n = c->next;
+		c->next = p;
+		p = c;
+		c = n;
+	}
+	*path = p;
+	*/
 }
 
 void path_destroy(struct waypoint** path)

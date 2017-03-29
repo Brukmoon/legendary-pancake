@@ -430,7 +430,7 @@ void enemy_update_all(void)
 		actor_gravity(&iter->actor);
 		vec2 enemy_pos = { 0, 0 }, enemy_pos_real = { 0, 0 };
 		// should jump
-		bool jump = false;
+		bool jumping = false;
 		enemy_pos_real.x = iter->actor.skeleton.x;
 		enemy_pos_real.y = iter->actor.skeleton.y;
 		enemy_pos = real_to_map(iter->actor.skeleton.x, iter->actor.skeleton.y);
@@ -471,7 +471,7 @@ void enemy_update_all(void)
 				if (iter->current->pos.y < enemy_pos.y)
 				{
 					iter->actor.velocity.y = -2;
-					jump = true;
+					jumping = true;
 				}
 				else if (iter->current->pos.y > enemy_pos.y)
 				{
@@ -486,8 +486,16 @@ void enemy_update_all(void)
 					iter->actor.velocity.x = 0;
 			}
 		}
-		if (jump)
-			actor_jump(&iter->actor, 4.5f);
+		if (jumping)
+		{
+			// stuck, big jump
+			if((abs(iter->current->pos.y-iter->actor.skeleton.y/32) > 1) || (iter->current->pos.y != (iter->actor.skeleton.y / 32) && iter->current->pos.x != (iter->actor.skeleton.x/32)))
+				actor_jump(&iter->actor, 5.5f);
+			// normal jump
+			else
+				actor_jump(&iter->actor, 4.5f);
+
+		}
 		vec2 move_delta = { (coord) iter->actor.velocity.x, (coord) iter->actor.velocity.y };
 		actor_move(&iter->actor, &move_delta);
 		if (tilemap_collision(g_level, &iter->actor.skeleton, LADDER_COLLISION))
