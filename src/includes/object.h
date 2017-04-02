@@ -27,6 +27,7 @@ void object_destroy(void);
 // animation
 void object_update_all(SDL_Renderer* renderer);
 void object_draw(SDL_Renderer* renderer);
+// write objects in-game to the level file
 void object_write_to_file(FILE* f);
 
 struct missile

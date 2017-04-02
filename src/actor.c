@@ -291,6 +291,7 @@ void player_eat(struct player* player)
 			player->actor.hitpoints += PLAYER_HEAL_RATE;
 		else
 			player->actor.hitpoints = PLAYER_DEFAULT_HP;
+		sound_play("eat");
 		player->collect--;
 	}
 }

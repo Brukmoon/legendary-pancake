@@ -218,6 +218,8 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		sound_add("fall", ".wav");
 		sound_add("shoot", ".wav");
 		sound_add("pick", ".wav");
+		if (game_mode == MODE_PACIFIC)
+			sound_add("eat", ".wav");
 		// custom cursor
 		texture_add(IMG_PATH"arrow.png", renderer);
 		sprite_add("arrow", IMG_PATH"arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
