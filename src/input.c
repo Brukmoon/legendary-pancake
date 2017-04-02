@@ -14,8 +14,12 @@
 
 int curr_sprite_num = 1;
 
-
-#include "path.h"
+static void toggle_fullscreen(SDL_Window* Window) {
+	Uint32 FullscreenFlag = SDL_WINDOW_FULLSCREEN;
+	bool IsFullscreen = SDL_GetWindowFlags(Window) & FullscreenFlag;
+	SDL_SetWindowFullscreen(Window, IsFullscreen ? 0 : FullscreenFlag);
+	SDL_ShowCursor(IsFullscreen);
+}
 
 bool process_input_menu(struct game* game)
 {
@@ -32,6 +36,9 @@ bool process_input_menu(struct game* game)
 				break;
 			case SDLK_DOWN:
 				menu_next_button(g_menu);
+				break;
+			case SDLK_f:
+				toggle_fullscreen(game->screen.window);
 				break;
 			case SDLK_RETURN:
 				// TODO: Redesign - send accept message to menu.
@@ -84,9 +91,13 @@ bool process_input_play(struct game* game)
 				case SDLK_w:
 					g_player.climb[1] = true;
 					break;
-				/*case SDLK_e:
-					game_state_change(game, game_state_edit(NULL));
-					break;*/
+				case SDLK_f:
+					toggle_fullscreen(game->screen.window);
+					break;
+				case SDLK_e:
+					if(game_mode == MODE_PACIFIC)
+						player_eat(&g_player);
+					break;
 				case SDLK_SPACE:
 					player_jump(&g_player, PLAYER_JUMP_INTENSITY);
 					break;
@@ -105,8 +116,8 @@ bool process_input_play(struct game* game)
 				case SDLK_a:
 					player_set_vel_x(&g_player, 0);
 					break;
-				case SDLK_q:
-					game_state_exit(game);
+				case SDLK_ESCAPE:
+					game_state_reset(game);
 					break;
 				case SDLK_s:
 					g_player.climb[0]= false;
@@ -183,7 +194,7 @@ bool process_input_preedit(struct game* game)
 			{
 				INFO("Clicked button %s.", g_menu->button_list->current->text);
 				sound_play("accept");
-				if (SDL_strcmp(E_MENU_OK, g_menu->button_list->current->text) == 0)
+				if (SDL_strcmp(MENU_OK, g_menu->button_list->current->text) == 0)
 				{
 					// BEWARE: Possible error here. Can text get freed before the state exits?
 					if (!game_state_change(game, game_state_edit(g_menu->text_box_list->current->text)))
@@ -192,7 +203,7 @@ bool process_input_preedit(struct game* game)
 						game_state_exit(game);
 					}
 				}
-				else if (SDL_strcmp(E_MENU_CANCEL, g_menu->button_list->current->text) == 0)
+				else if (SDL_strcmp(MENU_CANCEL, g_menu->button_list->current->text) == 0)
 					game_state_exit(game);
 			}
 			//Handle copy
@@ -249,7 +260,7 @@ bool process_input_preplay(struct game* game)
 				if (SDL_strcmp(P_MENU_LEVEL1, g_menu->button_list->current->text) == 0)
 				{
 					// BEWARE: Possible error here. Can text get freed before the state exits?
-					if (!game_state_change(game, game_state_play(P_MENU_LEVEL1)))
+					if (!game_state_change(game, game_state_mode(P_MENU_LEVEL1)))
 					{
 						INFO("Not loaded!");
 						game_state_exit(game);
@@ -258,13 +269,76 @@ bool process_input_preplay(struct game* game)
 				else if (SDL_strcmp(P_MENU_LEVEL2, g_menu->button_list->current->text) == 0)
 				{
 					// BEWARE: Possible error here. Can text get freed before the state exits?
-					if (!game_state_change(game, game_state_play(P_MENU_LEVEL2)))
+					if (!game_state_change(game, game_state_mode(P_MENU_LEVEL2)))
 					{
 						INFO("Not loaded!");
 						game_state_exit(game);
 					}
 				}
-				else if (SDL_strcmp(E_MENU_CANCEL, g_menu->button_list->current->text) == 0)
+				else if (SDL_strcmp(MENU_CANCEL, g_menu->button_list->current->text) == 0)
+					game_state_exit(game);
+			}
+		}
+	}
+	return true;
+}
+
+bool process_input_mode(struct game* game)
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e) != 0)
+	{
+		if (e.type == SDL_QUIT)
+		{
+			game_state_reset(game);
+			game_state_exit(game);
+			return false;
+		}
+		//Special key input
+		else if (e.type == SDL_KEYDOWN)
+		{
+			if (e.key.keysym.sym == SDLK_UP || e.key.keysym.sym == SDLK_LEFT)
+			{
+				menu_prev_button(g_menu);
+			}
+			else if (e.key.keysym.sym == SDLK_DOWN || e.key.keysym.sym == SDLK_RIGHT)
+			{
+				menu_next_button(g_menu);
+			}
+			else if (e.key.keysym.sym == SDLK_RETURN)
+			{
+				INFO("Clicked button %s.", g_menu->button_list->current->text);
+				sound_play("accept");
+				if (SDL_strcmp(P_DIFFICULTY_NORMAL, g_menu->button_list->current->text) == 0)
+				{
+					game_mode = MODE_NORMAL;
+					if (!game_state_change(game, game_state_play(game->run->state_param)))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+				}
+				else if (SDL_strcmp(P_DIFFICULTY_EXTERMINATION, g_menu->button_list->current->text) == 0)
+				{
+					game_mode = MODE_EXTERMINATION;
+					// BEWARE: Possible error here. Can text get freed before the state exits?
+					if (!game_state_change(game, game_state_play(game->run->state_param)))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+				}
+				else if (SDL_strcmp(P_DIFFICULTY_PACIFIC, g_menu->button_list->current->text) == 0)
+				{
+					game_mode = MODE_PACIFIC;
+					// BEWARE: Possible error here. Can text get freed before the state exits?
+					if (!game_state_change(game, game_state_play(game->run->state_param)))
+					{
+						INFO("Not loaded!");
+						game_state_exit(game);
+					}
+				}
+				else if (SDL_strcmp(MENU_CANCEL, g_menu->button_list->current->text) == 0)
 					game_state_exit(game);
 			}
 		}
@@ -343,6 +417,9 @@ bool process_input_edit(struct game* game)
 				toggle_map_ladder(&position);
 			}
 			break;
+			case SDLK_f:
+				toggle_fullscreen(game->screen.window);
+				break;
 			case SDLK_x:
 			{
 				// Set the spawn point for the player.
@@ -378,7 +455,7 @@ bool process_input_edit(struct game* game)
 			case SDLK_KP_8:
 				tile_map_resize(&g_level->tile_map, RESIZE_HEIGHT, -1);
 				break;
-			case SDLK_q:
+			case SDLK_ESCAPE:
 				game_state_exit(game);
 				break;
 			default:
@@ -490,7 +567,18 @@ static void goal_update(struct game* game)
 		SDL_Rect goal_skeleton = { g_level->goal.x, g_level->goal.y, g_level->tile_map.tile_width, g_level->tile_map.tile_height };
 		if (rects_collide(&g_player.actor.skeleton, &goal_skeleton))
 		{
-			ERROR("NEXT: %s", g_level->next);
+			if (game_mode == MODE_EXTERMINATION && SDL_strcmp("level3", g_level->name) != 0) // level3 is exempt from the EXTERMINATION requirement
+			{
+				struct enemy *iter = g_enemies;
+				while (iter)
+				{
+					if (iter->is_spawned)
+					{
+						return;
+					}
+					iter = iter->next;
+				}
+			}
 			sound_play("win");
 			// there is a next lvel
 			if (g_level->next[0] != '\0')

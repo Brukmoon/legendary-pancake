@@ -54,6 +54,14 @@ struct actor
 	Sint16 hitpoints;
 };
 
+// various player settings
+enum player_settings
+{
+	PLAYER_DEFAULT_HP = 100,
+	PLAYER_HEAL_RATE = 15,
+	PLAYER_CLIMB_SPEED = 6
+};
+
 // special case of an actor.
 struct player // : public actor;
 {
@@ -79,6 +87,8 @@ void player_spawn(struct player* player);
 bool player_can_climb(const struct player* player);
 bool player_can_shoot(const struct player* player);
 void player_climb(struct player* player);
+// eat collectable --> heal yourself
+void player_eat(struct player* player);
 // Cause damage to the player.
 void player_damage(struct player *player, Uint16 const damage);
 

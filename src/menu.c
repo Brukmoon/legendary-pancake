@@ -55,8 +55,8 @@ void preedit_menu_load(SDL_Renderer* renderer)
 {
 	menu_create(&g_menu, MENU_ALL);
 	text_box_add((const SDL_Rect) { CENTER_X - 65, CENTER_Y, 130, BUTTON_FONT_SIZE + 10}, 10);
-	button_add(renderer, E_MENU_OK, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 2*BUTTON_FONT_SIZE - 10, CENTER_Y + BUTTON_FONT_SIZE + 10 });
-	button_add(renderer, E_MENU_CANCEL, BUTTON_FONT_SIZE,(const vec2) { CENTER_X, CENTER_Y + BUTTON_FONT_SIZE + 10 });
+	button_add(renderer, MENU_OK, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 2*BUTTON_FONT_SIZE - 10, CENTER_Y + BUTTON_FONT_SIZE + 10 });
+	button_add(renderer, MENU_CANCEL, BUTTON_FONT_SIZE,(const vec2) { CENTER_X, CENTER_Y + BUTTON_FONT_SIZE + 10 });
 	g_menu->button_list->current = g_menu->button_list->root;
 	g_menu->text_box_list->current = g_menu->text_box_list->root;
 	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
@@ -68,7 +68,19 @@ void preplay_menu_load(SDL_Renderer* renderer)
 	menu_create(&g_menu, MENU_BUTTON);
 	button_add(renderer, P_MENU_LEVEL1, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 10, CENTER_Y });
 	button_add(renderer, P_MENU_LEVEL2, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 10, CENTER_Y + BUTTON_FONT_SIZE});
-	button_add(renderer, E_MENU_CANCEL, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 8, CENTER_Y + 2*BUTTON_FONT_SIZE });
+	button_add(renderer, MENU_CANCEL, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 8, CENTER_Y + 2*BUTTON_FONT_SIZE });
+	g_menu->button_list->current = g_menu->button_list->root;
+	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
+	g_menu->background = load_texture(renderer, IMG_PATH"background1.png");
+}
+
+void preplay_difficulty_menu_load(SDL_Renderer* renderer)
+{
+	menu_create(&g_menu, MENU_BUTTON);
+	button_add(renderer, P_DIFFICULTY_NORMAL, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 24, CENTER_Y });
+	button_add(renderer, P_DIFFICULTY_EXTERMINATION, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 8, CENTER_Y + BUTTON_FONT_SIZE });
+	button_add(renderer, P_DIFFICULTY_PACIFIC, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 24, CENTER_Y + 2 * BUTTON_FONT_SIZE });
+	button_add(renderer, MENU_CANCEL, BUTTON_FONT_SIZE, (const vec2) { CENTER_X - 10, CENTER_Y + 3 * BUTTON_FONT_SIZE });
 	g_menu->button_list->current = g_menu->button_list->root;
 	g_menu->button_list->root->curr_sprite = BUTTON_SPRITE_ACTIVE;
 	g_menu->background = load_texture(renderer, IMG_PATH"background1.png");

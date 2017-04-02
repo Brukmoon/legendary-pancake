@@ -7,10 +7,10 @@
 #include "sound.h"
 #include "physics.h"
 #include "texture.h"
+#include "game.h"
 
 #define PLAYER_PATH IMG_PATH"player.png"
 // How fast does a player climb a ladder.
-#define PLAYER_CLIMB_SPEED 6
 #define ACTOR_STANDARD_SPEED 4.f
 #define ACTOR_DEFAULT_HP 100
 #define ACTOR_DEFAULT_X 0
@@ -222,6 +222,7 @@ void actor_gravity(struct actor* actor)
 void player_init(struct player *player, const char* name, const vec2 spawn, const char* anim_name, SDL_Renderer *renderer)
 {
 	actor_init(&player->actor, name, spawn, anim_name, renderer); 
+	player->actor.hitpoints = PLAYER_DEFAULT_HP;
 	player->climb[0] = player->climb[1] = false;
 	player->collect = 0;
 }
@@ -273,9 +274,25 @@ bool player_can_climb(const struct player *player)
 
 bool player_can_shoot(const struct player* player)
 {
-	if (player->collect > 0 && player->actor.state != LADDER)
+	if (player->collect > 0 && player->actor.state != LADDER && game_mode != MODE_PACIFIC)
 		return true;
 	return false;
+}
+
+void player_eat(struct player* player)
+{
+	// if there is collectable
+	if (player->collect)
+	{
+		// player probably doesn't want to eat it
+		if (player->actor.hitpoints == PLAYER_DEFAULT_HP)
+			return;
+		if ((player->actor.hitpoints + PLAYER_HEAL_RATE) <= PLAYER_DEFAULT_HP)
+			player->actor.hitpoints += PLAYER_HEAL_RATE;
+		else
+			player->actor.hitpoints = PLAYER_DEFAULT_HP;
+		player->collect--;
+	}
 }
 
 void player_climb(struct player *player)

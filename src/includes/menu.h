@@ -10,11 +10,15 @@
 #define M_MENU_EDIT "EDITOR"
 #define M_MENU_QUIT "QUIT"
 
-#define E_MENU_OK "OK"
-#define E_MENU_CANCEL "BACK"
+#define MENU_OK "OK"
+#define MENU_CANCEL "BACK"
 
 #define P_MENU_LEVEL1 "level1"
-#define P_MENU_LEVEL2 "level3"
+#define P_MENU_LEVEL2 "demo"
+
+#define P_DIFFICULTY_NORMAL "normal"
+#define P_DIFFICULTY_EXTERMINATION "killer"
+#define P_DIFFICULTY_PACIFIC "pacifist"
 
 struct button_list
 {
@@ -62,6 +66,7 @@ void text_box_add(const SDL_Rect skeleton, int max_length);
 void main_menu_load(SDL_Renderer* renderer);
 void preedit_menu_load(SDL_Renderer* renderer);
 void preplay_menu_load(SDL_Renderer* renderer);
+void preplay_difficulty_menu_load(SDL_Renderer* renderer);
 
 void menu_create(struct menu **menu, const enum menu_flags flags);
 void menu_draw(struct menu *menu, SDL_Renderer* renderer);

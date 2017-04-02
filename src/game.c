@@ -26,6 +26,10 @@ static bool to_main_menu_state(SDL_Renderer* game, char*);
 static void from_main_menu_state(void);
 static bool to_edit_state(SDL_Renderer* game, const char* level_name);
 static void from_edit_state(void);
+// choose level
+static bool to_preplay_state(SDL_Renderer *renderer, char* unused);
+// choose mode
+static bool to_preplay_mode_state(SDL_Renderer *renderer, char *unused);
 
 static bool game_set_pause(struct game *game, bool yesno)
 {
@@ -68,6 +72,8 @@ bool game_init(struct game* game, struct game_screen* screen)
 						INFO("> Game initialization sequence finished.\n");
 						game_state_change(game, game_state_main_menu());
 						timer_reset(&g_timer);
+						// default mode is normal
+						game_mode = MODE_NORMAL;
 						return true;
 					}
 				}
@@ -103,7 +109,9 @@ void game_clean(struct game_screen *screen)
 
 void SDL_version_info(void)
 {
+	// version is either compiled or linked. Compiled SHOULD match linked.
 	SDL_version SDL_compiled, TTF_compiled, SDL_linked;
+	// TTF is the font library.
 	const SDL_version *TTF_linked = TTF_Linked_Version();
 	SDL_VERSION(&SDL_compiled);
 	SDL_TTF_VERSION(&TTF_compiled);
@@ -134,12 +142,12 @@ static void state_stack_print(const struct game *game)
 
 bool game_state_change(struct game *game, struct game_state *new_state)
 {
-	INFO("Changing game state to %d.", new_state->id);
 	// game->run != NULL
 	if (game_running(game))
 		new_state->next = game->run;
 	game->run = new_state;
 	state_stack_print(game);
+	INFO("Game state changed to %d.", new_state->id);
 	if (game->run->enter)
 		if (!game->run->enter(game->screen.renderer, game->run->state_param))
 			return false;
@@ -154,20 +162,25 @@ void game_state_exit(struct game *game)
 		// If the current state has a cleanup function, call it.
 		if (game->run->exit)
 			game->run->exit();
+		// free the current state
 		struct game_state *temp = game->run;
+		// switch to next state
 		game->run = game->run->next;
 		free(temp);
+		// if the next state is not null and has an enter transition function, call it
 		if(game->run && game->run->enter)
 			game->run->enter(game->screen.renderer, game->run->state_param);
 	}
 	else
-		ERROR("Can't exit when there is no current state.");
+		INFO("Can't exit when there is no current state.");
+	// print the game stack
 	state_stack_print(game);
 }
 
 void game_state_reset(struct game *game)
 {
 	INFO("< Exiting all states.");
+	// clean up the state stack
 	while (game->run->next)
 		game_state_exit(game);
 	INFO("> All states exited.");
@@ -186,8 +199,11 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		INFO("There is a level already. Using it.");
 	else
 	{
+		// load level
+		// init level data
 		if (!level_load(level_name, renderer))
 			return false;
+		// music has format <level_name>_music.ogg
 		size_t music_name_length = SDL_strlen(level_name) + SDL_strlen("_music") + 1;
 		char *music_name = malloc(music_name_length);
 		SDL_strlcpy(music_name, g_level->name, music_name_length);
@@ -195,16 +211,20 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		music_add(music_name, ".ogg");
 		music_play(music_name, 6000);
 		free(music_name);
+		// sounds required by the engine
 		sound_add("jump", ".wav");
 		sound_add("win", ".wav");
 		sound_add("death", ".wav");
 		sound_add("fall", ".wav");
 		sound_add("shoot", ".wav");
 		sound_add("pick", ".wav");
+		// custom cursor
 		texture_add(IMG_PATH"arrow.png", renderer);
 		sprite_add("arrow", IMG_PATH"arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
 	}
+	// window-system-specific cursor is hidden in the playstate
 	SDL_ShowCursor(false);
+	// camera is fixed @ player
 	camera_init(&g_camera, CAMERA_FIXED);
 	player_spawn(&g_player);
 	INFO("> Play started.");
@@ -213,12 +233,18 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 
 static void from_play_state(void)
 {
+	/*
+	* For now, we keep audio and graphics intact, because of frequent animation and sound reuse.
+	* This can be changed easily, just call audio_destroy.
+	*
+	*/
 	level_clean();
 	player_destroy(&g_player);
 }
 
 static bool to_main_menu_state(SDL_Renderer *renderer, char* unused)
 {
+	// state contains no variable, this macro is here so no warning is shown
 	UNUSED_PARAMETER(unused);
 	INFO("< Opening main menu.");
 	// set callbacks to menu state callbacks
@@ -258,6 +284,17 @@ static bool to_preplay_state(SDL_Renderer *renderer, char* unused)
 	return true;
 }
 
+static bool to_preplay_mode_state(SDL_Renderer *renderer, char *unused)
+{
+	UNUSED_PARAMETER(unused);
+	INFO("< Opening preedit menu.");
+	// set callbacks to menu state callbacks
+	preplay_difficulty_menu_load(renderer);
+	music_play("menu", 4000);
+	INFO("> Preedit menu opened.");
+	return true;
+}
+
 static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 {
 	INFO("< Opening editor.");
@@ -267,13 +304,14 @@ static bool to_edit_state(SDL_Renderer *renderer, const char *level_name)
 	}
 	else
 	{
+		// no loaded level, load a new one
 		if (!level_load(level_name, renderer))
 			return false;
 	}
-	// set callbacks to menu state callbacks
+	// we move the player, but he is invisible (not spawned). Default speed 0
     player_set_vel_x(&g_player, 0);
 	player_set_vel_y(&g_player, 0);
-	SDL_ShowCursor(1);
+	SDL_ShowCursor(true);
 	music_add("menux", ".ogg");
 	sound_add("click", ".wav");
 	music_play("menux", 6000);
@@ -360,6 +398,24 @@ struct game_state *game_state_preplay(void)
 	preplay->next = NULL;
 
 	return preplay;
+}
+
+struct game_state *game_state_mode(char *level_name)
+{
+	struct game_state *play = malloc(sizeof(struct game_state));
+
+	play->id = GAME_STATE_MODE;
+	play->state_param = level_name;
+
+	play->enter = to_preplay_mode_state;
+	play->exit = from_main_menu_state;
+
+	play->draw = render_menu;
+	play->process_input = process_input_mode;
+	play->update = update_menu;
+	play->next = NULL;
+
+	return play;
 }
 
 struct game_state *game_state_edit(char *level_name)

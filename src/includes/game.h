@@ -33,6 +33,13 @@ struct game
 	struct game_state *run;
 };
 
+enum game_mode
+{
+	MODE_NORMAL,
+	MODE_EXTERMINATION,
+	MODE_PACIFIC
+} game_mode;
+
 // Initialize. Must be called exactly once, after declaration of game state machine.
 bool game_init(struct game* game, struct game_screen* screen);
 // Clean the resources. After calling this function, calling any engine function will probably result in an error. 
@@ -48,6 +55,7 @@ enum game_state_id
 	GAME_STATE_PLAY,
 	GAME_STATE_PREEDIT,
 	GAME_STATE_PREPLAY,
+	GAME_STATE_MODE,
 	GAME_STATE_EDIT,
 	GAME_STATE_COUNT
 };
@@ -74,6 +82,7 @@ struct game_state *game_state_play(char* level_name);
 struct game_state *game_state_edit(char* level_name);
 struct game_state *game_state_preedit(void);
 struct game_state *game_state_preplay(void);
+struct game_state *game_state_mode(char *level_name);
 
 // add a new state to the stack and set it as current
 bool game_state_change(struct game *game, struct game_state *new_state);

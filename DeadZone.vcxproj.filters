@@ -55,22 +55,22 @@
     <ClCompile Include="src\stack.c">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="src\includes\map.c">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\text_box.c">
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="src\animation.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\includes\object.c">
+    <ClCompile Include="src\vector.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\includes\path.c">
+    <ClCompile Include="src\map.c">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="vector.c">
+    <ClCompile Include="src\object.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\path.c">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

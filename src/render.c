@@ -153,13 +153,16 @@ static void draw_player_info(const struct player *player, SDL_Renderer *renderer
 	// avatar
 	SDL_Texture *t = sprite_get(player->actor.anim.curr->curr->sprite_name, &src_rect);
 	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
-	t = sprite_get("bamboo", &src_rect);
-	dest_rect = (SDL_Rect) { SCREEN_WIDTH - 30, 35, 32, 32 };
-	SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
-	// load texture
-	char buffer[5];
-	SDL_itoa(player->collect, buffer, 10);
-	draw_text(buffer, 20, (SDL_Color) { 255, 255, 255, 1 }, (vec2) {SCREEN_WIDTH - 35, 33}, renderer);
+	if(player->collect > 0)
+	{
+		t = sprite_get("bamboo", &src_rect);
+		dest_rect = (SDL_Rect) { SCREEN_WIDTH - 30, 35, 32, 32 };
+		SDL_RenderCopy(renderer, t, src_rect, &dest_rect);
+		// write bamboo count
+		char buffer[5];
+		SDL_itoa(player->collect, buffer, 10);
+		draw_text(buffer, 20, (SDL_Color) { 255, 255, 255, 1 }, (vec2) { SCREEN_WIDTH - 35, 33 }, renderer);
+	}
 }
 
 void render_play(SDL_Renderer *renderer)
