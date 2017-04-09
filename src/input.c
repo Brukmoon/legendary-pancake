@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "input.h"
 #include "physics.h"
+#include "timer.h"
 
 int curr_sprite_num = 1;
 
@@ -90,6 +91,9 @@ bool process_input_play(struct game* game)
 					break;
 				case SDLK_w:
 					g_player.climb[1] = true;
+					break;
+				case SDLK_t:
+					timer_reset(&g_timer);
 					break;
 				case SDLK_f:
 					toggle_fullscreen(game->screen.window);
@@ -456,7 +460,7 @@ bool process_input_edit(struct game* game)
 				tile_map_resize(&g_level->tile_map, RESIZE_HEIGHT, -1);
 				break;
 			case SDLK_ESCAPE:
-				game_state_exit(game);
+				game_state_reset(game);
 				break;
 			default:
 				break;
@@ -610,6 +614,7 @@ void update_play(struct game* game)
 {
 	if (!game->paused)
 	{
+		timer_ticks(&g_timer);
 		// Update camera.
 		camera_set(&g_camera, (vec2) { g_player.actor.skeleton.x - CENTER_X, g_player.actor.skeleton.y - CENTER_Y });
 		object_update_all(game->screen.renderer);

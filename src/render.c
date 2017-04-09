@@ -10,6 +10,11 @@
 #include "object.h"
 #include "render.h"
 
+#if SHOW_TIME
+#include "text.h"
+#include "timer.h"
+#endif // SHOW_SCORE
+
 #if SHOW_CONSOLE
 #include "text.h"
 #endif // _DEBUG
@@ -35,6 +40,8 @@ static void draw_dyn_map_background(SDL_Renderer* const renderer);
 static void draw_map(SDL_Renderer* const renderer, const enum render_map_flags f);
 // draw actor paths
 static void draw_path(SDL_Renderer* const renderer);
+// draw current score
+static void draw_score(SDL_Renderer* const renderer);
 
 static void draw_map(SDL_Renderer* const renderer, const enum render_map_flags f)
 {
@@ -86,8 +93,6 @@ static void draw_map(SDL_Renderer* const renderer, const enum render_map_flags f
 }
 
 #undef MAP_NOT_OVERFLOW
-#undef TILE_HEIGHT
-#undef TILE_WIDTH
 
 #if SHOW_CONSOLE
 
@@ -187,6 +192,7 @@ void render_play(SDL_Renderer *renderer)
 	if(player_can_shoot(&g_player))
 		draw_cursor("arrow", renderer);
 	draw_path(renderer);
+	draw_score(renderer);
 
 	SDL_RenderPresent(renderer);
 }
@@ -215,8 +221,8 @@ void render_edit(SDL_Renderer *renderer)
 		255, 0, 0, 0
 	});
 	// current sprite
-	SDL_RenderCopy(renderer, g_level->tileset, &(const struct SDL_Rect){ ((curr_sprite_num%16)-1)* g_level->tile_map.tile_width, (curr_sprite_num / 16)*g_level->tile_map.tile_height, g_level->tile_map.tile_width, g_level->tile_map.tile_height },
-		&(const struct SDL_Rect){ x - (g_player.actor.skeleton.w) / 2, y - (g_player.actor.skeleton.h) / 2, g_level->tile_map.tile_width, g_level->tile_map.tile_height });
+	SDL_RenderCopy(renderer, g_level->tileset, &(const struct SDL_Rect){ ((curr_sprite_num%16)-1)* TILE_WIDTH, (curr_sprite_num / 16)*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT },
+		&(const struct SDL_Rect){ x - (g_player.actor.skeleton.w) / 2, y - (g_player.actor.skeleton.h) / 2, TILE_WIDTH, TILE_HEIGHT });
 	// spawn
 	hollow_rect(renderer, g_player.actor.spawn.x - g_camera.position.x,g_player.actor.spawn.y - g_camera.position.y, g_player.actor.skeleton.w, g_player.actor.skeleton.h,
 		(SDL_Color) {
@@ -235,15 +241,15 @@ static void draw_map_grid(SDL_Renderer *const renderer)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 1);
 	for (int i = 0; i < g_level->tile_map.width+1; ++i)
-		SDL_RenderDrawLine(renderer, i*g_level->tile_map.tile_width - (g_camera.position.x), 0 - (g_camera.position.y), i*g_level->tile_map.tile_width - (g_camera.position.x), g_level->tile_map.tile_height*g_level->tile_map.height - (g_camera.position.y));
+		SDL_RenderDrawLine(renderer, i*TILE_WIDTH - (g_camera.position.x), 0 - (g_camera.position.y), i*TILE_WIDTH - (g_camera.position.x), TILE_HEIGHT*g_level->tile_map.height - (g_camera.position.y));
 	for (int i = 0; i < g_level->tile_map.height+1; ++i)
-		SDL_RenderDrawLine(renderer, 0 - (g_camera.position.x), i*g_level->tile_map.tile_height - (g_camera.position.y), g_level->tile_map.tile_width*g_level->tile_map.width - (g_camera.position.x), i*g_level->tile_map.tile_height - (g_camera.position.y));
+		SDL_RenderDrawLine(renderer, 0 - (g_camera.position.x), i*TILE_HEIGHT - (g_camera.position.y), TILE_WIDTH*g_level->tile_map.width - (g_camera.position.x), i*TILE_HEIGHT - (g_camera.position.y));
 }
 
 static void draw_cursor(const char* name, SDL_Renderer *renderer)
 {
 	SDL_Rect *src = NULL;
-	SDL_Rect dst = { 0,0,32,32 };
+	SDL_Rect dst = { 0,0, TILE_WIDTH,TILE_HEIGHT };
 	// where is the mouse?
 	SDL_GetMouseState(&dst.x, &dst.y);
 	SDL_Texture *texture = sprite_get(name, &src);
@@ -289,13 +295,43 @@ static void draw_path(SDL_Renderer* const renderer)
 			{
 				SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
 				vec2 waypoint_pos = { current->pos.x * 32, current->pos.y * 32 };
-				if (is_visible(&g_camera, &waypoint_pos, g_level->tile_map.tile_width, g_level->tile_map.tile_height))
-					hollow_rect(renderer, waypoint_pos.x - g_camera.position.x, waypoint_pos.y - g_camera.position.y, 32, 32, (SDL_Color) { 255, 255, 255, 0 });
+				if (is_visible(&g_camera, &waypoint_pos, TILE_WIDTH, TILE_HEIGHT))
+					hollow_rect(renderer, waypoint_pos.x - g_camera.position.x, waypoint_pos.y - g_camera.position.y, TILE_WIDTH, TILE_HEIGHT, (SDL_Color) { 255, 255, 255, 0 });
 				current = current->next;
 			}
-			hollow_rect(renderer, enemy_current->current->pos.x * 32 - g_camera.position.x, enemy_current->current->pos.y * 32 - g_camera.position.y, 32, 32, (SDL_Color) { 255, 0, 0, 0 });
+			hollow_rect(renderer, enemy_current->current->pos.x * TILE_WIDTH - g_camera.position.x, enemy_current->current->pos.y * TILE_HEIGHT - g_camera.position.y, TILE_WIDTH, TILE_HEIGHT, (SDL_Color) { 255, 0, 0, 0 });
 		}
 		enemy_current = enemy_current->next;
 	}
 #endif // _DEBUG
+}
+
+static void draw_score(SDL_Renderer* const renderer)
+{
+#if SHOW_TIME
+	int delta_seconds = g_timer.delta / 1000;
+	if (delta_seconds != g_timer.draw_time_seconds)
+	{
+		g_timer.draw_time_seconds = delta_seconds;
+		char time[12], minutes[5], seconds[3];
+		int time_minutes = g_timer.draw_time_seconds / 60, time_seconds = g_timer.draw_time_seconds % 60;
+		// dont go over 99
+		if (time_minutes > 99)
+			time_minutes = 99;
+		SDL_itoa(time_minutes, minutes, 10);
+		SDL_itoa(time_seconds, seconds, 10);
+		time[0] = '\0';
+		// add a trailing zero
+		if(time_minutes < 10)
+			SDL_strlcat(time, "0", 10);
+		SDL_strlcat(time, minutes, 10);
+		SDL_strlcat(time, ":", 10);
+		if (time_seconds < 10)
+			SDL_strlcat(time, "0", 10);
+		SDL_strlcat(time, seconds, 10);
+		g_timer.time = create_text_texture(renderer, time, 32, (SDL_Color) { 255, 255, 255, 1 });
+	}
+	SDL_Rect dst_rect = (SDL_Rect){ CENTER_X, 0, 65, 45 };
+	SDL_RenderCopy(renderer, g_timer.time, NULL, &dst_rect);
+#endif // SHOW_TIME
 }

@@ -184,7 +184,7 @@ void music_play(const char *name, int fadein_ms)
 {
 #if MUSIC_ON
 	// which music is currently playing?
-	static unsigned long curr_hash = -1; // -1, make it overflow
+	static unsigned long curr_hash = (unsigned)-1; // -1, make it overflow
 	unsigned long new_hash = hash_s(name);
 	// not already playing?
 	if (new_hash != curr_hash)

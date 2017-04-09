@@ -18,7 +18,7 @@
 // Beware: If you change MULTI_JUMP, modify the UI (stamina) aswell.
 enum 
 { 
-	MULTI_JUMP = 2 
+	MULTI_JUMP = 2
 };
 
 // How much does a player jump.

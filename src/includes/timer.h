@@ -2,12 +2,16 @@
 #define TIMER_H
 
 #include <stdbool.h>
+#include <SDL.h>
 
 struct timer
 {
 	int last_tick_time;
 	int delta;
 	bool paused;
+
+	int draw_time_seconds;
+	SDL_Texture* time;
 } g_timer;
 
 inline void timer_pause(struct timer *t) { t->paused = !t->paused; }

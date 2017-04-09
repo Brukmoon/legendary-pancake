@@ -26,7 +26,6 @@
  * problem. Refer to SDL_main.c if you run into multiple definitions errors.
  *
  */
-
 int main(int argc, char* argv[]) 
 {
 	// Unused for now. Suppress warning.

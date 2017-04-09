@@ -94,6 +94,8 @@ void game_clean(struct game_screen *screen)
 	SDL_DestroyWindow(screen->window);
 	screen->renderer = NULL;
 	screen->window = NULL;
+	// destroy timer
+	timer_reset(&g_timer);
 	// destroy text resources
 	fonts_destroy();
 	// destroy sound
@@ -224,6 +226,8 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		texture_add(IMG_PATH"arrow.png", renderer);
 		sprite_add("arrow", IMG_PATH"arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
 	}
+	// start timer again
+	timer_reset(&g_timer);
 	// window-system-specific cursor is hidden in the playstate
 	SDL_ShowCursor(false);
 	// camera is fixed @ player

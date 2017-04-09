@@ -65,6 +65,7 @@ void actor_init(struct actor *actor, char const* name, vec2 const spawn, char co
 // NYI
 bool actor_can_shoot(const struct actor* actor)
 {
+	UNUSED_PARAMETER(actor);
 	return true;
 }
 
@@ -229,7 +230,11 @@ void player_init(struct player *player, const char* name, const vec2 spawn, cons
 
 void player_destroy(struct player *player)
 {
-	actor_destroy(&player->actor);
+	if (player)
+	{
+		actor_destroy(&player->actor);
+		player = NULL;
+	}
 }
 
 void player_draw(const struct player *player, SDL_Renderer *renderer)
@@ -460,6 +465,13 @@ void enemy_update_all(void)
 			if (iter->current->prev && iter->current->prev->pos.y > iter->current->pos.y)
 				enemy_pos.y++;
 			vec2 start_real = vec2_scale(&iter->start, g_level->tile_map.tile_width);
+			vec2 waypoint_real = vec2_scale(&iter->current->pos, g_level->tile_map.tile_width);
+			// zap
+			int waypoint_enemy_delta = abs(waypoint_real.x - enemy_pos_real.x);
+			if (waypoint_enemy_delta < 5 && waypoint_enemy_delta > 0 && enemy_pos_real.y == waypoint_real.y)
+			{
+				iter->actor.skeleton.x = waypoint_real.x;
+			}
 			// we reached the end point
 			if (vec2_similar(&enemy_pos_real, &start_real, 2))
 			{
@@ -476,7 +488,6 @@ void enemy_update_all(void)
 					continue;
 				}
 			}
-			vec2 waypoint_real = vec2_scale(&iter->current->pos, g_level->tile_map.tile_width);
 			if (vec2_similar(&waypoint_real, &enemy_pos_real, 3))
 			{
 				if(iter->current->next)
@@ -508,10 +519,10 @@ void enemy_update_all(void)
 		{
 			// stuck, big jump
 			if((abs(iter->current->pos.y-iter->actor.skeleton.y/32) > 1) || (iter->current->pos.y != (iter->actor.skeleton.y / 32) && iter->current->pos.x != (iter->actor.skeleton.x/32)))
-				actor_jump(&iter->actor, 5.5f);
+				actor_jump(&iter->actor, 5.5f); //5.5
 			// normal jump
 			else
-				actor_jump(&iter->actor, 4.5f);
+				actor_jump(&iter->actor, 4.5f); //4.5
 
 		}
 		vec2 move_delta = { (coord) iter->actor.velocity.x, (coord) iter->actor.velocity.y };
