@@ -10,6 +10,7 @@
 #include "object.h"
 #include "sound.h"
 #include "input.h"
+#include "replay.h"
 #include "physics.h"
 #include "timer.h"
 
@@ -48,6 +49,12 @@ bool process_input_menu(struct game* game)
 					game_state_change(game, game_state_preplay());
 				else if (SDL_strcmp(M_MENU_EDIT, g_menu->button_list->current->text) == 0)
 					game_state_change(game, game_state_preedit());
+				else if (SDL_strcmp(M_MENU_REPLAY, g_menu->button_list->current->text) == 0)
+				{
+					char* name = malloc(SDL_strlen("level1") + 1);
+					SDL_strlcpy(name, "level1", SDL_strlen("level1") + 1);
+					game_state_change(game, game_state_replay(name));
+				}
 				else if (SDL_strcmp(M_MENU_QUIT, g_menu->button_list->current->text) == 0)
 				{
 					game_state_exit(game);
@@ -80,17 +87,19 @@ bool process_input_play(struct game* game)
 				switch (event.key.keysym.sym) {
 				case SDLK_RIGHT:
 				case SDLK_d:
-					player_set_vel_x(&g_player, g_player.actor.speed);
+					g_player.action[ACTION_RIGHT] = true;
 					break;
 				case SDLK_LEFT:
 				case SDLK_a:
-					player_set_vel_x(&g_player, -g_player.actor.speed);
+					g_player.action[ACTION_LEFT] = true;
 					break;
+				case SDLK_DOWN:
 				case SDLK_s:
-					g_player.climb[0] = true;
+					g_player.action[ACTION_DOWN] = true;
 					break;
+				case SDLK_UP:
 				case SDLK_w:
-					g_player.climb[1] = true;
+					g_player.action[ACTION_UP] = true;
 					break;
 				case SDLK_t:
 					timer_reset(&g_timer);
@@ -103,7 +112,7 @@ bool process_input_play(struct game* game)
 						player_eat(&g_player);
 					break;
 				case SDLK_SPACE:
-					player_jump(&g_player, PLAYER_JUMP_INTENSITY);
+					g_player.action[ACTION_JUMP] = true;
 					break;
 				case SDLK_RETURN:
 					game_pause(game);
@@ -115,19 +124,23 @@ bool process_input_play(struct game* game)
 			case SDL_KEYUP:
 				switch (event.key.keysym.sym) {
 				case SDLK_RIGHT:
-				case SDLK_LEFT:
 				case SDLK_d:
+					g_player.action[ACTION_RIGHT] = false;
+					break;
+				case SDLK_LEFT:
 				case SDLK_a:
-					player_set_vel_x(&g_player, 0);
+					g_player.action[ACTION_LEFT] = false;
 					break;
 				case SDLK_ESCAPE:
 					game_state_reset(game);
 					break;
+				case SDLK_DOWN:
 				case SDLK_s:
-					g_player.climb[0]= false;
+					g_player.action[ACTION_DOWN] = false;
 					break;
+				case SDLK_UP:
 				case SDLK_w:
-					g_player.climb[1] = false;
+					g_player.action[ACTION_UP] = false;
 					break;
 				default:
 					break;
@@ -141,8 +154,10 @@ bool process_input_play(struct game* game)
 					// mouse pos
 					vec2 m_pos = { 0,0 };
 					SDL_GetMouseState(&m_pos.x, &m_pos.y);
-					float vel = m_pos.x > (g_player.actor.skeleton.x-g_camera.position.x) ? 7.f : -7.f;
-					missile_fire(&g_player, &vel, game->screen.renderer);
+					if (m_pos.x > (g_player.actor.skeleton.x - g_camera.position.x))
+						g_player.action[ACTION_SHOOT_RIGHT] = true;
+					else
+						g_player.action[ACTION_SHOOT_LEFT] = true;
 					break;
 				}
 				}
@@ -162,6 +177,24 @@ bool process_input_play(struct game* game)
 			if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN)
 				game_pause(game);
 		}
+	// Save the replay.
+	/*
+	ACTION_NONE,
+	ACTION_LEFT,
+	ACTION_RIGHT,
+	ACTION_UP,
+	ACTION_DOWN,
+	ACTION_JUMP,
+	ACTION_SHOOT_LEFT,
+	ACTION_SHOOT_RIGHT,*/
+	replay_save(g_player.action[ACTION_NONE]);
+	replay_save(g_player.action[ACTION_LEFT]);
+	replay_save(g_player.action[ACTION_RIGHT]);
+	replay_save(g_player.action[ACTION_UP]);
+	replay_save(g_player.action[ACTION_DOWN]);
+	replay_save(g_player.action[ACTION_JUMP]);
+	replay_save(g_player.action[ACTION_SHOOT_LEFT]);
+	replay_save(g_player.action[ACTION_SHOOT_RIGHT]);
 	return true;
 }
 
@@ -284,6 +317,32 @@ bool process_input_preplay(struct game* game)
 			}
 		}
 	}
+	return true;
+}
+
+bool process_input_replay(struct game* game)
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e) != 0)
+	{
+		if (e.type == SDL_QUIT)
+		{
+			game_state_reset(game);
+			game_state_exit(game);
+			return false;
+		}
+		else if (e.type == SDL_KEYDOWN)
+		{
+			if (e.key.keysym.sym == SDLK_ESCAPE)
+			{
+				// exit to main menu
+				game_state_reset(game);
+				return true;
+			}
+		}
+	}
+	// Read input from file.
+	replay_read_frame(g_player.action);
 	return true;
 }
 
@@ -523,6 +582,36 @@ bool process_input_edit(struct game* game)
 
 static void update_player(struct player* player, struct game* game)
 {
+	player_set_vel_x(&g_player, 0);
+	g_player.climb[0] = g_player.climb[1] = false;
+	if (player->action[ACTION_LEFT])
+		player_set_vel_x(&g_player, -g_player.actor.speed);
+	if(player->action[ACTION_RIGHT])
+		player_set_vel_x(&g_player, g_player.actor.speed);
+	
+	if(player->action[ACTION_DOWN])
+		g_player.climb[0] = true;
+	
+	if(player->action[ACTION_UP])
+		g_player.climb[1] = true;
+	
+	if (player->action[ACTION_JUMP])
+	{
+		player_jump(&g_player, PLAYER_JUMP_INTENSITY);
+		g_player.action[ACTION_JUMP] = false;
+	}
+	float vel = 7.f;
+	if (player->action[ACTION_SHOOT_RIGHT])
+	{
+		missile_fire(&g_player, &vel, game->screen.renderer);
+		player->action[ACTION_SHOOT_RIGHT] = false;
+	}
+	else if (player->action[ACTION_SHOOT_LEFT])
+	{
+		vel = -vel;
+		missile_fire(&g_player, &vel, game->screen.renderer);
+		player->action[ACTION_SHOOT_LEFT] = false;
+	}
 	player_gravity(player);
 	// Move him.
 	vec2 delta = {

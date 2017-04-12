@@ -35,6 +35,7 @@
     <ClCompile Include="src\object.c" />
     <ClCompile Include="src\path.c" />
     <ClCompile Include="src\render.c" />
+    <ClCompile Include="src\replay.c" />
     <ClCompile Include="src\sound.c" />
     <ClCompile Include="src\sprite.c" />
     <ClCompile Include="src\stack.c" />
@@ -63,6 +64,7 @@
     <ClInclude Include="src\includes\object.h" />
     <ClInclude Include="src\includes\physics.h" />
     <ClInclude Include="src\includes\render.h" />
+    <ClInclude Include="src\includes\replay.h" />
     <ClInclude Include="src\includes\sound.h" />
     <ClInclude Include="src\includes\sprite.h" />
     <ClInclude Include="src\includes\stack.h" />

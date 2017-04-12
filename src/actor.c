@@ -226,6 +226,10 @@ void player_init(struct player *player, const char* name, const vec2 spawn, cons
 	player->actor.hitpoints = PLAYER_DEFAULT_HP;
 	player->climb[0] = player->climb[1] = false;
 	player->collect = 0;
+	for (size_t i = 0; i < ACTION_COUNT; ++i)
+	{
+		player->action[i] = false;
+	}
 }
 
 void player_destroy(struct player *player)

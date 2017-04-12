@@ -8,6 +8,7 @@
 
 #define M_MENU_PLAY "PLAY"
 #define M_MENU_EDIT "EDITOR"
+#define M_MENU_REPLAY "REPLAY"
 #define M_MENU_QUIT "QUIT"
 
 #define MENU_OK "OK"

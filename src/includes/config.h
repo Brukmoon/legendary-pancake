@@ -23,6 +23,7 @@
 #define IMG_PATH DATA_PATH##"gfx/"
 #define SOUND_PATH DATA_PATH##"sfx/"
 #define LEVEL_PATH DATA_PATH##"level/"
+#define REPLAY_PATH DATA_PATH##"replay/"
 
 // good monospace font
 #define FONT_TYPE "OpenSans-Regular.ttf"

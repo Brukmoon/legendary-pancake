@@ -9,6 +9,7 @@
 #include "game.h"
 #include "input.h"
 #include "level.h"
+#include "replay.h"
 #include "sound.h"
 #include "sprite.h"
 #include "timer.h"
@@ -26,6 +27,7 @@ static bool to_main_menu_state(SDL_Renderer* game, char*);
 static void from_main_menu_state(void);
 static bool to_edit_state(SDL_Renderer* game, const char* level_name);
 static void from_edit_state(void);
+static bool to_replay_state(SDL_Renderer* game, const char *replay_name);
 // choose level
 static bool to_preplay_state(SDL_Renderer *renderer, char* unused);
 // choose mode
@@ -35,6 +37,7 @@ static bool game_set_pause(struct game *game, bool yesno)
 {
 	// Also pause music.
 	music_set_pause(yesno);
+	timer_set_pause(&g_timer, yesno);
 	return game->paused = yesno;
 }
 
@@ -226,6 +229,10 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 		texture_add(IMG_PATH"arrow.png", renderer);
 		sprite_add("arrow", IMG_PATH"arrow.png", (SDL_Rect) { 0, 0, 32, 32 });
 	}
+	if(game_mode == MODE_REPLAY)
+		replay_open_read(g_level->name);
+	else
+		replay_open_write(g_level->name);
 	// start timer again
 	timer_reset(&g_timer);
 	// window-system-specific cursor is hidden in the playstate
@@ -239,6 +246,7 @@ static bool to_play_state(SDL_Renderer *renderer, const char *level_name)
 
 static void from_play_state(void)
 {
+ 	replay_close();
 	/*
 	* For now, we keep audio and graphics intact, because of frequent animation and sound reuse.
 	* This can be changed easily, just call audio_destroy.
@@ -287,6 +295,13 @@ static bool to_preplay_state(SDL_Renderer *renderer, char* unused)
 	preplay_menu_load(renderer);
 	music_play("menu", 4000);
 	INFO("> Preedit menu opened.");
+	return true;
+}
+
+static bool to_replay_state(SDL_Renderer* renderer, const char *replay_name)
+{
+	game_mode = MODE_REPLAY;
+	to_play_state(renderer, replay_name);
 	return true;
 }
 
@@ -385,6 +400,25 @@ struct game_state *game_state_preedit(void)
 	preedit->next = NULL;
 
 	return preedit;
+}
+
+struct game_state *game_state_replay(char *replay_name)
+{
+	struct game_state *replay = malloc(sizeof(struct game_state));
+
+	replay->id = GAME_STATE_REPLAY;
+	replay->state_param = replay_name;
+
+	replay->enter = to_replay_state;
+	replay->exit = from_play_state;
+
+	replay->draw = render_play;
+	replay->process_input = process_input_replay;
+	replay->update = update_play;
+
+	replay->next = NULL;
+
+	return replay;
 }
 
 struct game_state *game_state_preplay(void)

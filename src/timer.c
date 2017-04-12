@@ -15,6 +15,7 @@ void timer_reset(struct timer *t)
 
 int timer_ticks(struct timer *t)
 {
+	// TODO: Fix pausing.
 	if (!t->paused)
 	{
 		t->delta = SDL_GetTicks() - t->last_tick_time;

@@ -15,6 +15,7 @@ bool process_input_edit(struct game* game);
 bool process_input_preedit(struct game* game);
 bool process_input_preplay(struct game* game);
 bool process_input_mode(struct game* game);
+bool process_input_replay(struct game* game);
 
 // Update the game.
 void update_menu(struct game* game);

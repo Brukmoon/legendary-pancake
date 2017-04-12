@@ -62,6 +62,19 @@ enum player_settings
 	PLAYER_CLIMB_SPEED = 6
 };
 
+enum player_action
+{
+	ACTION_NONE,
+	ACTION_LEFT,
+	ACTION_RIGHT,
+	ACTION_UP,
+	ACTION_DOWN,
+	ACTION_JUMP,
+	ACTION_SHOOT_LEFT,
+	ACTION_SHOOT_RIGHT,
+	ACTION_COUNT
+};
+
 // special case of an actor.
 struct player // : public actor;
 {
@@ -71,6 +84,7 @@ struct player // : public actor;
 	// how many collectables has he collected?
 	// TODO: Move into backpack struct.
 	Uint8 collect;
+	bool action[ACTION_COUNT];
 };
 
 // @anim_name: which animation table file to load?

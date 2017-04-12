@@ -73,6 +73,9 @@
     <ClCompile Include="src\path.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\replay.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -165,6 +168,9 @@
       <Filter>Core\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\includes\path.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\includes\replay.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
