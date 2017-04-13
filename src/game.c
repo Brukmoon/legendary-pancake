@@ -1,3 +1,4 @@
+#include <SDL_image.h>
 #include <SDL_mixer.h>
 
 #include "actor.h"
@@ -19,6 +20,7 @@
 static void SDL_version_info(void);
 // Outputs state stack.
 static void state_stack_print(const struct game *game);
+static void window_set_icon(SDL_Window* window, const char* icon_name);
 
 // State transitions.
 static bool to_play_state(SDL_Renderer* game, const char *level_name);
@@ -65,6 +67,7 @@ bool game_init(struct game* game, struct game_screen* screen)
 			if (screen->renderer)
 			{
 				INFO("Renderer activated.");
+				window_set_icon(screen->window, ICON_PATH);
 				// Stereo, high frequency, low latency.
 				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) != -1)
 				{
@@ -195,6 +198,18 @@ bool game_pause(struct game *game)
 { 
 	INFO("Game paused: %s", game->paused ? "FALSE" : "TRUE");
 	return game_set_pause(game, !game->paused); 
+}
+
+static void window_set_icon(SDL_Window* window, const char* icon_name)
+{
+	SDL_Surface* icon = IMG_Load(icon_name);
+	if (icon)
+	{
+		SDL_SetWindowIcon(window, icon);
+		SDL_FreeSurface(icon);
+	}
+	else
+		INFO("Window icon couldn't be loaded.");
 }
 
 static bool to_play_state(SDL_Renderer *renderer, const char *level_name)

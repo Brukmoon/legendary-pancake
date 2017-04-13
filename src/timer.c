@@ -3,6 +3,8 @@
 #include "timer.h"
 #include "text.h"
 
+#include "common.h"
+
 void timer_reset(struct timer *t)
 {
 	t->paused = false;
@@ -15,10 +17,12 @@ void timer_reset(struct timer *t)
 
 int timer_ticks(struct timer *t)
 {
+	t->delta = SDL_GetTicks() - t->last_tick_time;
 	// TODO: Fix pausing.
-	if (!t->paused)
+	if (t->paused)
 	{
-		t->delta = SDL_GetTicks() - t->last_tick_time;
+		t->last_tick_time += t->delta;
+		t->delta = 0;
 	}
 	return t->delta;
 }

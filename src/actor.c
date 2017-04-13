@@ -71,12 +71,14 @@ bool actor_can_shoot(const struct actor* actor)
 
 static bool actor_can_climb(struct actor const* actor)
 {
+	// check if there is ladder collision
 	return tilemap_collision(g_level, &actor->skeleton, LADDER_COLLISION);
 }
 
 void actor_destroy(struct actor *actor)
 {
 	free(actor->name);
+	actor->name = NULL;
 	animation_table_destroy(&actor->anim);
 }
 
@@ -347,10 +349,7 @@ void enemy_destroy(struct enemy* enemy)
 
 void enemy_draw(struct player const* enemy, SDL_Renderer* renderer)
 {
-	if (enemy->actor.is_visible)
-	{
-		actor_draw(&enemy->actor, 0, renderer);
-	}
+	actor_draw(&enemy->actor, 0, renderer);
 }
 
 void enemy_load(char const* name, char const* anim_name, vec2 const spawn, vec2 const goal, enum enemy_type t, SDL_Renderer *renderer)
