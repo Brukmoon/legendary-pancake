@@ -106,10 +106,10 @@ void player_eat(struct player* player);
 // Cause damage to the player.
 void player_damage(struct player *player, Uint16 const damage);
 
-inline void player_set_spawn(struct player *player, vec2 const spawn) { player->actor.spawn = spawn; }
+void player_set_spawn(struct player *player, vec2 const spawn);
 // Set player velocity to vel.
-inline void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }
-inline void player_set_vel_y(struct player *player, float vel) { player->actor.velocity.y = vel; }
+void player_set_vel_x(struct player *player, float vel);
+void player_set_vel_y(struct player *player, float vel);
 
 extern struct player g_player;
 

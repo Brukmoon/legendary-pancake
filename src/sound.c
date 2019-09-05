@@ -81,14 +81,14 @@ void music_add(const char *name, const char* type)
 	size_t str_len = SDL_strlen(name) + 1;
 	new_bucket->key = malloc(str_len);
 	// Copy name to the new bucket.
-	strcpy_s(new_bucket->key, str_len, name);
+	strncpy(new_bucket->key, name, str_len);
 	// Create buffer, put path to data folder inside.
 	size_t name_buffer_length = SDL_strlen(SOUND_PATH) + SDL_strlen(name) + SDL_strlen(type) + 1;
 	char *name_buffer = malloc(name_buffer_length);
-	strcpy_s(name_buffer, name_buffer_length, SOUND_PATH);
+	strncpy(name_buffer, SOUND_PATH, name_buffer_length);
 	// Append file name and type.
-	strcat_s(name_buffer, name_buffer_length, name);
-	strcat_s(name_buffer, name_buffer_length, type);
+	strncat(name_buffer, name, name_buffer_length);
+	strncat(name_buffer, type, name_buffer_length);
 	// Load music.
 	new_bucket->music = Mix_LoadMUS(name_buffer);
 	struct music_bucket* iter = music_container.music[index], *prev = NULL;
@@ -144,14 +144,14 @@ void sound_add(const char* name, const char* type)
 	size_t str_len = SDL_strlen(name) + 1;
 	new_bucket->key = malloc(str_len);
 	// Copy name to the new bucket.
-	strcpy_s(new_bucket->key, str_len, name);
+	strncpy(new_bucket->key, name, str_len);
 	// Create buffer, put name inside.
 	size_t name_buffer_length = SDL_strlen(SOUND_PATH) + SDL_strlen(name) + SDL_strlen(type) + 1;
 	char *name_buffer = malloc(name_buffer_length);
-	strcpy_s(name_buffer, name_buffer_length, SOUND_PATH);
+	strncpy(name_buffer, SOUND_PATH, name_buffer_length);
 	// Append file name and type.
-	strcat_s(name_buffer, name_buffer_length, name);
-	strcat_s(name_buffer, name_buffer_length, type);
+	strncat(name_buffer, name, name_buffer_length);
+	strncat(name_buffer, type, name_buffer_length);
 	// Load music.
 	new_bucket->sound = Mix_LoadWAV(name_buffer);
 	if (!new_bucket->sound)

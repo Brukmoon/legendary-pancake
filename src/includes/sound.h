@@ -1,6 +1,8 @@
 #ifndef SOUND_H
 #define SOUND_H
 
+#include <stdbool.h>
+
 // Load sound name.type into audio container.
 void music_add(const char* name, const char* type);
 void sound_add(const char* name, const char* type);

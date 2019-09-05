@@ -37,7 +37,7 @@ bool level_load(const char *name, SDL_Renderer *renderer)
 	}
 	level_init(&g_level);
 	char buffer[BUFFER_SIZE];
-	sprintf_s(buffer, BUFFER_SIZE, LEVEL_PATH"%s.level", name);
+	snprintf(buffer, BUFFER_SIZE, LEVEL_PATH"%s.level", name);
 	if (level_load_data(g_level, renderer, buffer))
 	{
 		INFO("Level %s loaded.", name);
@@ -59,28 +59,28 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 	FILE *f = NULL;
 	char buffer[BUFFER_SIZE], 
 		command[21]; // A command can be 20 characters long (+ '\0').
-	fopen_s(&f, file_name, "r");
+	f = fopen(file_name, "r");
 	if (f != NULL) {
 		while (!feof(f)) {
 			fgets(buffer, BUFFER_SIZE, f);
 			// Parse first string and ignore everything else except a newline.
-			sscanf_s(buffer, "%s%*[^\n]", command, 21);
+			sscanf(buffer, "%s%*[^\n]", command);
 			if (SDL_strcmp(command, "NAME") == 0)
 			{
 				// Name of the level.
-				sscanf_s(buffer, "%*s%s", level->name, LEVEL_NAME_LENGTH);
+				sscanf(buffer, "%*s%s", level->name);
 				INFO("name! %s", level->name);
 			}
 			else if (SDL_strcmp(command, "GOAL") == 0)
 			{
 				// Name of the level.
-				sscanf_s(buffer, "%*s%d%d%s", &level->goal.x, &level->goal.y, level->next, LEVEL_NAME_LENGTH);
+				sscanf(buffer, "%*s%d%d%s", &level->goal.x, &level->goal.y, level->next);
 				INFO("next! %s", level->next);
 			}
 			else if (SDL_strcmp(command, "MAP") == 0)
 			{
 				// Level width and height.
-				sscanf_s(buffer, "%*s%d%d", &level->tile_map.width, &level->tile_map.height);
+				sscanf(buffer, "%*s%d%d", &level->tile_map.width, &level->tile_map.height);
 				INFO("width! %d\nheight! %d", level->tile_map.width, level->tile_map.height);
 				// Load the grid.
 				level_load_tilemap(level, f);
@@ -89,7 +89,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			{
 				// Path to the spritesheet.
 				char name[BUFFER_SIZE];
-				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
+				sscanf(buffer, "%*s%s", name);
 				level->tileset = load_texture(renderer, name);
 				if (!level->tileset)
 				{
@@ -103,7 +103,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			else if (SDL_strcmp(command, "BACKGROUND") == 0)
 			{
 				char name[BUFFER_SIZE];
-				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
+				sscanf(buffer, "%*s%s", name);
 				g_level->background = load_texture(renderer, name);
 				if (!g_level->background)
 				{
@@ -117,7 +117,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			else if (SDL_strcmp(command, "D_BACKGROUND") == 0)
 			{
 				char name[BUFFER_SIZE];
-				sscanf_s(buffer, "%*s%s", name, BUFFER_SIZE);
+				sscanf(buffer, "%*s%s", name);
 				g_level->d_background = load_texture(renderer, name);
 				if (!g_level->d_background)
 				{
@@ -129,7 +129,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			}
 			else if (SDL_strcmp(command, "TILE") == 0)
 			{
-				sscanf_s(buffer, "%*s%d", &level->tile_map.tile_width);
+				sscanf(buffer, "%*s%d", &level->tile_map.tile_width);
 				level->tile_map.tile_height = level->tile_map.tile_width;
 				INFO("TILE loaded.");
 				INFO("tilewidth! %d", level->tile_map.tile_width);
@@ -139,14 +139,14 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 			{
 				char name[BUFFER_SIZE];
 				vec2 spawn = { 0, 0 };
-				sscanf_s(buffer, "%*s%s%d%d", name, BUFFER_SIZE, &spawn.x, &spawn.y);
+				sscanf(buffer, "%*s%s%d%d", name, &spawn.x, &spawn.y);
 				player_init(&g_player, "player", spawn, name, renderer);
 			}
 			else if (SDL_strcmp(command, "OBJECT") == 0)
 			{
 				char name[BUFFER_SIZE];
 				SDL_Rect skeleton = { 0, 0 };
-				sscanf_s(buffer, "%*s%s%d%d%d%d", name, BUFFER_SIZE, &skeleton.x, &skeleton.y, &skeleton.w, &skeleton.h);
+				sscanf(buffer, "%*s%s%d%d%d%d", name, &skeleton.x, &skeleton.y, &skeleton.w, &skeleton.h);
 				object_add(name, skeleton, renderer);
 			}
 			else if (SDL_strcmp(command, "ENEMY") == 0)
@@ -154,7 +154,7 @@ bool level_load_data(struct level *level, SDL_Renderer *renderer, const char* fi
 				char name[BUFFER_SIZE], type[BUFFER_SIZE];
 				vec2 spawn = { 0, 0 };
 				vec2 goal = { 0, 0 };
-				sscanf_s(buffer, "%*s%s%s%d%d%d%d", name, BUFFER_SIZE, type, BUFFER_SIZE, &spawn.x, &spawn.y, &goal.x, &goal.y);
+				sscanf(buffer, "%*s%s%s%d%d%d%d", name, type, &spawn.x, &spawn.y, &goal.x, &goal.y);
 				if(SDL_strcmp(type, "patrol") == 0)
 					enemy_load(name, name, spawn, goal, PATROL, renderer);
 				else if (SDL_strcmp(type, "raider") == 0)
@@ -229,7 +229,7 @@ bool level_load_tilemap(struct level *level, FILE *f)
 	level_alloc_grid(level);
 	for (int i = 0; i < level->tile_map.height; ++i)
 		for (int j = 0; j < level->tile_map.width; ++j)
-			fscanf_s(f, "%d:%d", &level->tile_map.map[TMAP_TEXTURE_LAYER][i][j], &level->tile_map.map[TMAP_COLLISION_LAYER][i][j]);
+			fscanf(f, "%d:%d", &level->tile_map.map[TMAP_TEXTURE_LAYER][i][j], &level->tile_map.map[TMAP_COLLISION_LAYER][i][j]);
 #ifdef _DEBUG
 	INFO("Map grid: ");
 	for (int i = 0; i < level->tile_map.height; ++i)
@@ -284,7 +284,7 @@ bool level_save()
 	SDL_strlcat(file_name, g_level->name, LEVEL_NAME_LENGTH + 7);
 	SDL_strlcat(file_name, ".level", LEVEL_NAME_LENGTH + 7);
 	FILE *f = NULL;
-	fopen_s(&f, file_name, "w");
+	f = fopen( file_name, "w");
 	if (!f)
 	{
 		ERROR("Couldn't open file %s.", file_name);
@@ -309,4 +309,9 @@ bool level_save()
 	INFO("Saving level to file %s.", file_name);
 	fclose(f);
 	return true;
+}
+
+vec2 real_to_map(coord x, coord y)
+{
+	return (vec2) { (int)x / g_level->tile_map.tile_width, (int)y / g_level->tile_map.tile_height };
 }

@@ -8,3 +8,5 @@ unsigned long hash_s(const char *str)
 		hash = ((hash << 5) + hash) + c;
 	return hash;
 }
+
+int hash_i ( int key ) { return key; }

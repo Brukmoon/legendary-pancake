@@ -46,7 +46,7 @@ bool game_init(struct game* game, struct game_screen* screen);
 // Clean the resources. After calling this function, calling any engine function will probably result in an error. 
 void game_clean(struct game_screen *screen);
 // Is the game running?
-inline bool game_running(const struct game *game) { return game->run; }
+bool game_running(const struct game *game); 
 // Set game paused.
 bool game_pause(struct game *game);
 

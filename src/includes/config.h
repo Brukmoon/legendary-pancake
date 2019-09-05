@@ -20,11 +20,11 @@
 //#define SCREEN_HEIGHT 1080
 
 #define DATA_PATH "./assets/"
-#define IMG_PATH DATA_PATH##"gfx/"
-#define SOUND_PATH DATA_PATH##"sfx/"
-#define LEVEL_PATH DATA_PATH##"level/"
-#define REPLAY_PATH DATA_PATH##"replay/"
-#define ICON_PATH IMG_PATH##"panda_icon.png"
+#define IMG_PATH DATA_PATH"gfx/"
+#define SOUND_PATH DATA_PATH"sfx/"
+#define LEVEL_PATH DATA_PATH"level/"
+#define REPLAY_PATH DATA_PATH"replay/"
+#define ICON_PATH IMG_PATH"panda_icon.png"
 // good monospace font
 #define FONT_TYPE "OpenSans-Regular.ttf"
 #define FONT_FILE DATA_PATH FONT_TYPE

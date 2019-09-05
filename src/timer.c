@@ -26,3 +26,5 @@ int timer_ticks(struct timer *t)
 	}
 	return t->delta;
 }
+
+void timer_set_pause(struct timer *t, bool yesno) { t->paused = yesno; }

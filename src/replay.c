@@ -20,7 +20,7 @@ bool replay_open_write(const char* level_name)
 	SDL_strlcat(replay, "replay_", replay_length);
 	SDL_strlcat(replay, level_name, replay_length);
 	SDL_strlcat(replay, ".log", replay_length);
-	fopen_s(&g_replay.f, replay, "w");
+	g_replay.f = fopen(replay, "w");
 	free(replay);
 	if (!g_replay.f)
 		return false;
@@ -40,7 +40,7 @@ bool replay_open_read(const char* level_name)
 	SDL_strlcat(replay, "replay_", replay_length);
 	SDL_strlcat(replay, level_name, replay_length);
 	SDL_strlcat(replay, ".log", replay_length);
-	fopen_s(&g_replay.f, replay, "r");
+	g_replay.f = fopen(replay, "r");
 	free(replay);
 	g_replay.curr_position = 0;
 	if (!g_replay.f)

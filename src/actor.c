@@ -569,3 +569,8 @@ void enemy_spawn(struct enemy* enemy)
 	enemy->current = enemy->path;
 	enemy->is_spawned = true;
 }
+
+void player_set_spawn(struct player *player, vec2 const spawn) { player->actor.spawn = spawn; }
+// Set player velocity to vel.
+void player_set_vel_x(struct player *player, float vel) { player->actor.velocity.x = vel; }
+void player_set_vel_y(struct player *player, float vel) { player->actor.velocity.y = vel; }

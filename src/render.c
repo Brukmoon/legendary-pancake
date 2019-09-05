@@ -102,31 +102,31 @@ static void render_debug_console(SDL_Renderer* const renderer)
 	// renderer
 	SDL_RendererInfo rendererInfo;
 	SDL_GetRendererInfo(renderer, &rendererInfo);
-	sprintf_s(buffer, 50, "Graphics API: %s %d x %d", rendererInfo.name, SCREEN_WIDTH, SCREEN_HEIGHT);
+	snprintf(buffer, 50, "Graphics API: %s %d x %d", rendererInfo.name, SCREEN_WIDTH, SCREEN_HEIGHT);
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 0 }, renderer);
 	// coordinates
-	sprintf_s(buffer, 50, "Player coordinates: [%d;%d]", g_player.actor.skeleton.x, g_player.actor.skeleton.y);
+	snprintf(buffer, 50, "Player coordinates: [%d;%d]", g_player.actor.skeleton.x, g_player.actor.skeleton.y);
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 12 }, renderer);
 	// speed
-	sprintf_s(buffer, 50, "Player speed: [%f;%f]", g_player.actor.velocity.x, g_player.actor.velocity.y);
+	snprintf(buffer, 50, "Player speed: [%f;%f]", g_player.actor.velocity.x, g_player.actor.velocity.y);
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 24 }, renderer);
 	// player animation
-	sprintf_s(buffer, 50, "Player animation state: %s", g_player.actor.anim.curr->name);
+	snprintf(buffer, 50, "Player animation state: %s", g_player.actor.anim.curr->name);
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 36 }, renderer);
 	// state
 	switch (g_player.actor.state)
 	{
 	case AIR:
-		sprintf_s(buffer, 50, "AIR");
+		snprintf(buffer, 50, "AIR");
 		break;
 	case GROUND:
-		sprintf_s(buffer, 50, "GROUND");
+		snprintf(buffer, 50, "GROUND");
 		break;
 	case LADDER:
-		sprintf_s(buffer, 50, "LADDER");
+		snprintf(buffer, 50, "LADDER");
 		break;
 	default:
-		sprintf_s(buffer, 50, "Unknown");
+		snprintf(buffer, 50, "Unknown");
 		break;
 	}
 	draw_text(buffer, 12, (SDL_Color) { 0, 0, 0 }, (vec2) { 0, 48 }, renderer);

@@ -36,9 +36,5 @@ extern struct level
 	SDL_Texture* d_background;
 } *g_level;
 
-inline vec2 real_to_map(coord x, coord y)
-{
-	return (vec2) { (int)x / g_level->tile_map.tile_width, (int)y / g_level->tile_map.tile_height };
-}
-
+vec2 real_to_map(coord x, coord y);
 #endif // LEVEL_H

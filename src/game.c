@@ -491,3 +491,8 @@ struct game_state *game_state_edit(char *level_name)
 
 	return edit;
 }
+
+bool game_running(const struct game *game) 
+{
+	return game->run;
+}

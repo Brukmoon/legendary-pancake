@@ -14,7 +14,7 @@ struct timer
 	SDL_Texture* time;
 } g_timer;
 
-inline void timer_set_pause(struct timer *t, bool yesno) { t->paused = yesno; }
+void timer_set_pause(struct timer *t, bool yesno); 
 void timer_reset(struct timer *t);
 int timer_ticks(struct timer *t);
 

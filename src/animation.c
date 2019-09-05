@@ -74,7 +74,7 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 	SDL_strlcat(file_name, name, s);
 	SDL_strlcat(file_name, ".an", s);
 	FILE* f = NULL;
-	fopen_s(&f, file_name, "r");
+	f = fopen(file_name, "r");
 	if (f != NULL)
 	{
 		char buffer[BUFFER_SIZE], command[MAX_COMM_LENGTH], texture_name[MAX_AN_LENGTH];
@@ -84,12 +84,12 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 		{
 			fgets(buffer, BUFFER_SIZE, f);
 			// Parse first string and ignore everything else except a newline.
-			sscanf_s(buffer, "%s%*[^\n]", command, 21);
+			sscanf(buffer, "%s%*[^\n]", command);
 			if (SDL_strcmp(command, "ANIMATION") == 0)
 			{
 				char animation_name[MAX_AN_LENGTH];
 				unsigned delay = 0;
-				sscanf_s(buffer, "%*s%s%d", animation_name, MAX_AN_LENGTH, &delay);
+				sscanf(buffer, "%*s%s%d", animation_name, &delay);
 				animation_create(&a, animation_name, &delay);
 				INFO("< Loading animation %s", animation_name);
 			}
@@ -103,14 +103,14 @@ void animation_table_load(const char* name, struct animation_table* t, SDL_Rende
 			{
 				SDL_Rect r = { 0, 0, 0, 0 };
 				char sprite_name[MAX_AN_LENGTH];
-				sscanf_s(buffer, "%*s%s%d%d%d%d", sprite_name, MAX_AN_LENGTH, &r.x, &r.y, &r.w, &r.h);
+				sscanf(buffer, "%*s%s%d%d%d%d", sprite_name, &r.x, &r.y, &r.w, &r.h);
 				// INFO("Loading frame %s [%d;%d]", sprite_name, r.x, r.y);
 				sprite_add(sprite_name, texture_name, r);
 				frame_add(a, sprite_name);
 			}
 			else if (SDL_strcmp(command, "TEXTURE") == 0)
 			{
-				sscanf_s(buffer, "%*s%s", texture_name, MAX_AN_LENGTH);
+				sscanf(buffer, "%*s%s", texture_name);
 				texture_add(texture_name, renderer);
 			}
 		}
